@@ -85,9 +85,9 @@
 
 using namespace boost::adaptors;
 
-#include <opc/ua/client/client.h>
-#include <opc/ua/node.h>
-#include <opc/ua/subscription.h>
+//#include <opc/ua/client/client.h>
+//#include <opc/ua/node.h>
+//#include <opc/ua/subscription.h>
 #include <opc/common/logger.h>
 
 #include "libxl.h"
