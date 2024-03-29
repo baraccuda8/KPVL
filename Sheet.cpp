@@ -171,65 +171,120 @@ void AddHistoriSheet(bool begin)
 std::string FilterComand = "SELECT * FROM sheet ORDER BY create_at DESC;";
 
 namespace {
-    int Col_Sheet_id = 0;
-    int Col_Sheet_create_at = 0;
-    int Col_Sheet_start_at = 0;
-    int Col_Sheet_datatime_end = 0;
-    int Col_Sheet_datatime_all = 0;
-    int Col_Sheet_alloy = 0;
-    int Col_Sheet_thikness = 0;
-    int Col_Sheet_melt = 0;
-    int Col_Sheet_partno = 0;
-    int Col_Sheet_pack = 0;
-    int Col_Sheet_sheet = 0;
-    int Col_Sheet_temper = 0;
-    int Col_Sheet_speed = 0;
+    enum{
+        Col_Sheet_id = 0,
+        Col_Sheet_create_at = 1,
+        Col_Sheet_start_at = 2,
+        Col_Sheet_datatime_end = 3,
+        Col_Sheet_pos = 4,
+        Col_Sheet_datatime_all,
+        Col_Sheet_alloy,
+        Col_Sheet_thikness,
+        Col_Sheet_melt,
+        Col_Sheet_slab,
+        Col_Sheet_partno,
+        Col_Sheet_pack,
+        Col_Sheet_sheet,
+        Col_Sheet_subsheet,
+        Col_Sheet_temper,
+        Col_Sheet_speed,
+        Col_Sheet_za_pt3,
+        Col_Sheet_za_te3,
+        Col_Sheet_lampresstop,
+        Col_Sheet_lampressbot,
+        Col_Sheet_posclapantop,
+        Col_Sheet_posclapanbot,
+        Col_Sheet_mask,
+        Col_Sheet_lam1posclapantop,
+        Col_Sheet_lam1posclapanbot,
+        Col_Sheet_lam2posclapantop,
+        Col_Sheet_lam2posclapanbot,
+        Col_Sheet_lam_te1,
+        Col_Sheet_news,
+        Col_Sheet_top1,
+        Col_Sheet_top2,
+        Col_Sheet_top3,
+        Col_Sheet_top4,
+        Col_Sheet_top5,
+        Col_Sheet_top6,
+        Col_Sheet_top7,
+        Col_Sheet_top8,
+        Col_Sheet_bot1,
+        Col_Sheet_bot2,
+        Col_Sheet_bot3,
+        Col_Sheet_bot4,
+        Col_Sheet_bot5,
+        Col_Sheet_bot6,
+        Col_Sheet_bot7,
+        Col_Sheet_bot8,
+        Col_Sheet_day,
+        Col_Sheet_month,
+        Col_Sheet_year,
+        Col_Sheet_cassetteno,
+        Col_Sheet_sheetincassette,
+        Col_Sheet_timeforplateheat,
+        Col_Sheet_prestostartcomp,
+    };
 
-    int Col_Sheet_za_pt3 = 0;
-    int Col_Sheet_za_te3 = 0;
-
-    int Col_Sheet_lampresstop = 0;
-    int Col_Sheet_lampressbot = 0;
-    int Col_Sheet_posclapantop = 0;
-    int Col_Sheet_posclapanbot = 0;
-    int Col_Sheet_mask = 0;
-
-    int Col_Sheet_lam1posclapantop = 0;
-    int Col_Sheet_lam1posclapanbot = 0;
-    int Col_Sheet_lam2posclapantop = 0;
-    int Col_Sheet_lam2posclapanbot = 0;
-
-    int Col_Sheet_lam_te1 = 0;
-    int Col_Sheet_news = 0;
-    int Col_Sheet_top1 = 0;
-    int Col_Sheet_top2 = 0;
-    int Col_Sheet_top3 = 0;
-    int Col_Sheet_top4 = 0;
-    int Col_Sheet_top5 = 0;
-    int Col_Sheet_top6 = 0;
-    int Col_Sheet_top7 = 0;
-    int Col_Sheet_top8 = 0;
-
-    int Col_Sheet_bot1 = 0;
-    int Col_Sheet_bot2 = 0;
-    int Col_Sheet_bot3 = 0;
-    int Col_Sheet_bot4 = 0;
-    int Col_Sheet_bot5 = 0;
-    int Col_Sheet_bot6 = 0;
-    int Col_Sheet_bot7 = 0;
-    int Col_Sheet_bot8 = 0;
-
-    int Col_Sheet_day = 0;
-    int Col_Sheet_month = 0;
-    int Col_Sheet_year = 0;
-    int Col_Sheet_cassetteno = 0;
-    int Col_Sheet_sheetincassette = 0;
-    int Col_Sheet_pos = 0;
-
-    int Col_Sheet_timeforplateheat = 0;
-    int Col_Sheet_prestostartcomp = 0;
-    int Col_Sheet_slab = 0;
-    int Col_Sheet_subsheet = 0;
+    //int Col_Sheet_id = 0;
+    //int Col_Sheet_create_at = 0;
+    //int Col_Sheet_start_at = 0;
+    //int Col_Sheet_datatime_end = 0;
+    //int Col_Sheet_datatime_all = 0;
+    //int Col_Sheet_alloy = 0;
+    //int Col_Sheet_thikness = 0;
+    //int Col_Sheet_melt = 0;
+    //int Col_Sheet_partno = 0;
+    //int Col_Sheet_pack = 0;
+    //int Col_Sheet_sheet = 0;
+    //int Col_Sheet_temper = 0;
+    //int Col_Sheet_speed = 0;
+    //
+    //int Col_Sheet_za_pt3 = 0;
+    //int Col_Sheet_za_te3 = 0;
+    //
+    //int Col_Sheet_lampresstop = 0;
+    //int Col_Sheet_lampressbot = 0;
+    //int Col_Sheet_posclapantop = 0;
+    //int Col_Sheet_posclapanbot = 0;
+    //int Col_Sheet_mask = 0;
+    //
+    //int Col_Sheet_lam1posclapantop = 0;
+    //int Col_Sheet_lam1posclapanbot = 0;
+    //int Col_Sheet_lam2posclapantop = 0;
+    //int Col_Sheet_lam2posclapanbot = 0;
+    //
+    //int Col_Sheet_lam_te1 = 0;
+    //int Col_Sheet_news = 0;
+    //int Col_Sheet_top1 = 0;
+    //int Col_Sheet_top2 = 0;
+    //int Col_Sheet_top3 = 0;
+    //int Col_Sheet_top4 = 0;
+    //int Col_Sheet_top5 = 0;
+    //int Col_Sheet_top6 = 0;
+    //int Col_Sheet_top7 = 0;
+    //int Col_Sheet_top8 = 0;
+    //
+    //int Col_Sheet_bot1 = 0;
+    //int Col_Sheet_bot2 = 0;
+    //int Col_Sheet_bot3 = 0;
+    //int Col_Sheet_bot4 = 0;
+    //int Col_Sheet_bot5 = 0;
+    //int Col_Sheet_bot6 = 0;
+    //int Col_Sheet_bot7 = 0;
+    //int Col_Sheet_bot8 = 0;
+    //
+    //int Col_Sheet_day = 0;
+    //int Col_Sheet_month = 0;
+    //int Col_Sheet_year = 0;
+    //int Col_Sheet_cassetteno = 0;
+    //int Col_Sheet_sheetincassette = 0;
+    //int Col_Sheet_pos = 0;
+    //
+    //int Col_Sheet_timeforplateheat = 0;
+    //int Col_Sheet_prestostartcomp = 0;
+    //int Col_Sheet_slab = 0;
+    //int Col_Sheet_subsheet = 0;
 }
 
 DLLRESULT FilterSheet()
@@ -312,84 +367,84 @@ DLLRESULT FilterSheet()
     //    }
     //}
 
-    if(Col_Sheet_prestostartcomp == 0)
-    {
-        std::string connand = "SELECT * FROM sheet WHERE id <= 1";
-        PGresult* res = conn_kpvl.PGexec(connand);
-        if(PQresultStatus(res) == PGRES_TUPLES_OK)
-        {
-            int line = PQntuples(res);
-            int nFields = PQnfields(res);
-
-            for(int position = 0; position < nFields; position++)
-            {
-                std::string column =  utf8_to_cp1251(PQfname(res, position));
-
-                //std::string column = conn_kpvl.PGgetvalue(res, l, 0);
-                //int position = atoi(conn_kpvl.PGgetvalue(res, l, 1).c_str());
-
-                if("create_at" == column)Col_Sheet_create_at = position;
-                else if("pos" == column)Col_Sheet_pos = position;
-                else if("id" == column)Col_Sheet_id = position;
-                else if("datatime_end" == column)Col_Sheet_datatime_end = position;
-                else if("datatime_all" == column)Col_Sheet_datatime_all = position;
-                else if("alloy" == column)Col_Sheet_alloy = position;
-                else if("thikness" == column)Col_Sheet_thikness = position;
-                else if("melt" == column)Col_Sheet_melt = position;
-                else if("slab" == column)Col_Sheet_slab = position;
-                else if("partno" == column)Col_Sheet_partno = position;
-                else if("pack" == column)Col_Sheet_pack = position;
-                else if("sheet" == column)Col_Sheet_sheet = position;
-                else if("subsheet" == column)Col_Sheet_subsheet = position;
-                else if("temper" == column)Col_Sheet_temper = position;
-                else if("speed" == column)Col_Sheet_speed = position;
-                else if("za_pt3" == column)Col_Sheet_za_pt3 = position;
-                else if("za_te3" == column)Col_Sheet_za_te3 = position;
-                else if("lampresstop" == column)Col_Sheet_lampresstop = position;
-                else if("lampressbot" == column)Col_Sheet_lampressbot = position;
-                else if("posclapantop" == column)Col_Sheet_posclapantop = position;
-                else if("posclapanbot" == column)Col_Sheet_posclapanbot = position;
-                else if("mask" == column)Col_Sheet_mask = position;
-                else if("lam1posclapantop" == column)Col_Sheet_lam1posclapantop = position;
-                else if("lam1posclapanbot" == column)Col_Sheet_lam1posclapanbot = position;
-                else if("lam2posclapantop" == column)Col_Sheet_lam2posclapantop = position;
-                else if("lam2posclapanbot" == column)Col_Sheet_lam2posclapanbot = position;
-                else if("lam_te1" == column)Col_Sheet_lam_te1 = position;
-                else if("news" == column)Col_Sheet_news = position;
-                else if("top1" == column)Col_Sheet_top1 = position;
-                else if("top2" == column)Col_Sheet_top2 = position;
-                else if("top3" == column)Col_Sheet_top3 = position;
-                else if("top4" == column)Col_Sheet_top4 = position;
-                else if("top5" == column)Col_Sheet_top5 = position;
-                else if("top6" == column)Col_Sheet_top6 = position;
-                else if("top7" == column)Col_Sheet_top7 = position;
-                else if("top8" == column)Col_Sheet_top8 = position;
-                else if("bot1" == column)Col_Sheet_bot1 = position;
-                else if("bot2" == column)Col_Sheet_bot2 = position;
-                else if("bot3" == column)Col_Sheet_bot3 = position;
-                else if("bot4" == column)Col_Sheet_bot4 = position;
-                else if("bot5" == column)Col_Sheet_bot5 = position;
-                else if("bot6" == column)Col_Sheet_bot6 = position;
-                else if("bot7" == column)Col_Sheet_bot7 = position;
-                else if("bot8" == column)Col_Sheet_bot8 = position;
-                else if("day" == column)Col_Sheet_day = position;
-                else if("month" == column)Col_Sheet_month = position;
-                else if("year" == column)Col_Sheet_year = position;
-                else if("cassetteno" == column)Col_Sheet_cassetteno = position;
-                else if("sheetincassette" == column)Col_Sheet_sheetincassette = position;
-                else if("start_at" == column)Col_Sheet_start_at = position;
-                else if("timeforplateheat" == column)Col_Sheet_timeforplateheat = position;
-                else if("prestostartcomp" == column)Col_Sheet_prestostartcomp = position;
-            }
-        }
-        else
-        {
-            std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-            SendDebug("conn_kpvl", errc);
-            SendDebug("conn_kpvl", FilterComand);
-        }
-        PQclear(res);
-    }
+    //if(Col_Sheet_prestostartcomp == 0)
+    //{
+    //    std::string connand = "SELECT * FROM sheet WHERE id <= 1";
+    //    PGresult* res = conn_kpvl.PGexec(connand);
+    //    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    //    {
+    //        int line = PQntuples(res);
+    //        int nFields = PQnfields(res);
+    //
+    //        for(int position = 0; position < nFields; position++)
+    //        {
+    //            std::string column =  utf8_to_cp1251(PQfname(res, position));
+    //
+    //            //std::string column = conn_kpvl.PGgetvalue(res, l, 0);
+    //            //int position = atoi(conn_kpvl.PGgetvalue(res, l, 1).c_str());
+    //
+    //            if("create_at" == column)Col_Sheet_create_at = position;
+    //            else if("pos" == column)Col_Sheet_pos = position;
+    //            else if("id" == column)Col_Sheet_id = position;
+    //            else if("datatime_end" == column)Col_Sheet_datatime_end = position;
+    //            else if("datatime_all" == column)Col_Sheet_datatime_all = position;
+    //            else if("alloy" == column)Col_Sheet_alloy = position;
+    //            else if("thikness" == column)Col_Sheet_thikness = position;
+    //            else if("melt" == column)Col_Sheet_melt = position;
+    //            else if("slab" == column)Col_Sheet_slab = position;
+    //            else if("partno" == column)Col_Sheet_partno = position;
+    //            else if("pack" == column)Col_Sheet_pack = position;
+    //            else if("sheet" == column)Col_Sheet_sheet = position;
+    //            else if("subsheet" == column)Col_Sheet_subsheet = position;
+    //            else if("temper" == column)Col_Sheet_temper = position;
+    //            else if("speed" == column)Col_Sheet_speed = position;
+    //            else if("za_pt3" == column)Col_Sheet_za_pt3 = position;
+    //            else if("za_te3" == column)Col_Sheet_za_te3 = position;
+    //            else if("lampresstop" == column)Col_Sheet_lampresstop = position;
+    //            else if("lampressbot" == column)Col_Sheet_lampressbot = position;
+    //            else if("posclapantop" == column)Col_Sheet_posclapantop = position;
+    //            else if("posclapanbot" == column)Col_Sheet_posclapanbot = position;
+    //            else if("mask" == column)Col_Sheet_mask = position;
+    //            else if("lam1posclapantop" == column)Col_Sheet_lam1posclapantop = position;
+    //            else if("lam1posclapanbot" == column)Col_Sheet_lam1posclapanbot = position;
+    //            else if("lam2posclapantop" == column)Col_Sheet_lam2posclapantop = position;
+    //            else if("lam2posclapanbot" == column)Col_Sheet_lam2posclapanbot = position;
+    //            else if("lam_te1" == column)Col_Sheet_lam_te1 = position;
+    //            else if("news" == column)Col_Sheet_news = position;
+    //            else if("top1" == column)Col_Sheet_top1 = position;
+    //            else if("top2" == column)Col_Sheet_top2 = position;
+    //            else if("top3" == column)Col_Sheet_top3 = position;
+    //            else if("top4" == column)Col_Sheet_top4 = position;
+    //            else if("top5" == column)Col_Sheet_top5 = position;
+    //            else if("top6" == column)Col_Sheet_top6 = position;
+    //            else if("top7" == column)Col_Sheet_top7 = position;
+    //            else if("top8" == column)Col_Sheet_top8 = position;
+    //            else if("bot1" == column)Col_Sheet_bot1 = position;
+    //            else if("bot2" == column)Col_Sheet_bot2 = position;
+    //            else if("bot3" == column)Col_Sheet_bot3 = position;
+    //            else if("bot4" == column)Col_Sheet_bot4 = position;
+    //            else if("bot5" == column)Col_Sheet_bot5 = position;
+    //            else if("bot6" == column)Col_Sheet_bot6 = position;
+    //            else if("bot7" == column)Col_Sheet_bot7 = position;
+    //            else if("bot8" == column)Col_Sheet_bot8 = position;
+    //            else if("day" == column)Col_Sheet_day = position;
+    //            else if("month" == column)Col_Sheet_month = position;
+    //            else if("year" == column)Col_Sheet_year = position;
+    //            else if("cassetteno" == column)Col_Sheet_cassetteno = position;
+    //            else if("sheetincassette" == column)Col_Sheet_sheetincassette = position;
+    //            else if("start_at" == column)Col_Sheet_start_at = position;
+    //            else if("timeforplateheat" == column)Col_Sheet_timeforplateheat = position;
+    //            else if("prestostartcomp" == column)Col_Sheet_prestostartcomp = position;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
+    //        SendDebug("conn_kpvl", errc);
+    //        SendDebug("conn_kpvl", FilterComand);
+    //    }
+    //    PQclear(res);
+    //}
 return 0;
 }
 
