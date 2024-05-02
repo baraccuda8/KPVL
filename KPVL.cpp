@@ -7,15 +7,29 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "main.h"
 #include "Calendar.h"
 
-#include "SQL.h"
-#include "OnLine.h"
 #include "Cassette.h"
 #include "Sheet.h"
+#include "File.h"
+#include "SQL.h"
+#include "OnLine.h"
+#include "GdiPlusInit.h"
+#include <gdiplusimagecodec.h>
+
+GUID guidBmp ={};
+GUID guidJpeg ={};
+GUID guidGif ={};
+GUID guidTiff ={};
+GUID guidPng ={};
+
 
 //std::string lpCassetteDir = "Cassette";
 std::string lpLogDir = "Log";
+
+Gdiplus::Font font1(L"Tahoma", 10, Gdiplus::FontStyleBold);
+Gdiplus::Font font2(L"Tahoma", 10, Gdiplus::FontStyleRegular);
 
 
 
@@ -31,7 +45,7 @@ std::string CurrentDirPatch = "";
 std::string strPatchFileName = "";
 
 #define AllDebugLog "All Debug.log"
-std::string FullAllDebugLog  = "";
+std::string FullAllDebugLog  = "All Debug.log";
 
 
 //Признак работы программы
@@ -179,21 +193,21 @@ LRESULT Command(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 
-//Перечисление фонтов от 6 до 16
-enum emFont {
-    FontNull = -1,
-    Font06 = 6,
-    Font07 = 7,
-    Font08 = 8,
-    Font09 = 9,
-    Font10 = 10,
-    Font11 = 11,
-    Font12 = 12,
-    Font13 = 13,
-    Font14 = 14,
-    Font15 = 15,
-    Font16 = 16,
-};
+////Перечисление фонтов от 6 до 16
+//enum emFont {
+//    FontNull = -1,
+//    Font06 = 6,
+//    Font07 = 7,
+//    Font08 = 8,
+//    Font09 = 9,
+//    Font10 = 10,
+//    Font11 = 11,
+//    Font12 = 12,
+//    Font13 = 13,
+//    Font14 = 14,
+//    Font15 = 15,
+//    Font16 = 16,
+//};
 
 //Масив фонтов от 8 до 16 размера жирный шрифт Arial
 std::map<emFont, HFONT> Font;
@@ -217,6 +231,61 @@ HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 224, 255));
 //темносиняя заливка
 HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
 
+HRESULT GetGdiplusEncoderClsid(const std::wstring& format, GUID* pGuid)
+{
+    HRESULT hr = S_OK;
+    UINT  nEncoders = 0;          // number of image encoders
+    UINT  nSize = 0;              // size of the image encoder array in bytes
+    std::vector<BYTE> spData;
+    Gdiplus::ImageCodecInfo* pImageCodecInfo = NULL;
+    Gdiplus::Status status;
+    bool found = false;
+
+    if(format.empty() || !pGuid)
+    {
+        hr = E_INVALIDARG;
+    }
+
+    if(SUCCEEDED(hr))
+    {
+        *pGuid = GUID_NULL;
+        status = Gdiplus::GetImageEncodersSize(&nEncoders, &nSize);
+
+        if((status != Gdiplus::Ok) || (nSize == 0))
+        {
+            hr = E_FAIL;
+        }
+    }
+
+    if(SUCCEEDED(hr))
+    {
+
+        spData.resize(nSize);
+        pImageCodecInfo = (Gdiplus::ImageCodecInfo*)&spData.front();
+        status = Gdiplus::GetImageEncoders(nEncoders, nSize, pImageCodecInfo);
+
+        if(status != Gdiplus::Ok)
+        {
+            hr = E_FAIL;
+        }
+    }
+
+    if(SUCCEEDED(hr))
+    {
+        for(UINT j = 0; j < nEncoders && !found; j++)
+        {
+            if(pImageCodecInfo[j].MimeType == format)
+            {
+                *pGuid = pImageCodecInfo[j].Clsid;
+                found = true;
+            }
+        }
+
+        hr = found ? S_OK : E_FAIL;
+    }
+
+    return hr;
+}
 
 
 //Инициализация масова фонтов от 8 до 16 размера жирный шрифт Arial
@@ -278,7 +347,7 @@ void InitInstance()
         throw std::exception(std::string("Ошибка создания окна : mdiclient").c_str());
 
 
-    ShowWindow(GlobalWindow, SW_SHOWDEFAULT);
+    ShowWindow(GlobalWindow, SW_MAXIMIZE);
     UpdateWindow(GlobalWindow);
 
     //MdiChildInitInstance();
@@ -322,6 +391,20 @@ BOOL CenterWindow(HWND hwndChild, HWND hwndParent)
     return SetWindowPos(hwndChild, NULL, xNew, yNew, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
+void DisplayContextMenu(HWND hwnd, int ID)
+{
+    DWORD dwpos = GetMessagePos();
+    POINT pt;
+    pt.x = LOWORD(dwpos);
+    pt.y = HIWORD(dwpos);
+
+    HMENU hmenu = LoadMenu(hInstance, MAKEINTRESOURCE(ID));
+    if(hmenu == NULL) return;
+
+    HMENU hmenuTrackPopup = GetSubMenu(hmenu, 0);
+    TrackPopupMenu(hmenuTrackPopup, TPM_LEFTALIGN | TPM_RIGHTBUTTON, pt.x, pt.y, 0, hwnd, NULL);
+    DestroyMenu(hmenu);
+}
 
 //Инициализация класса главного окна
 void MyRegisterClass()
@@ -421,23 +504,23 @@ void ClosePid();
 #define SizeLooger 1048576
 #define CountLooger 1000
 
-std::shared_ptr<spdlog::logger> AllLogger= NULL;
-std::shared_ptr<spdlog::logger> InitAllLogger(std::string LoogerOut)
-{
-    try
-    {
-        AllLogger = spdlog::details::registry::instance().get(LoogerOut);
-        if(!AllLogger.get())
-        {
-            std::string FileName = lpLogDir + "/" + LoogerOut + ".log";
-            AllLogger = spdlog::rotating_logger_mt(LoogerOut, FileName, SizeLooger, CountLooger);
-        }
-        AllLogger->set_level(spdlog::level::level_enum::info);
-        return AllLogger;
-    }
-    catch(...) {}
-    return 0;
-}
+//std::shared_ptr<spdlog::logger> AllLogger= NULL;
+//std::shared_ptr<spdlog::logger> InitAllLogger(std::string LoogerOut)
+//{
+//    try
+//    {
+//        AllLogger = spdlog::details::registry::instance().get(LoogerOut);
+//        if(!AllLogger.get())
+//        {
+//            std::string FileName = lpLogDir + "/" + LoogerOut + ".log";
+//            AllLogger = spdlog::rotating_logger_mt(LoogerOut, FileName, SizeLooger, CountLooger);
+//        }
+//        AllLogger->set_level(spdlog::level::level_enum::info);
+//        return AllLogger;
+//    }
+//    catch(...) {}
+//    return 0;
+//}
 
 
 ////Инициализация класса главного окна
@@ -540,6 +623,7 @@ std::shared_ptr<spdlog::logger> InitAllLogger(std::string LoogerOut)
 //
 //}
 
+
 void CurrentDir()
 {
     char ss[256] = "";
@@ -560,6 +644,10 @@ void CurrentDir()
         CurrentDirPatch = ss2;
     }
     strPatchFileName = std::string(ss);
+
+#ifdef SAWEDEBUG
+    remove(AllDebugLog);
+#endif
 }
 
 //Глобальная функция
@@ -567,6 +655,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
 {
     try
     {
+        SendDebug("wWinMain", "Start KPVL");
         hInstance = hInst; // Сохранить маркер экземпляра в глобальной переменной
 
         if(!hInstance)
@@ -575,11 +664,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
         CurrentDir();
         CheckDir(lpLogDir);
 
-        if(!InitAllLogger("All Debug"))
-        {
-            WinErrorExit(NULL, "Программа уже запущена");
-            return 0;
-        }
+        //if(!InitAllLogger("All Debug"))
+        //{
+        //    WinErrorExit(NULL, "Программа уже запущена");
+        //    return 0;
+        //}
 
         std::string Server = "";
         DWORD sizeServer = 0;
@@ -592,6 +681,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
         if(!gbi_plus)
             throw std::runtime_error(__FUN("Ошибка инициализации библиотеки \"GdiPlus\""));
 #endif
+        GetGdiplusEncoderClsid(L"image/bmp", &guidBmp);
+        GetGdiplusEncoderClsid(L"image/jpeg", &guidJpeg);
+        GetGdiplusEncoderClsid(L"image/gif", &guidGif);
+        GetGdiplusEncoderClsid(L"image/tiff", &guidTiff);
+        GetGdiplusEncoderClsid(L"image/png", &guidPng);
+
 
         if(!InitCommonControlsEx(&initcontrol)) throw std::runtime_error(__FUN("Ошибка загрузки общего модуля"));
 
@@ -599,6 +694,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
 
         if(!SetUserObjectInformation(GetCurrentProcess(), UOI_TIMERPROC_EXCEPTION_SUPPRESSION, &bBool, sizeof(BOOL)))
             throw std::runtime_error(__FUN("Ошибка загрузки пользовательсих модулей"));
+
+        if(!LoadRessurse("arial.ttf", IDR_DAT2))throw std::runtime_error(__FUN("Ошибка загрузки файла: \"arial.ttf\""));
 
         InitFont();
 
@@ -624,7 +721,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
                     }
                 }
                 isRun = false;
-                if(AllLogger)AllLogger->flush();
+                //if(AllLogger)AllLogger->flush();
             }
         }
     }

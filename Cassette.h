@@ -23,6 +23,10 @@ namespace casCassette{
             timeprocset,        //Полное время процесса (уставка), мин
             pointdtime_2,       //Время выдержки
             f_temper,           //Факт температуры за 5 минут до конца отпуска
+            HeatAcc,           //Факт время нагрева
+            HeatWait,          //Факт время выдержки
+            Total,             //Факт общее время
+
         };
     };
 
@@ -47,9 +51,39 @@ namespace casCassette{
         PointTime_1,        //Время разгона
         TimeProcSet,        //Полное время процесса (уставка), мин
         PointDTime_2,       //Время выдержки
+        HeatAcc,           //Факт время нагрева
+        HeatWait,          //Факт время выдержки
+        Total,             //Факт общее время
+
     };
 };
 
+enum Cassete{
+    NN,
+    Id,
+    Event,
+    Create_at,
+    Year,
+    Month,
+    Day,
+    CassetteNo,
+    SheetInCassette,
+    //Close_at,
+    Peth,
+    Run_at,
+    End_at,
+    Finish_at,
+    Error_at,
+    PointRef_1,     //Уставка температуры
+    f_temper,       //Факт температуры за 5 минут до конца отпуска
+
+    PointTime_1,    //Время разгона
+    HeatAcc,        //Факт время нагрева
+    TimeProcSet,    //Полное время процесса (уставка), мин
+    Total,          //Факт общее время
+    PointDTime_2,   //Время выдержки
+    HeatWait,       //Факт время выдержки
+};
 typedef struct TCassette{
     std::string Id = "";
     std::string Create_at = "";
@@ -71,6 +105,10 @@ typedef struct TCassette{
     std::string TimeProcSet = "";       //Полное время процесса (уставка), мин
     std::string PointDTime_2 = "";      //Время выдержки
     std::string f_temper = "";          //Факт температуры за 5 минут до конца отпуска
+    std::string Finish_at = "";         //Завершение процесса + 15 минут
+    std::string HeatAcc = "";           //Факт время нагрева
+    std::string HeatWait = "";          //Факт время выдержки
+    std::string Total = "";             //Факт общее время
 }TCassette;
 
 namespace cas4{
@@ -87,7 +125,7 @@ namespace cas4{
         End,
         Delete,
         Peth,
-        //TempRef,        //Заданное значение температуры
+        //TempRef,      //Заданное значение температуры
         PointTime_1,    //Время разгона
         PointRef_1,     //Уставка температуры
         TimeProcSet,    //Полное время процесса (уставка), мин

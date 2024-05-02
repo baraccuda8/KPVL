@@ -10,6 +10,8 @@
 
 #include "SQL.h"
 #include "Exel.h"
+#include "Pdf.h"
+
 
 
 //Класс окна Static
@@ -42,12 +44,14 @@ HWND UpdateHwndSheet = NULL;
 HWND SaveHwndSheetList = NULL;
 HWND ListSheetTemp = NULL;
 HWND ListCasseteTemp = NULL;
+HWND FilterHwndSheet = NULL;
 
 std::string strTitleSheet = "Лист";
 std::string strClassSheet = "ClassSheet";
 
 std::string DataStartSheet = "";
 std::string DataStopSheet = "";
+std::string DataFilterSheet = "";
 
 #define LL0 130
 #define LL1 100
@@ -55,6 +59,8 @@ std::string DataStopSheet = "";
 #define L0 50
 #define L1 60
 #define L2 70
+
+
 
 std::map <int, ListTitle> CasseteTemp_Collumn ={
     {0,  { "№", 30 }},
@@ -104,6 +110,7 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::Sheet, { "Номер\nлиста", L0 }},
     {casSheet::SubSheet, { "Номер\nдодлиста", L0 }},
     {casSheet::Temper, { "Заданная\nтемпература\nС°", LL2 }},
+    {casSheet::Temperature, { "Факт\nтемпература\nС°", LL2 }},
     {casSheet::Speed, { "Скорость\nвыдачи\nмм/с", 80 }},
     {casSheet::Za_PT3, { "Давление\nводы в баке.\nбар", LL2 }},
     {casSheet::Za_TE3, { "Температура\nводы в баке.\nС°", LL1 }},
@@ -149,6 +156,7 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
 //    return d1->first < d2->first;
 //}
 
+
 void SizeListSheet(HWND List, LPARAM lParam)
 {
     int cx = LOWORD(lParam);
@@ -170,61 +178,61 @@ void AddHistoriSheet(bool begin)
 
 std::string FilterComand = "SELECT * FROM sheet ORDER BY create_at DESC;";
 
-namespace {
-    enum{
-        Col_Sheet_id = 0,
-        Col_Sheet_create_at = 1,
-        Col_Sheet_start_at = 2,
-        Col_Sheet_datatime_end = 3,
-        Col_Sheet_pos = 4,
-        Col_Sheet_datatime_all,
-        Col_Sheet_alloy,
-        Col_Sheet_thikness,
-        Col_Sheet_melt,
-        Col_Sheet_slab,
-        Col_Sheet_partno,
-        Col_Sheet_pack,
-        Col_Sheet_sheet,
-        Col_Sheet_subsheet,
-        Col_Sheet_temper,
-        Col_Sheet_speed,
-        Col_Sheet_za_pt3,
-        Col_Sheet_za_te3,
-        Col_Sheet_lampresstop,
-        Col_Sheet_lampressbot,
-        Col_Sheet_posclapantop,
-        Col_Sheet_posclapanbot,
-        Col_Sheet_mask,
-        Col_Sheet_lam1posclapantop,
-        Col_Sheet_lam1posclapanbot,
-        Col_Sheet_lam2posclapantop,
-        Col_Sheet_lam2posclapanbot,
-        Col_Sheet_lam_te1,
-        Col_Sheet_news,
-        Col_Sheet_top1,
-        Col_Sheet_top2,
-        Col_Sheet_top3,
-        Col_Sheet_top4,
-        Col_Sheet_top5,
-        Col_Sheet_top6,
-        Col_Sheet_top7,
-        Col_Sheet_top8,
-        Col_Sheet_bot1,
-        Col_Sheet_bot2,
-        Col_Sheet_bot3,
-        Col_Sheet_bot4,
-        Col_Sheet_bot5,
-        Col_Sheet_bot6,
-        Col_Sheet_bot7,
-        Col_Sheet_bot8,
-        Col_Sheet_day,
-        Col_Sheet_month,
-        Col_Sheet_year,
-        Col_Sheet_cassetteno,
-        Col_Sheet_sheetincassette,
-        Col_Sheet_timeforplateheat,
-        Col_Sheet_prestostartcomp,
-    };
+//namespace {
+    //enum{
+    //    Col_Sheet_id = 0,
+    //    Col_Sheet_create_at = 1,
+    //    Col_Sheet_start_at = 2,
+    //    Col_Sheet_datatime_end = 3,
+    //    Col_Sheet_pos = 4,
+    //    Col_Sheet_datatime_all,
+    //    Col_Sheet_alloy,
+    //    Col_Sheet_thikness,
+    //    Col_Sheet_melt,
+    //    Col_Sheet_slab,
+    //    Col_Sheet_partno,
+    //    Col_Sheet_pack,
+    //    Col_Sheet_sheet,
+    //    Col_Sheet_subsheet,
+    //    Col_Sheet_temper,
+    //    Col_Sheet_speed,
+    //    Col_Sheet_za_pt3,
+    //    Col_Sheet_za_te3,
+    //    Col_Sheet_lampresstop,
+    //    Col_Sheet_lampressbot,
+    //    Col_Sheet_posclapantop,
+    //    Col_Sheet_posclapanbot,
+    //    Col_Sheet_mask,
+    //    Col_Sheet_lam1posclapantop,
+    //    Col_Sheet_lam1posclapanbot,
+    //    Col_Sheet_lam2posclapantop,
+    //    Col_Sheet_lam2posclapanbot,
+    //    Col_Sheet_lam_te1,
+    //    Col_Sheet_news,
+    //    Col_Sheet_top1,
+    //    Col_Sheet_top2,
+    //    Col_Sheet_top3,
+    //    Col_Sheet_top4,
+    //    Col_Sheet_top5,
+    //    Col_Sheet_top6,
+    //    Col_Sheet_top7,
+    //    Col_Sheet_top8,
+    //    Col_Sheet_bot1,
+    //    Col_Sheet_bot2,
+    //    Col_Sheet_bot3,
+    //    Col_Sheet_bot4,
+    //    Col_Sheet_bot5,
+    //    Col_Sheet_bot6,
+    //    Col_Sheet_bot7,
+    //    Col_Sheet_bot8,
+    //    Col_Sheet_day,
+    //    Col_Sheet_month,
+    //    Col_Sheet_year,
+    //    Col_Sheet_cassetteno,
+    //    Col_Sheet_sheetincassette,
+    //    Col_Sheet_timeforplateheat,
+    //    Col_Sheet_prestostartcomp,
+    //};
 
     //int Col_Sheet_id = 0;
     //int Col_Sheet_create_at = 0;
@@ -285,11 +293,217 @@ namespace {
     //int Col_Sheet_prestostartcomp = 0;
     //int Col_Sheet_slab = 0;
     //int Col_Sheet_subsheet = 0;
+//}
+
+
+//Номер колонки в таблице листов
+#pragma region //Номер колонки в таблице листов
+int Col_Sheet_id = 0;
+int Col_Sheet_create_at = 0;
+int Col_Sheet_start_at = 0;
+int Col_Sheet_datatime_end = 0;
+int Col_Sheet_pos = 0;
+int Col_Sheet_datatime_all = 0;
+int Col_Sheet_alloy = 0;
+int Col_Sheet_thikness = 0;
+int Col_Sheet_melt = 0;
+int Col_Sheet_slab = 0;
+int Col_Sheet_partno = 0;
+int Col_Sheet_pack = 0;
+int Col_Sheet_sheet = 0;
+int Col_Sheet_subsheet = 0;
+int Col_Sheet_temper = 0;
+int Col_Sheet_speed = 0;
+int Col_Sheet_za_pt3 = 0;
+int Col_Sheet_za_te3 = 0;
+int Col_Sheet_lampresstop = 0;
+int Col_Sheet_lampressbot = 0;
+int Col_Sheet_posclapantop  = 0;
+int Col_Sheet_posclapanbot = 0;
+int Col_Sheet_mask = 0;
+int Col_Sheet_lam1posclapantop = 0;
+int Col_Sheet_lam1posclapanbot = 0;
+int Col_Sheet_lam2posclapantop = 0;
+int Col_Sheet_lam2posclapanbot = 0;
+int Col_Sheet_lam_te1 = 0;
+int Col_Sheet_news = 0;
+int Col_Sheet_top1 = 0;
+int Col_Sheet_top2 = 0;
+int Col_Sheet_top3 = 0;
+int Col_Sheet_top4 = 0;
+int Col_Sheet_top5 = 0;
+int Col_Sheet_top6 = 0;
+int Col_Sheet_top7 = 0;
+int Col_Sheet_top8 = 0;
+int Col_Sheet_bot1 = 0;
+int Col_Sheet_bot2 = 0;
+int Col_Sheet_bot3 = 0;
+int Col_Sheet_bot4 = 0;
+int Col_Sheet_bot5 = 0;
+int Col_Sheet_bot6 = 0;
+int Col_Sheet_bot7 = 0;
+int Col_Sheet_bot8 = 0;
+int Col_Sheet_day = 0;
+int Col_Sheet_month = 0;
+int Col_Sheet_year = 0;
+int Col_Sheet_cassetteno = 0;
+int Col_Sheet_sheetincassette = 0;
+int Col_Sheet_timeforplateheat = 0;
+int Col_Sheet_prestostartcomp = 0;
+int Col_Sheet_temperature = 0;
+#pragma endregion
+
+//Получаем список колонов в таблице sheet
+void GetColSheet(PGresult* res)
+{
+    if(!Col_Sheet_prestostartcomp)
+    {
+        int nFields = PQnfields(res);
+        for(int j = 0; j < nFields; j++)
+        {
+            std::string l =  utf8_to_cp1251(PQfname(res, j));
+            if(l == "id") Col_Sheet_id = j;
+            else if(l == "create_at") Col_Sheet_create_at = j;
+            else if(l == "start_at") Col_Sheet_start_at = j;
+            else if(l == "datatime_end") Col_Sheet_datatime_end = j;
+            else if(l == "pos") Col_Sheet_pos = j;
+            else if(l == "datatime_all") Col_Sheet_datatime_all = j;
+            else if(l == "alloy") Col_Sheet_alloy = j;
+            else if(l == "thikness") Col_Sheet_thikness = j;
+            else if(l == "melt") Col_Sheet_melt = j;
+            else if(l == "slab") Col_Sheet_slab = j;
+            else if(l == "partno") Col_Sheet_partno = j;
+            else if(l == "pack") Col_Sheet_pack = j;
+            else if(l == "sheet") Col_Sheet_sheet = j;
+            else if(l == "subsheet") Col_Sheet_subsheet = j;
+            else if(l == "temper") Col_Sheet_temper = j;
+            else if(l == "speed") Col_Sheet_speed = j;
+            else if(l == "za_pt3") Col_Sheet_za_pt3 = j;
+            else if(l == "za_te3") Col_Sheet_za_te3 = j;
+            else if(l == "lampresstop") Col_Sheet_lampresstop = j;
+            else if(l == "lampressbot") Col_Sheet_lampressbot = j;
+            else if(l == "posclapantop") Col_Sheet_posclapantop = j;
+            else if(l == "posclapanbot") Col_Sheet_posclapanbot = j;
+            else if(l == "mask") Col_Sheet_mask = j;
+            else if(l == "lam1posclapantop") Col_Sheet_lam1posclapantop = j;
+            else if(l == "lam1posclapanbot") Col_Sheet_lam1posclapanbot = j;
+            else if(l == "lam2posclapantop") Col_Sheet_lam2posclapantop = j;
+            else if(l == "lam2posclapanbot") Col_Sheet_lam2posclapanbot = j;
+            else if(l == "lam_te1") Col_Sheet_lam_te1 = j;
+            else if(l == "news") Col_Sheet_news = j;
+            else if(l == "top1") Col_Sheet_top1 = j;
+            else if(l == "top2") Col_Sheet_top2 = j;
+            else if(l == "top3") Col_Sheet_top3 = j;
+            else if(l == "top4") Col_Sheet_top4 = j;
+            else if(l == "top5") Col_Sheet_top5 = j;
+            else if(l == "top6") Col_Sheet_top6 = j;
+            else if(l == "top7") Col_Sheet_top7 = j;
+            else if(l == "top8") Col_Sheet_top8 = j;
+            else if(l == "bot1") Col_Sheet_bot1 = j;
+            else if(l == "bot2") Col_Sheet_bot2 = j;
+            else if(l == "bot3") Col_Sheet_bot3 = j;
+            else if(l == "bot4") Col_Sheet_bot4 = j;
+            else if(l == "bot5") Col_Sheet_bot5 = j;
+            else if(l == "bot6") Col_Sheet_bot6 = j;
+            else if(l == "bot7") Col_Sheet_bot7 = j;
+            else if(l == "bot8") Col_Sheet_bot8 = j;
+            else if(l == "day") Col_Sheet_day = j;
+            else if(l == "month") Col_Sheet_month = j;
+            else if(l == "year") Col_Sheet_year = j;
+            else if(l == "cassetteno") Col_Sheet_cassetteno = j;
+            else if(l == "sheetincassette") Col_Sheet_sheetincassette = j;
+            else if(l == "timeforplateheat") Col_Sheet_timeforplateheat = j;
+            else if(l == "prestostartcomp") Col_Sheet_prestostartcomp = j;
+            else if(l == "temperature") Col_Sheet_temperature = j;
+            
+        }
+    }
 }
 
 DLLRESULT FilterSheet()
 {
     ListView_DeleteAllItems(ListSheet);
+    AllSheet.erase(AllSheet.begin(), AllSheet.end());
+    PGresult* res = conn_kpvl.PGexec(FilterComand);
+    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    {
+        GetColSheet(res);
+        int line = PQntuples(res);
+        for(int l = 0; l < line; l++)
+        {
+            TSheet sheet;
+            sheet.DataTime = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_create_at));
+            sheet.Pos = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pos);
+            sheet.id = conn_kpvl.PGgetvalue(res, l, Col_Sheet_id);
+            sheet.DataTime_End = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_datatime_end));
+            sheet.DataTime_All = conn_kpvl.PGgetvalue(res, l, Col_Sheet_datatime_all);
+            sheet.Alloy = conn_kpvl.PGgetvalue(res, l, Col_Sheet_alloy);
+            sheet.Thikness = conn_kpvl.PGgetvalue(res, l, Col_Sheet_thikness);
+            sheet.Melt = conn_kpvl.PGgetvalue(res, l, Col_Sheet_melt);
+            sheet.Slab = conn_kpvl.PGgetvalue(res, l, Col_Sheet_slab);
+            sheet.PartNo = conn_kpvl.PGgetvalue(res, l, Col_Sheet_partno);
+            sheet.Pack = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pack);
+            sheet.Sheet = conn_kpvl.PGgetvalue(res, l, Col_Sheet_sheet);
+            sheet.SubSheet = conn_kpvl.PGgetvalue(res, l, Col_Sheet_subsheet);
+            sheet.Temper = conn_kpvl.PGgetvalue(res, l, Col_Sheet_temper);
+            sheet.Speed = conn_kpvl.PGgetvalue(res, l, Col_Sheet_speed);
+
+            sheet.Za_PT3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_za_pt3);
+            sheet.Za_TE3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_za_te3);
+
+            sheet.LaminPressTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampresstop);
+            sheet.LaminPressBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampressbot);
+            sheet.PosClapanTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_posclapantop);
+            sheet.PosClapanBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_posclapanbot);
+            sheet.Mask = conn_kpvl.PGgetvalue(res, l, Col_Sheet_mask);
+
+            sheet.Lam1PosClapanTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam1posclapantop);
+            sheet.Lam1PosClapanBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam1posclapanbot);
+            sheet.Lam2PosClapanTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam2posclapantop);
+            sheet.Lam2PosClapanBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam2posclapanbot);
+
+            sheet.LAM_TE1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam_te1);
+            sheet.News = conn_kpvl.PGgetvalue(res, l, Col_Sheet_news);
+            sheet.Top1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top1);
+            sheet.Top2 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top2);
+            sheet.Top3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top3);
+            sheet.Top4 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top4);
+            sheet.Top5 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top5);
+            sheet.Top6 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top6);
+            sheet.Top7 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top7);
+            sheet.Top8 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top8);
+
+            sheet.Bot1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot1);
+            sheet.Bot2 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot2);
+            sheet.Bot3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot3);
+            sheet.Bot4 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot4);
+            sheet.Bot5 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot5);
+            sheet.Bot6 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot6);
+            sheet.Bot7 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot7);
+            sheet.Bot8 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot8);
+
+            sheet.Day = conn_kpvl.PGgetvalue(res, l, Col_Sheet_day);
+            sheet.Month = conn_kpvl.PGgetvalue(res, l, Col_Sheet_month);
+            sheet.Year = conn_kpvl.PGgetvalue(res, l, Col_Sheet_year);
+            sheet.CassetteNo = conn_kpvl.PGgetvalue(res, l, Col_Sheet_cassetteno);
+            sheet.SheetInCassette = conn_kpvl.PGgetvalue(res, l, Col_Sheet_sheetincassette);
+
+            sheet.Start_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_start_at));
+            sheet.TimeForPlateHeat = conn_kpvl.PGgetvalue(res, l, Col_Sheet_timeforplateheat);
+            sheet.PresToStartComp = conn_kpvl.PGgetvalue(res, l, Col_Sheet_prestostartcomp);
+            sheet.Temperature = conn_kpvl.PGgetvalue(res, l, Col_Sheet_temperature);
+            AllSheet.push_back(sheet);
+            AddHistoriSheet(false);
+        }
+    }
+    else
+    {
+        std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
+        SendDebug("conn_kpvl", errc);
+        SendDebug("conn_kpvl", FilterComand);
+    }
+
+
     //if(Col_Sheet_prestostartcomp == 0)
     //{
     //    std::string connand = "SELECT column_name, ordinal_position FROM information_schema.columns WHERE table_name = 'sheet' ORDER BY ordinal_position;";
@@ -454,16 +668,16 @@ std::string strDay;
 std::string strCassetteNo = "1";
 
 BOOL bFilterData = TRUE;
-
-std::string FindTag(std::string name)
-{
-    for(auto t : AllTag)
-    {
-        if(t.name == name) return t.content;
-    }
-    return "";
-}
-
+//
+//std::string FindTag(std::string name)
+//{
+//    for(auto t : AllTag)
+//    {
+//        //if(t->Name == name) return t.content;
+//    }
+//    return "";
+//}
+//
 void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno)
 {
     strYear = std::to_string(stryear);
@@ -471,15 +685,32 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     strDay = std::to_string(strday);
     strCassetteNo = std::to_string(strcassetteno);
 
+    
+
+
     FilterComand = "SELECT * FROM sheet ";
     FilterComand += "WHERE ";
-    FilterComand += "year = '" + strYear + "' AND ";
+    FilterComand +=  "year = '" + strYear + "' AND ";
     FilterComand += "month = '" + strMonth + "' AND ";
     FilterComand += "day = '" + strDay + "' AND ";
     FilterComand += "cassetteno = '" + strCassetteNo + "' ";
+
+    DataFilterSheet = "Год = " + strYear + ", ";
+    DataFilterSheet += "Месяц = " + strMonth + ", ";
+    DataFilterSheet += "День = " + strDay + ", ";
+    DataFilterSheet += "Кассета = " + strCassetteNo;
+
+    //DataFilterSheet = FilterComand;
+
+    SetWindowText(FilterHwndSheet, DataFilterSheet.c_str());
+    //FilterComand += "year = '" + strYear + "' AND ";
+    //FilterComand += "month = '" + strMonth + "' AND ";
+    //FilterComand += "day = '" + strDay + "' AND ";
+    //FilterComand += "cassetteno = '" + strCassetteNo + "' ";
     FilterComand += "ORDER BY create_at DESC";
     FilterComand += ";";
     FilterSheet();
+    
     bFilterData = FALSE;
 }
 
@@ -487,6 +718,8 @@ void FilterDataTimeSheet()
 {
     ListView_DeleteAllItems(ListSheet);
     AllSheet.erase(AllSheet.begin(), AllSheet.end());
+    DataFilterSheet = "от " + DataStartSheet + " до " + DataStopSheet;
+    SetWindowText(FilterHwndSheet, DataFilterSheet.c_str());
 
     FilterComand = "SELECT * FROM sheet ";
     FilterComand += "WHERE create_at >= ";
@@ -558,15 +791,15 @@ LRESULT OnHeader_Layout(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, U
     return ret;
 }
 
-std::map<int, const char*> NameZone ={
-    {0, "На входе" },
-    {1, "1-я часть печи"},
-    {2, "2-я часть печи"},
-    {3, "Закалка"},
-    {4, "Охлаждение"},
-    {5, "Выдача"},
-    {6, "Кантовка"},
-    {7, "В касете"},
+std::map<std::string, std::string> NamePos ={
+    //{0, "На входе" },
+    //{1, "1-я часть печи"},
+    //{2, "2-я часть печи"},
+    //{3, "Закалка"},
+    //{4, "Охлаждение"},
+    //{5, "Выдача"},
+    //{6, "Кантовка"},
+    //{7, "В касете"},
 };
 
 
@@ -585,7 +818,8 @@ DLLRESULT CommandPassportSheetDialog(HWND hWnd, WPARAM wParam)
     return 0;
 }
 
-void GetCassete(TSheet& p, TCassette& сassette)
+void GetCassette(PGresult* res, TCassette& cassette, int line);
+void GetCassete(TSheet& p, TCassette& cassette)
 {
     strYear = std::to_string(atoi(p.Year.c_str()));
     strMonth = std::to_string(atoi(p.Month.c_str()));
@@ -609,27 +843,28 @@ void GetCassete(TSheet& p, TCassette& сassette)
         int nFields = PQnfields(res);
         for(int l = 0; l < line; l++)
         {
-            сassette.Create_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::create_at));
-            сassette.Id = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::id);
-            сassette.Event = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::event);
-            сassette.Day = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::day);
-            сassette.Month = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::month);
-            сassette.Year = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::year);
-            сassette.CassetteNo = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::cassetteno);
-            сassette.SheetInCassette = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::sheetincassette);
-            сassette.Close_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::close_at));
-            сassette.Peth = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::peth);
-            сassette.Run_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::run_at));
-            сassette.Error_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::error_at));
-            сassette.End_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::end_at));
-            сassette.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::delete_at));
+            GetCassette(res, cassette, l);
+            //cassette.Create_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::create_at));
+            //cassette.Id = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::id);
+            //cassette.Event = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::event);
+            //cassette.Day = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::day);
+            //cassette.Month = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::month);
+            //cassette.Year = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::year);
+            //cassette.CassetteNo = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::cassetteno);
+            //cassette.SheetInCassette = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::sheetincassette);
+            //cassette.Close_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::close_at));
+            //cassette.Peth = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::peth);
+            //cassette.Run_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::run_at));
+            //cassette.Error_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::error_at));
+            //cassette.End_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::end_at));
+            //cassette.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::delete_at));
 
-            сassette.TempRef = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::tempref);
-            сassette.PointTime_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointtime_1);
-            сassette.PointRef_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointref_1);
-            сassette.TimeProcSet = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::timeprocset);
-            сassette.PointDTime_2 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointdtime_2);
-            сassette.f_temper = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::f_temper);
+            //cassette.TempRef = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::tempref);
+            //cassette.PointTime_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointtime_1);
+            //cassette.PointRef_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointref_1);
+            //cassette.TimeProcSet = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::timeprocset);
+            //cassette.PointDTime_2 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointdtime_2);
+            //cassette.f_temper = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::f_temper);
 
         }
     }
@@ -870,121 +1105,121 @@ float GetDataTempSheet(TSheet& p, std::string name, int pos)
 }
 
 
-void GetTemperSheet(HWND hWnd, LPARAM lParam)
-{
-    if(lParam >= 0 && lParam < (int)AllSheet.size())
-    {
-        TSheet& p = AllSheet[lParam];
-        {
-            SetWindowText(GetDlgItem(hWnd, IDC_pAlloy), p.Alloy.c_str());           //Марка стали
-            SetWindowText(GetDlgItem(hWnd, IDC_pThikness), p.Thikness.c_str());     //Толщина листа
-            SetWindowText(GetDlgItem(hWnd, IDC_pMelt), p.Melt.c_str());             //Плавка
-            SetWindowText(GetDlgItem(hWnd, IDC_pPartNo), p.PartNo.c_str());         //Партия
-            SetWindowText(GetDlgItem(hWnd, IDC_pPack), p.Pack.c_str());             //Пачка
-            SetWindowText(GetDlgItem(hWnd, IDC_pSheet), p.Sheet.c_str());           //Лист
-            SetWindowText(GetDlgItem(hWnd, IDC_pSlab), "0");                        //Сляб
-
-            std::vector <std::string>split;
-            std::string DataTime = p.Start_at;
-            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
-            if(split.size() == 2)
-            {
-                SetWindowText(GetDlgItem(hWnd, IDC_pSheetDate), split[0].c_str());  //Дата
-                SetWindowText(GetDlgItem(hWnd, IDC_pSheetTime), split[1].c_str());  //Время
-            }
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT11), p.TimeForPlateHeat.c_str());//Задание Время нахождения листа в закалочной печи. мин
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT12), p.DataTime_All.c_str());    //Факт Время нахождения листа в закалочной печи. мин
-
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT13), p.Temper.c_str());          //Задание Температуры закалки
-            
-
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT15), p.PresToStartComp.c_str()); //Задание Давления воды
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT16), p.Za_PT3.c_str());          //Факт Давления воды
-
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT17), p.Za_TE3.c_str());         //Факт Температура воды, °С
-        }
-        DataTempSheet.erase(DataTempSheet.begin(), DataTempSheet.end());
-        if(p.Start_at.length()/* && p.DataTime_End.length()*/)
-        {
-            int line = 0;
-            //GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1", 2); //Задание Температуры закалки
-                                                  //Application.GenSeqFromHmi.Data.TempSet1
-
-            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu", 3);
-
-            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct", 4);
-            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct", 5);
-            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct", 6);
-            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct", 7);
-
-            float t21 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct", 8);
-            float t22 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct", 9);
-            float t23 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct", 10);
-            float t24 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct", 11);
-            float t = (float)((t21 + t22 + t23 + t24) / 4.0);
-            char ss[256];
-            sprintf(ss, "%0.1f", t);
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT14), ss);                        //Факт Температуры закалки
-
-            #define COUNT_COLUMN_SHEET 12
-            int iItemServ = 0;
-            //std::vector<float>first[COUNT_COLUMN_SHEET] = {
-            float first[COUNT_COLUMN_SHEET]{
-                0, 0,
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct").c_str()),
-                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct").c_str()),
-            };
-
-            //int iItemServ = 0;
-            for(auto& d : DataTempSheet)
-            {
-                char ss[256];
-                sprintf_s(ss, 256, "%d", iItemServ + 1);
-
-                LV_ITEM lvi ={0};
-                lvi.mask = LVIF_TEXT;
-                lvi.pszText = (LPSTR)ss;
-                lvi.cchTextMax = 255;
-                lvi.iItem = (int)iItemServ;
-                lvi.lParam = NULL;
-                LRESULT ret = ListView_InsertItem(ListSheetTemp, &lvi);
-
-                ListView_SetItemText(ListSheetTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
-                for(int i = 2; i < COUNT_COLUMN_SHEET; i++)
-                {
-                    BOOL end = FALSE;
-                    for(auto& s : d.second)
-                    {
-                        if(s.t == i)
-                        {
-                            char ss[256];
-                            sprintf_s(ss, 256, "%.1f", s.f);
-                            ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
-                            first[i] = s.f;
-                            end = TRUE;
-                            break;
-                        }
-                    }
-                    if(!end)
-                    {
-                        char ss[256];
-                        sprintf_s(ss, 256, "%.1f", first[i]);
-                        ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
-                    }
-                }
-                iItemServ++;
-            }
-        }
-    }
-}
+//void GetTemperSheet(HWND hWnd, LPARAM lParam)
+//{
+//    if(lParam >= 0 && lParam < (int)AllSheet.size())
+//    {
+//        TSheet& p = AllSheet[lParam];
+//        {
+//            SetWindowText(GetDlgItem(hWnd, IDC_pAlloy), p.Alloy.c_str());           //Марка стали
+//            SetWindowText(GetDlgItem(hWnd, IDC_pThikness), p.Thikness.c_str());     //Толщина листа
+//            SetWindowText(GetDlgItem(hWnd, IDC_pMelt), p.Melt.c_str());             //Плавка
+//            SetWindowText(GetDlgItem(hWnd, IDC_pPartNo), p.PartNo.c_str());         //Партия
+//            SetWindowText(GetDlgItem(hWnd, IDC_pPack), p.Pack.c_str());             //Пачка
+//            SetWindowText(GetDlgItem(hWnd, IDC_pSheet), p.Sheet.c_str());           //Лист
+//            SetWindowText(GetDlgItem(hWnd, IDC_pSlab), "0");                        //Сляб
+//
+//            std::vector <std::string>split;
+//            std::string DataTime = p.Start_at;
+//            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
+//            if(split.size() == 2)
+//            {
+//                SetWindowText(GetDlgItem(hWnd, IDC_pSheetDate), split[0].c_str());  //Дата
+//                SetWindowText(GetDlgItem(hWnd, IDC_pSheetTime), split[1].c_str());  //Время
+//            }
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT11), p.TimeForPlateHeat.c_str());//Задание Время нахождения листа в закалочной печи. мин
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT12), p.DataTime_All.c_str());    //Факт Время нахождения листа в закалочной печи. мин
+//
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT13), p.Temper.c_str());          //Задание Температуры закалки
+//            
+//
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT15), p.PresToStartComp.c_str()); //Задание Давления воды
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT16), p.Za_PT3.c_str());          //Факт Давления воды
+//
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT17), p.Za_TE3.c_str());         //Факт Температура воды, °С
+//        }
+//        DataTempSheet.erase(DataTempSheet.begin(), DataTempSheet.end());
+//        if(p.Start_at.length()/* && p.DataTime_End.length()*/)
+//        {
+//            int line = 0;
+//            //GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1", 2); //Задание Температуры закалки
+//                                                  //Application.GenSeqFromHmi.Data.TempSet1
+//
+//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu", 3);
+//
+//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct", 4);
+//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct", 5);
+//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct", 6);
+//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct", 7);
+//
+//            float t21 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct", 8);
+//            float t22 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct", 9);
+//            float t23 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct", 10);
+//            float t24 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct", 11);
+//            float t = (float)((t21 + t22 + t23 + t24) / 4.0);
+//            char ss[256];
+//            sprintf(ss, "%0.1f", t);
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT14), ss);                        //Факт Температуры закалки
+//
+//            #define COUNT_COLUMN_SHEET 12
+//            int iItemServ = 0;
+//            //std::vector<float>first[COUNT_COLUMN_SHEET] = {
+//            float first[COUNT_COLUMN_SHEET]{
+//                0, 0,
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct").c_str()),
+//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct").c_str()),
+//            };
+//
+//            //int iItemServ = 0;
+//            for(auto& d : DataTempSheet)
+//            {
+//                char ss[256];
+//                sprintf_s(ss, 256, "%d", iItemServ + 1);
+//
+//                LV_ITEM lvi ={0};
+//                lvi.mask = LVIF_TEXT;
+//                lvi.pszText = (LPSTR)ss;
+//                lvi.cchTextMax = 255;
+//                lvi.iItem = (int)iItemServ;
+//                lvi.lParam = NULL;
+//                LRESULT ret = ListView_InsertItem(ListSheetTemp, &lvi);
+//
+//                ListView_SetItemText(ListSheetTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
+//                for(int i = 2; i < COUNT_COLUMN_SHEET; i++)
+//                {
+//                    BOOL end = FALSE;
+//                    for(auto& s : d.second)
+//                    {
+//                        if(s.t == i)
+//                        {
+//                            char ss[256];
+//                            sprintf_s(ss, 256, "%.1f", s.f);
+//                            ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
+//                            first[i] = s.f;
+//                            end = TRUE;
+//                            break;
+//                        }
+//                    }
+//                    if(!end)
+//                    {
+//                        char ss[256];
+//                        sprintf_s(ss, 256, "%.1f", first[i]);
+//                        ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
+//                    }
+//                }
+//                iItemServ++;
+//            }
+//        }
+//    }
+//}
 
 
 
@@ -1029,112 +1264,112 @@ void GetDataTempCassete(TCassette& p, std::string name, int pos)
     }
 }
 
-void GetTemperCassette(HWND hWnd, LPARAM lParam)
-{
-    if(lParam >= 0 && lParam < (int)AllSheet.size())
-    {
-        TSheet& p = AllSheet[lParam];
-        {
-            TCassette сassette;
-            GetCassete(p, сassette);
-
-            //GetTM(std::string datatime, std::tm & TM)
-            std::vector <std::string>split;
-            std::string DataTime = сassette.Run_at;
-            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
-            if(split.size() == 2)
-            {
-                SetWindowText(GetDlgItem(hWnd, IDC_pCassetteDate), split[0].c_str());
-                SetWindowText(GetDlgItem(hWnd, IDC_pCasseteTime), split[1].c_str());
-            }
-
-            //Время нагрева до температуры отпуска, мин
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT18), сassette.PointTime_1.c_str());  //Задание
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT19), "");                            //Факт
-
-            //Время выдержки при заданной температуре, мин
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT20), сassette.PointDTime_2.c_str()); //Задание
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT21), "");                            //Факт
-
-            //Температура отпуска, °С
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT22), сassette.PointRef_1.c_str());   //Задание
-            SetWindowText(GetDlgItem(hWnd, IDC_EDIT23), сassette.f_temper.c_str());                 //Факт. За 5 минут лдо конца отпуска
-
-            float first[6] ={0, 0,0, 0,0, 0};
-            DataTempCassette.erase(DataTempCassette.begin(), DataTempCassette.end());
-            int iItemServ = 0;
-            if(сassette.Run_at.length())
-            {
-                if(atoi(сassette.Peth.c_str()) == 1)
-                {
-                    float t1 = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.ProcTimeMin").c_str());      //REAL Время до окончания процесса, мин TimeToProcEnd
-                    
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef", 2);    //Заданное значение температуры
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct", 3);    //Фактическое значение температуры
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1", 4);         //Термопара 1
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2", 5);         //Термопара 2
-
-                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef").c_str());
-                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct").c_str());
-                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1").c_str());
-                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2").c_str());
-                }
-                if(atoi(сassette.Peth.c_str()) == 2)
-                {
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef", 2);    //Заданное значение температуры
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct", 3);    //Фактическое значение температуры
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1", 4);         //Термопара 1
-                    GetDataTempCassete(сassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2", 5);         //Термопара 2
-
-                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef").c_str());
-                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct").c_str());
-                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1").c_str());
-                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2").c_str());
-                }
-
-                for(auto& d : DataTempCassette)
-                {
-                    char ss[256];
-                    sprintf_s(ss, 256, "%d", iItemServ + 1);
-
-                    LV_ITEM lvi ={0};
-                    lvi.mask = LVIF_TEXT;
-                    lvi.pszText = (LPSTR)ss;
-                    lvi.cchTextMax = 255;
-                    lvi.iItem = (int)iItemServ;
-                    lvi.lParam = NULL;// param;
-                    LRESULT ret = ListView_InsertItem(ListCasseteTemp, &lvi);
-
-                    ListView_SetItemText(ListCasseteTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
-                    for(int i = 2; i < 6; i++)
-                    {
-                        BOOL end = FALSE;
-                        for(auto& s : d.second)
-                        {
-                            if(s.t == i)
-                            {
-                                char ss[256];
-                                sprintf_s(ss, 256, "%.1f", s.f);
-                                ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
-                                first[i] = s.f;
-                                end = TRUE;
-                                break;
-                            }
-                        }
-                        if(!end)
-                        {
-                            char ss[256];
-                            sprintf_s(ss, 256, "%.1f", first[i]);
-                            ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
-                        }
-
-                    }
-                    iItemServ++;
-                }
-            }
-        }
-    }
-}
+//void GetTemperCassette(HWND hWnd, LPARAM lParam)
+//{
+//    if(lParam >= 0 && lParam < (int)AllSheet.size())
+//    {
+//        TSheet& p = AllSheet[lParam];
+//        {
+//            TCassette cassette;
+//            GetCassete(p, cassette);
+//
+//            //GetTM(std::string datatime, std::tm & TM)
+//            std::vector <std::string>split;
+//            std::string DataTime = cassette.Run_at;
+//            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
+//            if(split.size() == 2)
+//            {
+//                SetWindowText(GetDlgItem(hWnd, IDC_pCassetteDate), split[0].c_str());
+//                SetWindowText(GetDlgItem(hWnd, IDC_pCasseteTime), split[1].c_str());
+//            }
+//
+//            //Время нагрева до температуры отпуска, мин
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT18), cassette.PointTime_1.c_str());  //Задание
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT19), "");                            //Факт
+//
+//            //Время выдержки при заданной температуре, мин
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT20), cassette.PointDTime_2.c_str()); //Задание
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT21), "");                            //Факт
+//
+//            //Температура отпуска, °С
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT22), cassette.PointRef_1.c_str());   //Задание
+//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT23), cassette.f_temper.c_str());                 //Факт. За 5 минут лдо конца отпуска
+//
+//            float first[6] ={0, 0,0, 0,0, 0};
+//            DataTempCassette.erase(DataTempCassette.begin(), DataTempCassette.end());
+//            int iItemServ = 0;
+//            if(cassette.Run_at.length())
+//            {
+//                if(atoi(cassette.Peth.c_str()) == 1)
+//                {
+//                    float t1 = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.ProcTimeMin").c_str());      //REAL Время до окончания процесса, мин TimeToProcEnd
+//                    
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef", 2);    //Заданное значение температуры
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct", 3);    //Фактическое значение температуры
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1", 4);         //Термопара 1
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2", 5);         //Термопара 2
+//
+//                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef").c_str());
+//                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct").c_str());
+//                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1").c_str());
+//                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2").c_str());
+//                }
+//                if(atoi(cassette.Peth.c_str()) == 2)
+//                {
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef", 2);    //Заданное значение температуры
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct", 3);    //Фактическое значение температуры
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1", 4);         //Термопара 1
+//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2", 5);         //Термопара 2
+//
+//                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef").c_str());
+//                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct").c_str());
+//                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1").c_str());
+//                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2").c_str());
+//                }
+//
+//                for(auto& d : DataTempCassette)
+//                {
+//                    char ss[256];
+//                    sprintf_s(ss, 256, "%d", iItemServ + 1);
+//
+//                    LV_ITEM lvi ={0};
+//                    lvi.mask = LVIF_TEXT;
+//                    lvi.pszText = (LPSTR)ss;
+//                    lvi.cchTextMax = 255;
+//                    lvi.iItem = (int)iItemServ;
+//                    lvi.lParam = NULL;// param;
+//                    LRESULT ret = ListView_InsertItem(ListCasseteTemp, &lvi);
+//
+//                    ListView_SetItemText(ListCasseteTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
+//                    for(int i = 2; i < 6; i++)
+//                    {
+//                        BOOL end = FALSE;
+//                        for(auto& s : d.second)
+//                        {
+//                            if(s.t == i)
+//                            {
+//                                char ss[256];
+//                                sprintf_s(ss, 256, "%.1f", s.f);
+//                                ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
+//                                first[i] = s.f;
+//                                end = TRUE;
+//                                break;
+//                            }
+//                        }
+//                        if(!end)
+//                        {
+//                            char ss[256];
+//                            sprintf_s(ss, 256, "%.1f", first[i]);
+//                            ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
+//                        }
+//
+//                    }
+//                    iItemServ++;
+//                }
+//            }
+//        }
+//    }
+//}
 
 //BOOL CenterWindow2(HWND hwndChild, HWND hwndParent);
 DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
@@ -1166,7 +1401,7 @@ DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
     //CenterWindow2(ListSheetTemp, ParentSheet);
     //MoveWindow(ListSheetTemp, 20, 125, 680, 180, true);
 
-    GetTemperSheet(hDlg, lParam);
+    //GetTemperSheet(hDlg, lParam);
 
     //ListCasseteTemp = GetDlgItem(hDlg, IDC_LIST3);
     //SetWindowLongPtr(ListCasseteTemp, GWL_STYLE, Flag);
@@ -1188,7 +1423,7 @@ DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
     //CenterWindow2(ListCasseteTemp, ParentCassete);
     //MoveWindow(ListCasseteTemp, 20, 345, 680, 140, true);
 
-    GetTemperCassette(hDlg, lParam);
+    //GetTemperCassette(hDlg, lParam);
 
     HWND child = GetWindow(hDlg, GW_CHILD);
     do
@@ -1214,12 +1449,12 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
     if(pnm->hdr.code == NM_DBLCLK)
     {
-        LPNMITEMACTIVATE lvi = (LPNMITEMACTIVATE)lParam;
-        if(lvi->iItem >= 0 && lvi->iItem < (int)AllSheet.size())
+        HWND hwndLV = pnm->hdr.hwndFrom;
+        int item = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+        if(item >= 0 && item < (int)AllSheet.size())
         {
-            TSheet& p = AllSheet[lvi->iItem];
-            DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_DIALOG4), hWnd, SheetPasportProc, lvi->iItem);
-            //FilterIDCasseteSheet(atoi(p.Year.c_str()), atoi(p.Month.c_str()), atoi(p.Day.c_str()), atoi(p.CassetteNo.c_str()));
+            TSheet p = AllSheet[item];
+            PrintPdf(p);
         }
     }
     else if(pnm->hdr.code == LVN_GETDISPINFO)
@@ -1242,7 +1477,7 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
 
                     //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
-                    ELSEIF (casSheet::Pos, NameZone[atoi(p.Pos.c_str())]);
+                    else if(subItem == casSheet::Pos) lstrcpyA(plvdi->item.pszText, NamePos[p.Pos].c_str());
 
                     ELSEIF (casSheet::Alloy, p.Alloy.c_str());
                     ELSEIF (casSheet::Thikness, p.Thikness.c_str());
@@ -1254,6 +1489,8 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                     ELSEIF (casSheet::Sheet, p.Sheet.c_str());
                     ELSEIF (casSheet::SubSheet, p.SubSheet.c_str());
                     ELSEIF (casSheet::Temper, p.Temper.c_str());
+                    ELSEIF (casSheet::Temperature, p.Temperature.c_str());
+                    
                     ELSEIF (casSheet::Speed, p.Speed.c_str());
                     ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
                     ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
@@ -1538,7 +1775,7 @@ LRESULT SaveSheetList(HWND hWnd)
     strcpy_s(SaveFilename, 255, file.c_str());
     if(CmdFileSaveXlsx(hWnd, SaveFilename))
     {
-        SaveSheetListXlcx(hWnd, SaveFilename, IDR_DAT4);
+        SaveSheetListXlcx(hWnd, SaveFilename, IDR_DAT1);
     }
     return 0;
 }
@@ -1657,6 +1894,11 @@ void SheetInitInstance()
     SaveHwndSheetList = CreateWindowExA(0, "BUTTON", "Сохранить", WS_CHILD | WS_VISIBLE | WS_BORDER/* | BS_FLAT*/, 450, 0, 150, 20, SheetWindow, (HMENU)113, hInstance, NULL);
     if(!SaveHwndSheetList)
         throw std::exception(std::string("Ошибка создания окна : Сохранить").c_str());
+
+    FilterHwndSheet = CreateWindowExA(0, "EDIT", DataFilterSheet.c_str(), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_READONLY | ES_CENTER | ES_AUTOHSCROLL/* | BS_FLAT*/, 610, 0, 540, 20, SheetWindow, (HMENU)114, hInstance, NULL);
+    if(!FilterHwndSheet)
+        throw std::exception(std::string("Ошибка создания окна : Филтер").c_str());
+
 
     //SELECT* FROM cassette WHERE delete_at IS NULL ORDER BY create_at DESC;
 

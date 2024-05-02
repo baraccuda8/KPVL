@@ -2,6 +2,8 @@
 
 #include "main.h"
 #include "file.h"
+#include "Cassette.h"
+#include "Sheet.h"
 #include "SQL.h"
 
 
@@ -39,15 +41,18 @@ PGConnection conn_tags;
 
 #define SQLFileName "PostgreSQL.dat"
 
-std::string m_dbhost = "192.168.9.61";
+std::string m_dbhost = "192.168.9.63";
 std::string m_dbport = "5432";
 std::string m_dbname = "kpvl";
 std::string m_dbuser = "user";
 std::string m_dbpass = "TutonHamon8*";
 
-std::deque<TTag>AllTag;
+//std::deque<TTag>AllTag;
+extern std::map<int, std::string> EventCassette;
+extern std::map<std::string, std::string> NamePos;
 
-bool PGConnection::connection(std::string con){
+
+bool PGConnection::connection(){
     try
     {
         m_connection = PQsetdbLogin(m_dbhost.c_str(), m_dbport.c_str(), NULL, NULL, m_dbname.c_str(), m_dbuser.c_str(), m_dbpass.c_str());
@@ -55,11 +60,12 @@ bool PGConnection::connection(std::string con){
         if(PQstatus(m_connection) != CONNECTION_OK && PQsetnonblocking(m_connection, 1) != 0)
         {
             connections = false;
+            SendDebug("conn_kpvl", "Ошибка соединения..." + m_dbhost + ":" + m_dbport);
             throw std::runtime_error(PQerrorMessage(m_connection));
         }
 
         PGresult* res = PGexec("SET TIME ZONE 'Asia/Yekaterinburg';");
-        SendDebug(con, "SET TIME ZONE 'Asia/Yekaterinburg';");
+        //SendDebug(con, "SET TIME ZONE 'Asia/Yekaterinburg';");
         if(PQresultStatus(res) != PGRES_TUPLES_OK)
         {
             std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
@@ -119,7 +125,7 @@ DLLRESULT CommandDialog(HWND hWnd, WPARAM wParam)
         GetWindowText(GetDlgItem(hWnd, IDC_EDIT4), ss, 256);    m_dbuser = ss;
         GetWindowText(GetDlgItem(hWnd, IDC_EDIT5), ss, 256);    m_dbpass = ss;
 
-        if(conn_kpvl.connection("conn_kpvl"))
+        if(conn_kpvl.connection())
         {
             //SaveConnect();
             EndDialog(hWnd, FALSE);
@@ -142,33 +148,127 @@ DLLRESULT CALLBACK bagSave(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
 
 
 
+#define AppFurn1 ForBase_RelFurn_1
+#define AppFurn2 ForBase_RelFurn_2
+#define AppCassette cassetteArray.cassette
+#define AppSelected1 cassetteArray.selected_cassetFurn1
+#define AppSelected2 cassetteArray.selected_cassetFurn2
+#define AppCassette1 cassetteArray.cassette[0]
+#define AppCassette2 cassetteArray.cassette[1]
+#define AppCassette3 cassetteArray.cassette[2]
+#define AppCassette4 cassetteArray.cassette[3]
+#define AppCassette5 cassetteArray.cassette[4]
+#define AppCassette6 cassetteArray.cassette[5]
+#define AppCassette7 cassetteArray.cassette[6]
 
+#define StrFurn1 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.")
+#define StrFurn2 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.")
+
+
+T_Hmi210_1 Hmi210_1;
+T_ForBase_RelFurn ForBase_RelFurn_1;
+T_ForBase_RelFurn ForBase_RelFurn_2;
+T_GenSeqFromHmi GenSeqFromHmi;
+
+
+const std::string PathKpvl = "|var|PLC210 OPC-UA.Application.";
+const std::string AppGenSeqFromHmi = PathKpvl + "GenSeqFromHmi.Data.";
+
+
+std::deque<Value*> AllTag ={
+    {Hmi210_1.Htr1_1  = new Value(PathKpvl + "Hmi210_1.Htr_1.ToHmi.TAct")},       //Температура в зоне 1.1
+    {Hmi210_1.Htr1_2  = new Value(PathKpvl + "Hmi210_1.Htr_2.ToHmi.TAct")},       //Температура в зоне 1.2
+    {Hmi210_1.Htr1_3  = new Value(PathKpvl + "Hmi210_1.Htr_3.ToHmi.TAct")},       //Температура в зоне 1.3
+    {Hmi210_1.Htr1_4  = new Value(PathKpvl + "Hmi210_1.Htr_4.ToHmi.TAct")},       //Температура в зоне 1.4
+    {Hmi210_1.Htr2_1 = new Value(PathKpvl + "Hmi210_1.Htr2_1.ToHmi.TAct")},       //Температура в зоне 2.1
+    {Hmi210_1.Htr2_2 = new Value(PathKpvl + "Hmi210_1.Htr2_2.ToHmi.TAct")},       //Температура в зоне 2.2
+    {Hmi210_1.Htr2_3 = new Value(PathKpvl + "Hmi210_1.Htr2_3.ToHmi.TAct")},       //Температура в зоне 2.3
+    {Hmi210_1.Htr2_4 = new Value(PathKpvl + "Hmi210_1.Htr2_4.ToHmi.TAct")},       //Температура в зоне 2.4
+
+    {GenSeqFromHmi.TempSet1     = new Value(AppGenSeqFromHmi + "TempSet1")},       //Уставка температуры 
+
+    {AppFurn1.PointTime_1           = new Value(StrFurn1 + "PointTime_1")}, //: REAL; //Время разгона
+    {AppFurn1.PointRef_1            = new Value(StrFurn1 + "PointRef_1")}, //: REAL;  //Уставка температуры
+    {AppFurn1.PointDTime_2          = new Value(StrFurn1 + "PointDTime_2")}, //: REAL;//Время выдержки
+
+    {AppFurn1.ProcRun               = new Value(StrFurn1 + "ProcRun")}, //: BOOL;//Работа
+    {AppFurn1.ProcEnd               = new Value(StrFurn1 + "ProcEnd")}, //: BOOL;//Окончание процесса
+    {AppFurn1.ProcFault             = new Value(StrFurn1 + "ProcFault")}, //: BOOL;//Авария процесса
+
+    {AppFurn1.TimeProcSet           = new Value(StrFurn1 + "TimeProcSet")}, //: REAL;//Полное время процесса (уставка), мин
+    {AppFurn1.ProcTimeMin           = new Value(StrFurn1 + "ProcTimeMin")}, //: REAL;//Время процесса, час (0..XX)
+    {AppFurn1.TimeToProcEnd         = new Value(StrFurn1 + "TimeToProcEnd")}, //: REAL;//Время до окончания процесса, мин
+    {AppFurn1.TempRef               = new Value(StrFurn1 + "TempRef")}, //: REAL;//Заданное значение температуры
+    {AppFurn1.TempAct               = new Value(StrFurn1 + "TempAct")}, //: REAL;//Фактическое значение температуры
+    {AppFurn1.T1                    = new Value(StrFurn1 + "T1")}, //: REAL; // термопара 1
+    {AppFurn1.T2                    = new Value(StrFurn1 + "T2")}, //: REAL; // термопара 2
+    {AppFurn1.ActTimeHeatAcc        = new Value(StrFurn1 + "ActTimeHeatAcc")}, //: REAL; // Факт время нагрева
+    {AppFurn1.ActTimeHeatWait       = new Value(StrFurn1 + "ActTimeHeatWait")}, //: REAL; // Факт время выдержки
+    {AppFurn1.ActTimeTotal          = new Value(StrFurn1 + "ActTimeTotal")}, //: REAL; // Факт общее время
+
+    {AppFurn1.Cassette.Day          = new Value(StrFurn1 + "Cassette.Day")}, //ID касеты день
+    {AppFurn1.Cassette.Month        = new Value(StrFurn1 + "Cassette.Month")}, //ID касеты месяц
+    {AppFurn1.Cassette.Year         = new Value(StrFurn1 + "Cassette.Year")}, //ID касеты год
+    {AppFurn1.Cassette.CassetteNo   = new Value(StrFurn1 + "Cassette.CaasetteNo")}, //ID касеты номер
+
+    //Вторая печь
+    {AppFurn2.PointTime_1           = new Value(StrFurn2 + "PointTime_1")}, //: REAL;//Время разгона
+    {AppFurn2.PointRef_1            = new Value(StrFurn2 + "PointRef_1")}, //: REAL;//Уставка температуры
+    {AppFurn2.PointDTime_2          = new Value(StrFurn2 + "PointDTime_2")}, //: REAL;//Время выдержки
+
+    {AppFurn2.ProcRun               = new Value(StrFurn2 + "ProcRun")}, //: BOOL;//Работа
+    {AppFurn2.ProcEnd               = new Value(StrFurn2 + "ProcEnd")}, //: BOOL;//Окончание процесса
+    {AppFurn2.ProcFault             = new Value(StrFurn2 + "ProcFault")}, //: BOOL;//Авария процесса
+
+    {AppFurn2.TimeProcSet           = new Value(StrFurn2 + "TimeProcSet")}, //: REAL;//Полное время процесса (уставка), мин
+    {AppFurn2.ProcTimeMin           = new Value(StrFurn2 + "ProcTimeMin")}, //: REAL;//Время процесса, час (0..XX)
+    {AppFurn2.TimeToProcEnd         = new Value(StrFurn2 + "TimeToProcEnd")}, //: REAL;//Время до окончания процесса, мин
+    {AppFurn2.TempRef               = new Value(StrFurn2 + "TempRef")}, //: REAL;//Заданное значение температуры
+    {AppFurn2.TempAct               = new Value(StrFurn2 + "TempAct")}, //: REAL;//Фактическое значение температуры
+    {AppFurn2.T1                    = new Value(StrFurn2 + "T1")}, //: REAL; // термопара 1
+    {AppFurn2.T2                    = new Value(StrFurn2 + "T2")}, //: REAL; // термопара 2
+
+    {AppFurn2.ActTimeHeatAcc        = new Value(StrFurn2 + "ActTimeHeatAcc")}, //: REAL; // Факт время нагрева
+    {AppFurn2.ActTimeHeatWait       = new Value(StrFurn2 + "ActTimeHeatWait")}, //: REAL; // Факт время выдержки
+    {AppFurn2.ActTimeTotal          = new Value(StrFurn2 + "ActTimeTotal")}, //: REAL; // Факт общее время
+
+    {AppFurn2.Cassette.Day          = new Value(StrFurn2 + "Cassette.Day")}, ///ID касеты день
+    {AppFurn2.Cassette.Month        = new Value(StrFurn2 + "Cassette.Month")}, //ID касеты месяц
+    {AppFurn2.Cassette.Year         = new Value(StrFurn2 + "Cassette.Year")},  //ID касеты год
+    {AppFurn2.Cassette.CassetteNo   = new Value(StrFurn2 + "Cassette.CaasetteNo")}, //ID касеты номер
+};
+
+bool GetTagTable(std::string patch, PGresult* res, int l)
+{
+    for(auto& val : AllTag)
+    {
+        if(val->Name == patch)
+        {
+            val->ID = conn_kpvl.PGgetvalue(res, l, 0).c_str();
+            return true;
+        }
+    }
+    return false;
+}
 
 void GetTag()
 {
     try
     {
-        TTag tag;
-        AllTag.push_back(tag);
+        //Value tag;
+        //AllTag.push_back(tag);
 
-        std::string command = "SELECT * FROM tag ORDER BY id_name";
+        std::string command = "SELECT id, name FROM tag ORDER BY id";
         PGresult* res = conn_kpvl.PGexec(command);
         SendDebug(__FUNCTION__, "conn_kpvl", command);
         if(PQresultStatus(res) == PGRES_TUPLES_OK)
         {
             int line = PQntuples(res);
+
             for(int l = 0; l < line; l++)
             {
-                tag.create_at = conn_kpvl.PGgetvalue(res, l, 0);
-                tag.id =  conn_kpvl.PGgetvalue(res, l, 1);
-                tag.id_name = conn_kpvl.PGgetvalue(res, l, 2);
-                tag.name = conn_kpvl.PGgetvalue(res, l, 3);
-                tag.type = conn_kpvl.PGgetvalue(res, l, 4);
-                tag.arhive = conn_kpvl.PGgetvalue(res, l, 5);
-                tag.comment = conn_kpvl.PGgetvalue(res, l, 6);
-                tag.content = conn_kpvl.PGgetvalue(res, l, 7);
-                tag.content_at = conn_kpvl.PGgetvalue(res, l, 8);
-                AllTag.push_back(tag);
+                std::string Patch = conn_kpvl.PGgetvalue(res, l, 1);
+                GetTagTable(Patch, res, l);
             }
         }
         else
@@ -190,60 +290,60 @@ void GetTag()
 }
 
 
-DWORD WINAPI GetTagContent(LPVOID pv)
-{
-    try
-    {
-        Run=TRUE;
-        GetTag();
-        while(Run)
-        {
-            std::string command = "SELECT id_name, content, create_at FROM tag ORDER BY id_name";
-            PGresult* res = conn_tags.PGexec(command);
-            //SendDebug("conn_tags", command);
-            if(PQresultStatus(res) == PGRES_TUPLES_OK)
-            {
-                int line = PQntuples(res);
-                for(int l = 0; l < line; l++)
-                {
-                    std::string id_name = conn_kpvl.PGgetvalue(res, l, 0);
-                    std::string content = conn_kpvl.PGgetvalue(res, l, 1);
-                    std::string content_at = conn_kpvl.PGgetvalue(res, l, 2);
-                    for(auto& id : AllTag)
-                    {
-                        if(id.id_name == id_name)
-                        {
-                            id.content = content;
-                            id.content_at = content_at;
-                            break;
-                        }
-                    }
-                    //AllTag.push_back(tag);
-                }
-            }
-            else
-            {
-                std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-                SendDebug("conn_kpvl", errc);
-                SendDebug("conn_kpvl", command);
-            }
-            PQclear(res);
-            int r = 0;
-            while(Run && r++ < 10) //10 секунд
-                Sleep(1000);
-        }
-    }
-    catch(std::exception& exc)
-    {
-        WinErrorExit(NULL, exc.what());
-    }
-    catch(...)
-    {
-        WinErrorExit(NULL, "Unknown error.");
-    }
-
-    return 0;
-}
+//DWORD WINAPI GetTagContent(LPVOID pv)
+//{
+//    try
+//    {
+//        Run=TRUE;
+//        //GetTag();
+//        while(Run)
+//        {
+//            std::string command = "SELECT name, content, create_at FROM tag ORDER BY id";
+//            PGresult* res = conn_tags.PGexec(command);
+//            //SendDebug("conn_tags", command);
+//            if(PQresultStatus(res) == PGRES_TUPLES_OK)
+//            {
+//                int line = PQntuples(res);
+//                for(int l = 0; l < line; l++)
+//                {
+//                    std::string id_name = conn_kpvl.PGgetvalue(res, l, 0);
+//                    std::string content = conn_kpvl.PGgetvalue(res, l, 1);
+//                    std::string content_at = conn_kpvl.PGgetvalue(res, l, 2);
+//                    for(auto& id : AllTag)
+//                    {
+//                        if(id.id_name == id_name)
+//                        {
+//                            id.content = content;
+//                            id.content_at = content_at;
+//                            break;
+//                        }
+//                    }
+//                    //AllTag.push_back(tag);
+//                }
+//            }
+//            else
+//            {
+//                std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
+//                SendDebug("conn_kpvl", errc);
+//                SendDebug("conn_kpvl", command);
+//            }
+//            PQclear(res);
+//            int r = 0;
+//            while(Run && r++ < 10) //10 секунд
+//                Sleep(1000);
+//        }
+//    }
+//    catch(std::exception& exc)
+//    {
+//        WinErrorExit(NULL, exc.what());
+//    }
+//    catch(...)
+//    {
+//        WinErrorExit(NULL, "Unknown error.");
+//    }
+//
+//    return 0;
+//}
 
 namespace SETALLOY{
     //typedef struct sde{
@@ -379,6 +479,109 @@ HANDLE hKPVLURI = NULL;
 //Серьезность	Код	Описание	Проект	Файл	Строка	Состояние подавления	Подробности
 //Ошибка	C4996	'std::copy::_Unchecked_iterators::_Deprecate': Call to 'std::copy' with parameters that may be unsafe - this call relies on the caller to check that the passed values are correct.To disable this warning, use - D_SCL_SECURE_NO_WARNINGS.See documentation on how to use Visual C++ 'Checked Iterators'	KPVL	C : \Program Files (x86)\Microsoft Visual Studio 14.0\VC\include\xutility	2372
 
+void ItitTag()
+{
+
+    GetTag();
+
+    std::string comand;
+    PGresult* res;
+#pragma region SELECT id, content FROM possheet
+    comand = "SELECT id, content FROM possheet"; ///* WHERE name = '" + val->Patch + "'*/;";
+    res = conn_kpvl.PGexec(comand);
+    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    {
+        int line = PQntuples(res);
+        for(int l = 0; l < line; l++)
+            NamePos[conn_kpvl.PGgetvalue(res, l, 0)] = conn_kpvl.PGgetvalue(res, l, 1);
+    }
+    if(PQresultStatus(res) == PGRES_FATAL_ERROR)
+        LOG_ERR_SQL(SQLLogger, res, comand);
+    PQclear(res);
+
+    if(!NamePos.size())
+    {
+        NamePos ={
+            {"0", "На входе" },
+            {"1", "1-я часть печи"},
+            {"2", "2-я часть печи"},
+            {"3", "Закалка"},
+            {"4", "Охлаждение"},
+            {"5", "Кантовка"},
+            {"6", "Кантовка"},
+            {"7", "В касете"},
+
+            {"10", "Потерян На входе" },
+            {"11", "Потерян 1-я часть печи"},
+            {"12", "Потерян 2-я часть печи"},
+            {"13", "Потерян Закалке"},
+            {"14", "Потерян Охлаждении"},
+            {"15", "Потерян Кантовке"},
+            {"16", "Потерян Кантовке"},
+            {"17", "Потерян В касете"},
+
+            {"20", "Потерян На входе" },
+            {"21", "Потерян 1-я часть печи"},
+            {"22", "Потерян 2-я часть печи"},
+            {"23", "Потерян Закалке"},
+            {"24", "Потерян Охлаждении"},
+            {"25", "Потерян Кантовке"},
+            {"26", "Потерян Кантовке"},
+            {"27", "Потерян В касете"},
+        };
+
+        std::stringstream ss;
+        for(std::map <std::string, std::string>::iterator it = NamePos.begin(); it != NamePos.end(); it++)
+        {
+            ss << "INSERT INTO possheet (id, content) VALUES ('" << it->first << "', '" << it->second << "');\n";
+            NamePos[it->first] = it->second;
+        }
+        SETUPDATESQL(conn_kpvl, ss);
+        //comand = ss.str();
+        //res = conn_kpvl.PGexec(comand);
+        //if(PQresultStatus(res) == PGRES_FATAL_ERROR)
+        //    LOG_ERR_SQL(SQLLogger, res, comand);
+        //PQclear(res);
+    }
+#pragma endregion
+
+#pragma region SELECT id, content FROM EventCassette
+    comand = "SELECT id, content FROM EventCassette"; ///* WHERE name = '" + val->Patch + "'*/;";
+    res = conn_kpvl.PGexec(comand);
+    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    {
+        int line = PQntuples(res);
+        for(int l = 0; l < line; l++)
+            EventCassette[(evCassete::EV)std::stoi(conn_kpvl.PGgetvalue(res, l, 0))] = conn_kpvl.PGgetvalue(res, l, 1).c_str();
+    }
+    if(PQresultStatus(res) == PGRES_FATAL_ERROR)
+        LOG_ERR_SQL(SQLLogger, res, comand);
+    PQclear(res);
+
+    if(!EventCassette.size())
+    {
+        std::map<int, std::string> eventcassette ={
+            {evCassete::Nul,  "Неизвестно"},
+            {evCassete::Fill, "Набирается"},
+            {evCassete::Wait, "Ожидает"},
+            {evCassete::Rel, "Отпуск"},
+            {evCassete::Error, "Авария"},
+            {evCassete::End, "Конец"},
+            {evCassete::History, "Из базы"},
+        };
+
+        std::stringstream ss;
+        for(std::map <int, std::string>::iterator it = eventcassette.begin(); it != eventcassette.end(); it++)
+        {
+            ss << "INSERT INTO EventCassette (id, content) VALUES (" << it->first << ", '" << it->second << "');\n";
+            EventCassette[it->first] = it->second;
+        }
+        SETUPDATESQL(conn_kpvl, ss);
+        PQclear(res);
+    }
+#pragma endregion
+
+}
 
 bool InitSQL()
 {
@@ -387,33 +590,35 @@ bool InitSQL()
         if(!LoadConnect())
         {
             DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, bagSave);
-            if(!conn_kpvl.connection("conn_kpvl"))
+            if(!conn_kpvl.connection())
                 throw std::exception("Error SQL connection KPVL");
             //Sleep(1000);
-            if(!conn_dops.connection("conn_dops"))
+            if(!conn_dops.connection())
                 throw std::exception("Error SQL connection dops");
             //Sleep(1000);
-            if(!conn_tags.connection("conn_tags"))
+            if(!conn_tags.connection())
                 throw std::exception("Error SQL connection tags");
             //Sleep(1000);
             SaveConnect();
+            ItitTag();
             //Sleep(3000);
             //SETALLOY::Reloc();
-            hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
+            //hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
         }
         else
         {
-            if(!conn_kpvl.connection("conn_kpvl"))
+            if(!conn_kpvl.connection())
                 throw std::exception("Error SQL connection KPVL");
             //Sleep(1000);
-            if(!conn_dops.connection("conn_dops"))
+            if(!conn_dops.connection())
                 throw std::exception("Error SQL connection dops");
             //Sleep(1000);
-            if(!conn_tags.connection("conn_tags"))
+            if(!conn_tags.connection())
                 throw std::exception("Error SQL connection tags");
             //SETALLOY::Reloc();
             //Sleep(3000);
-            hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
+            ItitTag();
+            //hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
         }
     }
     catch(std::exception& exc)

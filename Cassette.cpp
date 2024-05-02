@@ -19,6 +19,7 @@ HWND FilterHwndCassetteData = NULL;
 HWND FilterHwndCassetteID = NULL;
 HWND UpdateHwndCassette = NULL;
 HWND SaveHwndCassetteList = NULL;
+HWND FilterHwndCassette = NULL;
 
 std::string strTitleCassette = "Кассеты";
 std::string strClassCassette = "ClassCassette";
@@ -27,43 +28,62 @@ std::string DataStartCassette = "";
 std::string DataStopCassette = "";
 std::string FilterUpdateComand = "SELECT * FROM cassete ORDER BY create_at DESC;";
 
-//Заголовки колонок окна кассет
-std::map <casCassette::cas, ListTitle> Cassette_Collumn ={
-    {casCassette::cas::nn, { "№", 30}},
-    {casCassette::cas::Id, { "Ид", 50}},
-    {casCassette::cas::Create_at, { "Новая кассета", 130}},
-    {casCassette::cas::Event, { "Текущая\nпозицитя", 100}},
-    {casCassette::cas::Year, {"Год", 50}},
-    {casCassette::cas::Month, {"Месяц", 50}},
-    {casCassette::cas::Day, { "День", 50 }},
-    {casCassette::cas::CassetteNo, { "Касета", 60 }},
-    {casCassette::cas::SheetInCassette, { "Листов", 60 }},
-    {casCassette::cas::Close_at, { "Кассета закрыта", 130 }},
-    {casCassette::cas::Peth, {"Печь", 50}},
-    {casCassette::cas::Run_at, { "Начало оптуска", 130 }},
-    {casCassette::cas::End_at, { "Конец оптуска", 130 }},
-    {casCassette::cas::Error_at, { "Ошибка оптуска", 130 }},
-    {casCassette::cas::Delete_at, {"Удален", 130}},
+//Заголовки колонок окна касет
+std::map<int, std::string> EventCassette ={
+    //{evCassete::Nul,  "Неизвестно"},
+    //{evCassete::Fill, "Набирается"},
+    //{evCassete::Wait, "Ожидает"},
+    //{evCassete::Rel, "Отпуск"},
+    //{evCassete::Error, "Авария"},
+    //{evCassete::End, "Конец"},
+    //{evCassete::History, "Из базы"},
+};
 
-    {casCassette::cas::PointRef_1, { "Уставка\nтемпературы", 100 }},
-    {casCassette::cas::f_temper, { "Факт\nтемпературы", 100 }},  //Факт температуры за 5 минут до конца отпуска
-    {casCassette::cas::PointTime_1, { "Уставка\nвремя разгона", 130 }},
-    {casCassette::cas::TimeProcSet, { "Уставка\nполное время", 130 }},
-    {casCassette::cas::PointDTime_2, { "Уставка\nвремя выдержки", 130 }},
-     
+
+
+//Заголовки колонок окна кассет
+std::map <int, ListTitle> Cassette_Collumn ={
+    {Cassete::NN, { "№", 30}},
+    {Cassete::Id, { "Ид", 50}},
+    {Cassete::Event, { "Событие", 100}},
+    {Cassete::Create_at, { "Новая кассета", 130}},
+    {Cassete::Year, {"Год", 50}},
+    {Cassete::Month, {"Месяц", 50}},
+    {Cassete::Day, { "День", 50 }},
+    {Cassete::CassetteNo, { "Касета", 60 }},
+    {Cassete::SheetInCassette, { "Листов", 60 }},
+    //{Cassete::Close_at, { "Кассета закрыта", 130 }},
+    {Cassete::Peth, {"Печь", 50}},
+    {Cassete::Run_at, { "Начало отпуска", 130 }},
+    {Cassete::End_at, { "Конец отпуска", 130 }},
+    {Cassete::Finish_at, { "Финиш отпуска", 130 }},
+    {Cassete::Error_at, { "Ошибка отпуска", 130 }},
+    //{Cassete::Delete_at, {"Удален", 130}},
+    {Cassete::HeatAcc, {"Факт время\nнагрева", 100 }},
+    {Cassete::HeatWait, {"Факт время\nвыдержки", 100 }},
+    {Cassete::Total, {"Факт общее\nвремя", 100 }},
+
+    {Cassete::PointRef_1, { "Уставка\nтемпературы", 100 }},
+    {Cassete::f_temper, { "Факт\nтемпературы", 100 }},  //Факт температуры за 5 минут до конца отпуска
+
+    {Cassete::PointTime_1, { "Уставка\nвремя нагрева", 130 }},
+    {Cassete::TimeProcSet, { "Уставка\nполное время", 130 }},
+    {Cassete::PointDTime_2, { "Уставка\nвремя выдержки", 130 }},
+
 
 };
 
 //Заголовки колонок окна касет
-std::map<int, const char*> NameEventCassette ={
-    {0,  "Неизвестно"},
-    {1, "Набирается"},
-    {2, "Ожидает"},
-    {3, "Отпуск"},
-    {4, "Авария"},
-    {5, "Конец"},
-    {6, "Из базы"},
-};
+//std::map<int, const char*> NameEventCassette ={
+//    {0,  "Неизвестно"},
+//    {1, "Набирается"},
+//    {2, "Ожидает"},
+//    {3, "Отпуск"},
+//    {4, "Авария"},
+//    {5, "Конец"},
+//    {6, "Из базы"},
+//    {7, "Удален"},
+//};
 
 
 void SizeListCassette(LPARAM lParam)
@@ -79,6 +99,101 @@ void AddHistoriCassette(bool begin)
     AddItem(ListCassette, begin);
 }
 
+namespace Coll{
+    int Create_at = 0;
+    int Id = 0;
+    int Event = 0;
+    int Day = 0;
+    int Month = 0;
+    int Year = 0;
+    int CassetteNo = 0;
+    int SheetInCassette = 0;
+    int Close_at = 0;
+    int Peth = 0;
+    int Run_at = 0;
+    int Error_at = 0;
+    int End_at = 0;
+    int Delete_at = 0;
+    int TempRef = 0;           //Заданное значение температуры
+    int PointTime_1 = 0;       //Время разгона
+    int PointRef_1 = 0;        //Уставка температуры
+    int TimeProcSet = 0;       //Полное время процесса (уставка), мин
+    int PointDTime_2 = 0;      //Время выдержки
+    int f_temper = 0;          //Факт температуры за 5 минут до конца отпуска
+    int Finish_at = 0;
+    int HeatAcc = 0;           //Факт время нагрева
+    int HeatWait = 0;          //Факт время выдержки
+    int Total = 0;             //Факт общее время
+
+};
+
+
+//Получение номера колонки
+void GetCollCassette(PGresult* res)
+{
+    if(!Coll::Total)
+    {
+        int nFields = PQnfields(res);
+        for(int j = 0; j < nFields; j++)
+        {
+            std::string l =  utf8_to_cp1251(PQfname(res, j));
+            if(l == "create_at") Coll::Create_at = j;
+            else if(l == "id") Coll::Id = j;
+            else if(l == "event") Coll::Event = j;
+            else if(l == "day") Coll::Day = j;
+            else if(l == "month") Coll::Month = j;
+            else if(l == "year") Coll::Year = j;
+            else if(l == "cassetteno") Coll::CassetteNo = j;
+            else if(l == "sheetincassette") Coll::SheetInCassette = j;
+            else if(l == "close_at") Coll::Close_at = j;
+            else if(l == "peth") Coll::Peth = j;
+            else if(l == "run_at") Coll::Run_at = j;
+            else if(l == "error_at") Coll::Error_at = j;
+            else if(l == "end_at") Coll::End_at = j;
+            else if(l == "delete_at") Coll::Delete_at = j;
+            else if(l == "tempref") Coll::TempRef = j;
+            else if(l == "pointtime_1") Coll::PointTime_1 = j;
+            else if(l == "pointref_1") Coll::PointRef_1 = j;
+            else if(l == "timeprocset") Coll::TimeProcSet = j;
+            else if(l == "pointdtime_2") Coll::PointDTime_2 = j;
+            else if(l == "facttemper") Coll::f_temper = j;
+            else if(l == "finish_at") Coll::Finish_at = j;
+            else if(l == "heatacc")Coll::HeatAcc = j;
+            else if(l == "heatwait")Coll::HeatWait = j;
+            else if(l == "total")Coll::Total = j;
+
+        }
+    }
+}
+
+//Чтение кассеты
+void GetCassette(PGresult* res, TCassette& cassette, int line)
+{
+    cassette.Create_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Create_at));
+    cassette.Id = conn_kpvl.PGgetvalue(res, line, Coll::Id);
+    cassette.Event = conn_kpvl.PGgetvalue(res, line, Coll::Event);
+    cassette.Day = conn_kpvl.PGgetvalue(res, line, Coll::Day);
+    cassette.Month = conn_kpvl.PGgetvalue(res, line, Coll::Month);
+    cassette.Year = conn_kpvl.PGgetvalue(res, line, Coll::Year);
+    cassette.CassetteNo = conn_kpvl.PGgetvalue(res, line, Coll::CassetteNo);
+    cassette.SheetInCassette = conn_kpvl.PGgetvalue(res, line, Coll::SheetInCassette);
+    cassette.Close_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Close_at));
+    cassette.Peth = conn_kpvl.PGgetvalue(res, line, Coll::Peth);
+    cassette.Run_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Run_at));
+    cassette.Error_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Error_at));
+    cassette.End_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::End_at));
+    cassette.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Delete_at));
+    cassette.TempRef = conn_kpvl.PGgetvalue(res, line, Coll::TempRef);           //Заданное значение температуры
+    cassette.PointTime_1 = conn_kpvl.PGgetvalue(res, line, Coll::PointTime_1);       //Время разгона
+    cassette.PointRef_1 = conn_kpvl.PGgetvalue(res, line, Coll::PointRef_1);        //Уставка температуры
+    cassette.TimeProcSet = conn_kpvl.PGgetvalue(res, line, Coll::TimeProcSet);       //Полное время процесса (уставка), мин
+    cassette.PointDTime_2 = conn_kpvl.PGgetvalue(res, line, Coll::PointDTime_2);      //Время выдержки
+    cassette.f_temper = conn_kpvl.PGgetvalue(res, line, Coll::f_temper);          //Факт температуры за 5 минут до конца отпуска
+    cassette.Finish_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Finish_at)); //Завершение процесса + 15 минут
+    cassette.HeatAcc = conn_kpvl.PGgetvalue(res, line, Coll::HeatAcc); //Завершение процесса + 15 минут
+    cassette.HeatWait = conn_kpvl.PGgetvalue(res, line, Coll::HeatWait); //Завершение процесса + 15 минут
+    cassette.Total = conn_kpvl.PGgetvalue(res, line, Coll::Total); //Завершение процесса + 15 минут
+}
 
 void FilterUpdate()
 {
@@ -86,42 +201,18 @@ void FilterUpdate()
     AllCassette.erase(AllCassette.begin(), AllCassette.end());
 
     PGresult* res = conn_kpvl.PGexec(FilterUpdateComand);
-    SendDebug("conn_kpvl", FilterUpdateComand);
+    //SendDebug("conn_kpvl", FilterUpdateComand);
     if(PQresultStatus(res) == PGRES_TUPLES_OK)
     {
+        GetCollCassette(res);
+
         int line = PQntuples(res);
-        int nFields = PQnfields(res);
+        //int nFields = PQnfields(res);
         for(int l = 0; l < line; l++)
         {
-
-            TCassette сassette;
-
-            //create_at | id | event | day | month | year | cassetteno | sheetincassette | close_at | peth | run_at | error_at | end_at | delete_at |
-            //std::vector <std::string>split;
-            сassette.Create_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::create_at));
-            сassette.Id = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::id);
-            сassette.Event = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::event);
-            сassette.Day = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::day);
-            сassette.Month = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::month);
-            сassette.Year = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::year);
-            сassette.CassetteNo = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::cassetteno);
-            сassette.SheetInCassette = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::sheetincassette);
-            сassette.Close_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::close_at));
-            сassette.Peth = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::peth);
-            сassette.Run_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::run_at));
-            сassette.Error_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::error_at));
-            сassette.End_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::end_at));
-            сassette.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::delete_at));
-
-            сassette.TempRef = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::tempref);
-            сassette.PointTime_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointtime_1);
-            сassette.PointRef_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointref_1);
-            сassette.TimeProcSet = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::timeprocset);
-            сassette.PointDTime_2 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointdtime_2);
-            сassette.f_temper = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::f_temper);
-
-
-            AllCassette.push_back(сassette);
+            TCassette cassette;
+            GetCassette(res, cassette, l);
+            AllCassette.push_back(cassette);
             AddHistoriCassette(false);
         }
     }
@@ -132,8 +223,12 @@ void FilterUpdate()
     }
     PQclear(res);
 }
+std::string DataFilterCassette;
 void FilterDataTimeCassette()
 {
+    DataFilterCassette = "от " + DataStartCassette + " до " + DataStopCassette;
+    SetWindowText(FilterHwndCassette, DataFilterCassette.c_str());
+
     FilterUpdateComand = "SELECT * FROM cassette ";
     FilterUpdateComand += "WHERE ";
     //Если не нужны удаленные в ручную то
@@ -246,6 +341,19 @@ DLLRESULT CALLBACK FilterCassetteIDProc(HWND hWnd, UINT message, WPARAM wParam, 
 LRESULT OnNotifyCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
+    if(pnm->hdr.code == NM_RCLICK)
+    {
+        HWND hwndLV = pnm->hdr.hwndFrom;
+        LV_ITEM lvi;
+        lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+        if(lvi.iItem == -1) return FALSE;
+        TCassette& cassette = AllCassette[lvi.iItem];
+        if(cassette.Event == "7")
+            DisplayContextMenu(hWnd, IDR_MENU3);
+        else
+            DisplayContextMenu(hWnd, IDR_MENU2);
+    }
+
     if(pnm->hdr.code == NM_DBLCLK)
     {
         LPNMITEMACTIVATE lvi = (LPNMITEMACTIVATE)lParam;
@@ -268,54 +376,30 @@ LRESULT OnNotifyCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 TCassette& p = AllCassette[item];
                 {
 
-                    ////{casCassette::cas::nn, {"№", 30} },
-                    ////{casCassette::cas::Id, { "Ид", 50}},
-                    ////{casCassette::cas::Create_at, { "Новая кассета", 130}},
-                    ////{casCassette::cas::Event, { "Текущая\nпозицитя", 100}},
-                    ////{casCassette::cas::Year, {"Год", 50}},
-                    ////{casCassette::cas::Month, {"Месяц", 50}},
-                    ////{casCassette::cas::Day, { "День", 50 }},
-                    ////{casCassette::cas::CassetteNo, { "Касета", 60 }},
-                    ////{casCassette::cas::SheetInCassette, { "Листов", 60 }},
-                    ////{casCassette::cas::Close_at, { "Кассета закрыта", 130 }},
-                    ////{casCassette::cas::Peth, {"Печь", 50}},
-                    ////{casCassette::cas::Run_at, { "Начало оптуска", 130 }},
-                    ////{casCassette::cas::End_at, { "Конец оптуска", 130 }},
-                    ////{casCassette::cas::Error_at, { "Ошибка оптуска", 130 }},
-                    ////{casCassette::cas::Delete_at, {"Удален", 130}},
+                    if(plvdi->item.iSubItem == Cassete::NN)                lstrcpy(plvdi->item.pszText, std::to_string(item + 1).c_str());
+                    if(plvdi->item.iSubItem == Cassete::Id)                lstrcpy(plvdi->item.pszText, p.Id.c_str());
+                    if(plvdi->item.iSubItem == Cassete::Event)             lstrcpy(plvdi->item.pszText, EventCassette[std::stoi(p.Event)].c_str());
+                    if(plvdi->item.iSubItem == Cassete::Create_at)         lstrcpy(plvdi->item.pszText, p.Create_at.c_str());
+                    if(plvdi->item.iSubItem == Cassete::Year)              lstrcpy(plvdi->item.pszText, p.Year.c_str());
+                    if(plvdi->item.iSubItem == Cassete::Month)             lstrcpy(plvdi->item.pszText, p.Month.c_str());
+                    if(plvdi->item.iSubItem == Cassete::Day)               lstrcpy(plvdi->item.pszText, p.Day.c_str());
+                    if(plvdi->item.iSubItem == Cassete::CassetteNo)        lstrcpy(plvdi->item.pszText, p.CassetteNo.c_str());
+                    if(plvdi->item.iSubItem == Cassete::SheetInCassette)   lstrcpy(plvdi->item.pszText, p.SheetInCassette.c_str());
+                    //if(plvdi->item.iSubItem == Cassete::Close_at)          lstrcpy(plvdi->item.pszText, p.Close_at.c_str());    //Закрытие касеты
+                    if(plvdi->item.iSubItem == Cassete::Peth)              lstrcpy(plvdi->item.pszText, p.Peth.c_str());        //Печь
+                    if(plvdi->item.iSubItem == Cassete::Run_at)            lstrcpy(plvdi->item.pszText, p.Run_at.c_str());      //Начало отпуска
+                    if(plvdi->item.iSubItem == Cassete::End_at)            lstrcpy(plvdi->item.pszText, p.End_at.c_str());      //Конец отпуска
+                    if(plvdi->item.iSubItem == Cassete::Finish_at)         lstrcpy(plvdi->item.pszText, p.Finish_at.c_str());   //Финиш процесса
+                    if(plvdi->item.iSubItem == Cassete::Error_at)          lstrcpy(plvdi->item.pszText, p.Error_at.c_str());    //Ошибка отпуска
+                    if(plvdi->item.iSubItem == Cassete::HeatAcc)           lstrcpy(plvdi->item.pszText, p.HeatAcc.c_str());     //Факт время нагрева
+                    if(plvdi->item.iSubItem == Cassete::HeatWait)          lstrcpy(plvdi->item.pszText, p.HeatWait.c_str());    //Факт время выдержки
+                    if(plvdi->item.iSubItem == Cassete::Total)             lstrcpy(plvdi->item.pszText, p.Total.c_str());       //Факт общее время
 
-                    ////{casCassette::cas::TempRef, { "Заданная\nтемпература", 80 }},            //Заданное значение температуры
-                    //{casCassette::cas::PointTime_1, { "Время\nразгона", 80 }},
-                    //{casCassette::cas::PointRef_1, { "Уставка\nтемпературы", 80 }},
-                    //{casCassette::cas::TimeProcSet, { "Полное\nвремя", 80 }},
-                    //{casCassette::cas::PointDTime_2, { "Время\nвыдержки", 80 }},
-                    //{casCassette::cas::f_temper, { "Факт\nтемпературы", 88 }},  //Факт температуры за 5 минут до конца отпуска
-
-                    if(subItem == casCassette::nn)          lstrcpy(plvdi->item.pszText, std::to_string(item + 1).c_str());
-                    else if(subItem == casCassette::Id) lstrcpyA(plvdi->item.pszText, p.Id.c_str());
-                    else if(subItem == casCassette::Create_at) lstrcpyA(plvdi->item.pszText, p.Create_at.c_str());
-                    else if(subItem == casCassette::Event) lstrcpyA(plvdi->item.pszText, NameEventCassette[atoi(p.Event.c_str())]);
-                    else if(subItem == casCassette::Year) lstrcpyA(plvdi->item.pszText, p.Year.c_str());
-                    else if(subItem == casCassette::Month) lstrcpyA(plvdi->item.pszText, p.Month.c_str());
-                    else if(subItem == casCassette::Day) lstrcpyA(plvdi->item.pszText, p.Day.c_str());
-                    else if(subItem == casCassette::CassetteNo) lstrcpyA(plvdi->item.pszText, p.CassetteNo.c_str());
-                    else if(subItem == casCassette::SheetInCassette) lstrcpyA(plvdi->item.pszText, p.SheetInCassette.c_str());
-                    else if(subItem == casCassette::Close_at) lstrcpyA(plvdi->item.pszText, p.Close_at.c_str());
-                    else if(subItem == casCassette::Peth) lstrcpyA(plvdi->item.pszText, p.Peth.c_str());
-                    else if(subItem == casCassette::Run_at) lstrcpyA(plvdi->item.pszText, p.Run_at.c_str());
-                    else if(subItem == casCassette::End_at) lstrcpyA(plvdi->item.pszText, p.End_at.c_str());
-                    else if(subItem == casCassette::Error_at) lstrcpyA(plvdi->item.pszText, p.Error_at.c_str());
-                    else if(subItem == casCassette::Delete_at) lstrcpyA(plvdi->item.pszText, p.Delete_at.c_str());
-                    //else if(subItem == casCassette::TempRef) lstrcpyA(plvdi->item.pszText, p.TempRef.c_str());
-                    else if(subItem == casCassette::PointTime_1) lstrcpyA(plvdi->item.pszText, p.PointTime_1.c_str());
-                    else if(subItem == casCassette::PointRef_1) lstrcpyA(plvdi->item.pszText, p.PointRef_1.c_str());
-                    else if(subItem == casCassette::TimeProcSet) lstrcpyA(plvdi->item.pszText, p.TimeProcSet.c_str());
-                    else if(subItem == casCassette::PointDTime_2) lstrcpyA(plvdi->item.pszText, p.PointDTime_2.c_str());
-                    else 
-                        if(subItem == casCassette::f_temper) 
-                            lstrcpyA(plvdi->item.pszText, p.f_temper.c_str());
-
-
+                    if(plvdi->item.iSubItem == Cassete::PointRef_1)        lstrcpy(plvdi->item.pszText, p.PointRef_1.c_str());      //Уставка температуры
+                    if(plvdi->item.iSubItem == Cassete::f_temper)          lstrcpy(plvdi->item.pszText, p.f_temper.c_str());        //Факт температуры за 5 минут до конца отпуска
+                    if(plvdi->item.iSubItem == Cassete::PointTime_1)       lstrcpy(plvdi->item.pszText, p.PointTime_1.c_str());     //Уставка время разгона
+                    if(plvdi->item.iSubItem == Cassete::TimeProcSet)       lstrcpy(plvdi->item.pszText, p.TimeProcSet.c_str());     //Уставка полное время
+                    if(plvdi->item.iSubItem == Cassete::PointDTime_2)      lstrcpy(plvdi->item.pszText, p.PointDTime_2.c_str());    //Уставка время выдержки
                 }
             }
         }
@@ -395,14 +479,121 @@ LRESULT SaveCassetteList(HWND hWnd)
     if(CmdFileSaveXlsx(hWnd, SaveFilename))
     {
         //MessageBox(hWnd, SaveFilename, "", 0);
-        SaveCassetteListXlcx(hWnd, SaveFilename, IDR_DAT2);
+        //SaveCassetteListXlcx(hWnd, SaveFilename, IDR_DAT2);
     }
+    return 0;
+}
+
+HWND OutDialog = NULL;
+DLLRESULT CALLBACK OutInfoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if(message == WM_INITDIALOG)
+    {
+        OutDialog = GetDlgItem(hWnd, IDC_EDIT1);
+        CenterWindow(hWnd, GlobalWindow);
+    }
+    if(message == WM_CLOSE)    DestroyWindow(hWnd);
+
+
+    return 0;
+}
+
+
+//std::thread hPdf;
+void PrintPdfAuto(TCassette& TC);
+//extern std::string FilterComand;
+void PrintPdfAuto(TSheet& Sheet, bool view);
+void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);
+
+HANDLE hThreadPdf = NULL;;
+HWND hDlg = NULL;
+
+DWORD WINAPI ThreadPdf(LPVOID l)
+{
+    int iItem = (int)(LRESULT)l;
+
+    TCassette cassette = AllCassette[iItem];
+    //FilterIDCasseteSheet(std::stoi(cassette.Year), std::stoi(cassette.Month), std::stoi(cassette.Day), std::stoi(cassette.CassetteNo));
+    PrintPdfAuto(cassette);
+    //for(auto a : AllSheet)
+    //{
+    //    PrintPdfAuto(a, false);
+    //}
+    SendMessage(hDlg, WM_CLOSE, 0, 0);
+    hThreadPdf = NULL;
     return 0;
 }
 
 LRESULT CommandCassette(HWND hWnd, WPARAM wParam)
 {
     WORD command = LOWORD(wParam);
+    if(command == ID_POP_40020) //Удалить
+    {
+        int iItem = ListView_GetNextItem(ListCassette, -1, LVNI_ALL | LVNI_FOCUSED);
+        if(iItem >= 0 && iItem < AllCassette.size())
+        {
+            if(MessageBox(hWnd, "Уверены?", "Удаление", MB_YESNO) == IDYES)
+            {
+                TCassette& cassette = AllCassette[iItem];
+                PGConnection conn;
+                conn.connection();
+                std::stringstream sd;
+                sd << "UPDATE cassette SET delete_at = now(), event = 7 WHERE id = " << cassette.Id << ";";
+                SETUPDATESQL(conn, sd);
+                UpdateCassette();
+            }
+        }
+    }
+    if(command == ID_POP_40021) //Восстановит 
+    {
+        int iItem = ListView_GetNextItem(ListCassette, -1, LVNI_ALL | LVNI_FOCUSED);
+        if(iItem >= 0 && iItem < AllCassette.size())
+        {
+            if(MessageBox(hWnd, "Уверены?", "Восстановление", MB_YESNO) == IDYES)
+            {
+                TCassette& cassette = AllCassette[iItem];
+                PGConnection conn;
+                conn.connection();
+                std::stringstream sd;
+                sd << "UPDATE cassette SET delete_at = DEFAULT, event = 0 WHERE id = " << cassette.Id << ";";
+                SETUPDATESQL(conn, sd);
+                UpdateCassette();
+            }
+        }
+    }
+    if(command == ID_POP_40023)
+    {
+        if(MessageBox(hWnd, "Уверены?", "Паспорта", MB_YESNO) == IDYES)
+        {
+            hDlg = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_DIALOG5), GlobalWindow, OutInfoProc);
+            ShowWindow(hDlg, SW_SHOW);
+
+            int iItem = ListView_GetNextItem(ListCassette, -1, LVNI_ALL | LVNI_FOCUSED);
+            if(iItem >= 0 && iItem < AllCassette.size())
+            {
+                if(hThreadPdf == NULL)
+                    hThreadPdf = CreateThread(0, 0, ThreadPdf, (LPVOID)(LRESULT)iItem, 0, 0);
+
+
+                //hPdf = std::thread(PrintPdfAuto, AllCassette[iItem]);
+                //hPdf.join();
+                //PrintPdfAuto(AllCassette[iItem]);
+                //std::stringstream ss;
+                //FilterComand = "SELECT * FROM sheet ";
+                //FilterComand += "WHERE ";
+                //FilterComand +=  "year = '" + cassette.Year + "' AND ";
+                //FilterComand += "month = '" + cassette.Month + "' AND ";
+                //FilterComand += "day = '" + cassette.Day + "' AND ";
+                //FilterComand += "cassetteno = '" + cassette.CassetteNo + "' ";
+
+                //Год = 2024, Месяц = 4, День = 23, Кассета = 1
+                //FilterComand 
+                //});
+                //th.join();
+            }
+        }
+    }
+
     if(command == 110) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, FilterCassetteDataProc);
     if(command == 111) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, FilterCassetteIDProc);;
     if(command == 112) return UpdateCassette();
@@ -490,9 +681,13 @@ void CassetteInitInstance()
     if(!UpdateHwndCassette)
         throw std::exception(std::string("Ошибка создания окна : Обновить").c_str());
 
-    SaveHwndCassetteList = CreateWindowExA(0, "BUTTON", "Сохранить", WS_CHILD | WS_VISIBLE | WS_BORDER/* | BS_FLAT*/, 300, 0, 150, 20, CassetteWindow, (HMENU)113, hInstance, NULL);
-    if(!SaveHwndCassetteList)
-        throw std::exception(std::string("Ошибка создания окна : Сохранить").c_str());
+    //SaveHwndCassetteList = CreateWindowExA(0, "BUTTON", "Сохранить", WS_CHILD | WS_VISIBLE | WS_BORDER/* | BS_FLAT*/, 300, 0, 150, 20, CassetteWindow, (HMENU)113, hInstance, NULL);
+    //if(!SaveHwndCassetteList)
+    //    throw std::exception(std::string("Ошибка создания окна : Сохранить").c_str());
+
+    FilterHwndCassette = CreateWindowExA(0, "EDIT", DataFilterCassette.c_str(), WS_CHILD | WS_VISIBLE | WS_BORDER | ES_READONLY | ES_CENTER | ES_AUTOHSCROLL/* | BS_FLAT*/, 310, 0, 240, 20, CassetteWindow, (HMENU)114, hInstance, NULL);
+    if(!FilterHwndCassette)
+        throw std::exception(std::string("Ошибка создания окна : Фильтер").c_str());
 
     //SendMessage(FilterHwndCassetteData, WM_SETFONT, (WPARAM)Font[emFont::Font08], FALSE);
 }

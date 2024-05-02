@@ -42,6 +42,12 @@
     <ClCompile Include="SQL.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Pdf.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="GdiPlusInit.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -77,6 +83,12 @@
     <ClInclude Include="Exel.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
+    <ClInclude Include="Pdf.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="GdiPlusInit.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KPVL.rc">
@@ -92,9 +104,16 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cassette.xlsx" />
-    <None Include="Journal.xlsx" />
-    <None Include="Sheet.xlsx" />
-    <None Include="Паспорт для АСУ.xlsx" />
+    <None Include="параметры для хранения.xlsx">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+    <None Include="dat2.bin">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="arial.ttf">
+      <Filter>Файлы ресурсов</Filter>
+    </Font>
   </ItemGroup>
 </Project>

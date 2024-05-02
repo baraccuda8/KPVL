@@ -145,15 +145,17 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\boost_1_81_0;D:\FreeOpcUa\include;D:\Exel\LibXL_4.0.4\include_cpp;D:\YandexDisk\Project\Compressor;D:\PostgreSQL\pgsql\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Haru/include;../boost_1_81_0;../Exel/LibXL_4.0.4/include_cpp;D:\PostgreSQL\pgsql\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);D:\FreeOpcUa\lib;D:\wbenny-ziplib\lib\$(PlatformArchitecture)\$(Configuration);D:\Exel\LibXL_4.0.4\lib64_32;D:\boost_1_81_0\lib$(PlatformArchitecture)$(PlatformToolset);D:\YandexDisk\Project\Compressor\lib\$(PlatformArchitecture)\$(Configuration);D:\PostgreSQL\pgsql\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opcuaclient_$(PlatformArchitecture)_$(Configuration).lib;opcuacore_$(PlatformArchitecture)_$(Configuration).lib;opcuaprotocol_$(PlatformArchitecture)_$(Configuration).lib;Wininet.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);../wbenny-ziplib/lib/$(PlatformArchitecture)/$(Configuration);../Exel/LibXL_4.0.4/lib64_32;../boost_1_81_0/lib$(PlatformArchitecture)$(PlatformToolset);../Haru/Lib;D:\PostgreSQL\pgsql\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;Haru$(PlatformArchitecture)$(PlatformToolset)_$(Configuration).lib;Wininet.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -166,7 +168,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>D:\boost_1_81_0;D:\FreeOpcUa\include;D:\Exel\LibXL_4.0.4\include_cpp;D:\YandexDisk\Project\Compressor;D:\PostgreSQL\pgsql\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Haru/include;../boost_1_81_0;../Exel/LibXL_4.0.4/include_cpp;D:\PostgreSQL\pgsql\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
@@ -175,8 +177,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);D:\FreeOpcUa\lib;D:\wbenny-ziplib\lib\$(PlatformArchitecture)\$(Configuration);D:\Exel\LibXL_4.0.4\lib64_32;D:\boost_1_81_0\lib$(PlatformArchitecture)$(PlatformToolset);D:\YandexDisk\Project\Compressor\lib\$(PlatformArchitecture)\$(Configuration);D:\PostgreSQL\pgsql\lib</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opcuaclient_$(PlatformArchitecture)_$(Configuration).lib;opcuacore_$(PlatformArchitecture)_$(Configuration).lib;opcuaprotocol_$(PlatformArchitecture)_$(Configuration).lib;Wininet.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;Psapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);../wbenny-ziplib/lib/$(PlatformArchitecture)/$(Configuration);../Exel/LibXL_4.0.4/lib64_32;../boost_1_81_0/lib$(PlatformArchitecture)$(PlatformToolset);../Haru/Lib;D:\PostgreSQL\pgsql\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Psapi.lib;Haru$(PlatformArchitecture)$(PlatformToolset)_$(Configuration).lib;Wininet.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD.LIB</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -184,6 +187,7 @@
     <ClCompile Include="Cassette.cpp" />
     <ClCompile Include="Exel.cpp" />
     <ClCompile Include="file.cpp" />
+    <ClCompile Include="GdiPlusInit.cpp" />
     <ClCompile Include="KPVL.cpp" />
     <ClCompile Include="OnLine.cpp" />
     <ClCompile Include="pch.cpp">
@@ -192,6 +196,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Pdf.cpp" />
     <ClCompile Include="Sheet.cpp" />
     <ClCompile Include="SQL.cpp" />
   </ItemGroup>
@@ -200,9 +205,11 @@
     <ClInclude Include="Cassette.h" />
     <ClInclude Include="Exel.h" />
     <ClInclude Include="file.h" />
+    <ClInclude Include="GdiPlusInit.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="OnLine.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Pdf.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Service.h" />
     <ClInclude Include="Sheet.h" />
@@ -216,10 +223,11 @@
     <Image Include="IDI_ICON1.ICO" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cassette.xlsx" />
-    <None Include="Journal.xlsx" />
-    <None Include="Sheet.xlsx" />
-    <None Include="Паспорт для АСУ.xlsx" />
+    <None Include="dat2.bin" />
+    <None Include="параметры для хранения.xlsx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="arial.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -12,7 +12,7 @@
 #define NOMINMAX //prevent windows redefining min/max
 #endif 
 
-#define OPCUACLENT
+//#define OPCUACLENT
 #define MAX_STRING 1024
 
 #include <windows.h>
@@ -51,7 +51,8 @@
 #include <stdexcept>
 #include <thread>
 
-
+#include <gdiplus.h>
+//#define GDIPLUS;
 #pragma comment(lib, "Comctl32.lib")
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
@@ -88,7 +89,10 @@ using namespace boost::adaptors;
 //#include <opc/ua/client/client.h>
 //#include <opc/ua/node.h>
 //#include <opc/ua/subscription.h>
-#include <opc/common/logger.h>
+//#include <opc/common/logger.h>
+
+//#define FUNCTION_LINE_NAME (std::string( __FUNCTION__ ) + std::string (":") + std::to_string(__LINE__))
+#define __FUN(__s) (FUNCTION_LINE_NAME + "| " + __s).c_str()
 
 #include "libxl.h"
 

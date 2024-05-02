@@ -118,6 +118,7 @@ typedef struct TSheet{
     std::string TimeForPlateHeat = ""; //Время сигнализации окончания нагрева, мин
     std::string PresToStartComp = "";  //Уставка давления для запуска комперссора
     //std::string TempWatTankCool = "";  //Температура закалочной воды для вкл.охлаждения
+    std::string Temperature = "";        //Средняя температура 2-части печи закалки
 
     TSheet()
     {
@@ -162,6 +163,7 @@ namespace casSheet{
 
 
         Temper,
+        Temperature, 
         Speed,
 
         Za_PT3,
@@ -208,62 +210,70 @@ namespace casSheet{
 
 namespace cas{
     enum {
-        DataTime = 0,
-        Alloy = 1,
-        Thikness = 2,
-        Melt = 3,
-        Slab,
-        PartNo,
-        Pack,
-        Sheet,
-        SubSheet,
+        //DataTime = 0,
+        Data = 0,
+        Time = 1,
+        Alloy = 2,
+        Thikness = 3,
+        Melt = 4,
+        //Slab,
+        PartNo = 5,
+        Pack = 6,
+        Sheet = 7,
+        //SubSheet,
 
-        Temper,
-        Speed,
+        Temper = 8, //Заданная температура в печи закалки, °С
+        FactTemp = 9, //Фактическая температура в печи закалки, °С
 
-        Za_PT3,
-        Za_TE3,
+        TimeForPlateHeat = 10,   //Задание Время окончания нагрева
+        DataTime_All = 11,       //Время закалки мин
 
-        LamPressTop,
-        LamPressBot,
-        PosClapanTop,
-        PosClapanBot,
-        Mask,
 
-        Lam1PosClapanTop,
-        Lam1PosClapanBot,
-        Lam2PosClapanTop,
-        Lam2PosClapanBot,
+        //Za_PT3,
+        Speed = 12,     //Скорость закалки
+        Za_PT3 = 13,    //Давление воды в баке бар
+        Za_TE3 = 14,    //Темперратура воды в баке
 
-        Lam_TE1,
-        News,
-        Top1,
-        Top2,
-        Top3,
-        Top4,
-        Top5,
-        Top6,
-        Top7,
-        Top8,
+        //LamPressTop,
+        //LamPressBot,
+        //PosClapanTop,
+        //PosClapanBot,
+        //Mask,
 
-        Bot1,
-        Bot2,
-        Bot3,
-        Bot4,
-        Bot5,
-        Bot6,
-        Bot7,
-        Bot8,
+        //Lam1PosClapanTop,
+        //Lam1PosClapanBot,
+        //Lam2PosClapanTop,
+        //Lam2PosClapanBot,
+        //Lam_TE1,
+        
+        //News,
+        //Top1,
+        //Top2,
+        //Top3,
+        //Top4,
+        //Top5,
+        //Top6,
+        //Top7,
+        //Top8,
+        //
+        //Bot1,
+        //Bot2,
+        //Bot3,
+        //Bot4,
+        //Bot5,
+        //Bot6,
+        //Bot7,
+        //Bot8,
 
-        Day,
-        Month,
-        Year,
-        CassetteNo,
-        SheetInCassette,
-        DataTime_End,
-        DataTime_All,
-        TimeForPlateHeat, //Время сигнализации окончания нагрева, мин
-        PresToStartComp,  //Уставка давления для запуска комперссора
+        //Day,
+        //Month,
+        //Year,
+        //CassetteNo,
+        //SheetInCassette,
+        //DataTime_End,
+        //DataTime_All,
+        //TimeForPlateHeat, //Время сигнализации окончания нагрева, мин
+        //PresToStartComp,  //Уставка давления для запуска комперссора
     };
 };
 
@@ -275,3 +285,60 @@ void SheetInitInstance();
 
 //void FilterIDCasseteSheet(TCassette& p);
 void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);
+
+//Номер колонки в таблице листов
+#pragma region //Номер колонки в таблице листов
+extern int Col_Sheet_id;
+extern int Col_Sheet_create_at;
+extern int Col_Sheet_start_at;
+extern int Col_Sheet_datatime_end;
+extern int Col_Sheet_pos;
+extern int Col_Sheet_datatime_all;
+extern int Col_Sheet_alloy;
+extern int Col_Sheet_thikness;
+extern int Col_Sheet_melt;
+extern int Col_Sheet_slab;
+extern int Col_Sheet_partno;
+extern int Col_Sheet_pack;
+extern int Col_Sheet_sheet;
+extern int Col_Sheet_subsheet;
+extern int Col_Sheet_temper;
+extern int Col_Sheet_speed;
+extern int Col_Sheet_za_pt3;
+extern int Col_Sheet_za_te3;
+extern int Col_Sheet_lampresstop;
+extern int Col_Sheet_lampressbot;
+extern int Col_Sheet_posclapantop ;
+extern int Col_Sheet_posclapanbot;
+extern int Col_Sheet_mask;
+extern int Col_Sheet_lam1posclapantop;
+extern int Col_Sheet_lam1posclapanbot;
+extern int Col_Sheet_lam2posclapantop;
+extern int Col_Sheet_lam2posclapanbot;
+extern int Col_Sheet_lam_te1;
+extern int Col_Sheet_news;
+extern int Col_Sheet_top1;
+extern int Col_Sheet_top2;
+extern int Col_Sheet_top3;
+extern int Col_Sheet_top4;
+extern int Col_Sheet_top5;
+extern int Col_Sheet_top6;
+extern int Col_Sheet_top7;
+extern int Col_Sheet_top8;
+extern int Col_Sheet_bot1;
+extern int Col_Sheet_bot2;
+extern int Col_Sheet_bot3;
+extern int Col_Sheet_bot4;
+extern int Col_Sheet_bot5;
+extern int Col_Sheet_bot6;
+extern int Col_Sheet_bot7;
+extern int Col_Sheet_bot8;
+extern int Col_Sheet_day;
+extern int Col_Sheet_month;
+extern int Col_Sheet_year;
+extern int Col_Sheet_cassetteno;
+extern int Col_Sheet_sheetincassette;
+extern int Col_Sheet_timeforplateheat;
+extern int Col_Sheet_prestostartcomp;
+extern int Col_Sheet_temperature;
+#pragma endregion
