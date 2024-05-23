@@ -149,6 +149,10 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::Bot6, { "После\nкантовки\n6", L2 }},
     {casSheet::Bot7, { "После\nкантовки\n7", L2 }},
     {casSheet::Bot8, { "После\nкантовки\n8", L2 }},
+#ifdef _DEBUG
+    {casSheet::Correct,  { "Correct", L2 }},
+    {casSheet::Pdf,  { "Pdf", L2 }},
+#endif
 };
 
 //bool SortSheet(std::pair<int, ListTitle>* d1, std::pair <int, ListTitle>* d2)
@@ -178,122 +182,6 @@ void AddHistoriSheet(bool begin)
 
 std::string FilterComand = "SELECT * FROM sheet ORDER BY create_at DESC;";
 
-//namespace {
-    //enum{
-    //    Col_Sheet_id = 0,
-    //    Col_Sheet_create_at = 1,
-    //    Col_Sheet_start_at = 2,
-    //    Col_Sheet_datatime_end = 3,
-    //    Col_Sheet_pos = 4,
-    //    Col_Sheet_datatime_all,
-    //    Col_Sheet_alloy,
-    //    Col_Sheet_thikness,
-    //    Col_Sheet_melt,
-    //    Col_Sheet_slab,
-    //    Col_Sheet_partno,
-    //    Col_Sheet_pack,
-    //    Col_Sheet_sheet,
-    //    Col_Sheet_subsheet,
-    //    Col_Sheet_temper,
-    //    Col_Sheet_speed,
-    //    Col_Sheet_za_pt3,
-    //    Col_Sheet_za_te3,
-    //    Col_Sheet_lampresstop,
-    //    Col_Sheet_lampressbot,
-    //    Col_Sheet_posclapantop,
-    //    Col_Sheet_posclapanbot,
-    //    Col_Sheet_mask,
-    //    Col_Sheet_lam1posclapantop,
-    //    Col_Sheet_lam1posclapanbot,
-    //    Col_Sheet_lam2posclapantop,
-    //    Col_Sheet_lam2posclapanbot,
-    //    Col_Sheet_lam_te1,
-    //    Col_Sheet_news,
-    //    Col_Sheet_top1,
-    //    Col_Sheet_top2,
-    //    Col_Sheet_top3,
-    //    Col_Sheet_top4,
-    //    Col_Sheet_top5,
-    //    Col_Sheet_top6,
-    //    Col_Sheet_top7,
-    //    Col_Sheet_top8,
-    //    Col_Sheet_bot1,
-    //    Col_Sheet_bot2,
-    //    Col_Sheet_bot3,
-    //    Col_Sheet_bot4,
-    //    Col_Sheet_bot5,
-    //    Col_Sheet_bot6,
-    //    Col_Sheet_bot7,
-    //    Col_Sheet_bot8,
-    //    Col_Sheet_day,
-    //    Col_Sheet_month,
-    //    Col_Sheet_year,
-    //    Col_Sheet_cassetteno,
-    //    Col_Sheet_sheetincassette,
-    //    Col_Sheet_timeforplateheat,
-    //    Col_Sheet_prestostartcomp,
-    //};
-
-    //int Col_Sheet_id = 0;
-    //int Col_Sheet_create_at = 0;
-    //int Col_Sheet_start_at = 0;
-    //int Col_Sheet_datatime_end = 0;
-    //int Col_Sheet_datatime_all = 0;
-    //int Col_Sheet_alloy = 0;
-    //int Col_Sheet_thikness = 0;
-    //int Col_Sheet_melt = 0;
-    //int Col_Sheet_partno = 0;
-    //int Col_Sheet_pack = 0;
-    //int Col_Sheet_sheet = 0;
-    //int Col_Sheet_temper = 0;
-    //int Col_Sheet_speed = 0;
-    //
-    //int Col_Sheet_za_pt3 = 0;
-    //int Col_Sheet_za_te3 = 0;
-    //
-    //int Col_Sheet_lampresstop = 0;
-    //int Col_Sheet_lampressbot = 0;
-    //int Col_Sheet_posclapantop = 0;
-    //int Col_Sheet_posclapanbot = 0;
-    //int Col_Sheet_mask = 0;
-    //
-    //int Col_Sheet_lam1posclapantop = 0;
-    //int Col_Sheet_lam1posclapanbot = 0;
-    //int Col_Sheet_lam2posclapantop = 0;
-    //int Col_Sheet_lam2posclapanbot = 0;
-    //
-    //int Col_Sheet_lam_te1 = 0;
-    //int Col_Sheet_news = 0;
-    //int Col_Sheet_top1 = 0;
-    //int Col_Sheet_top2 = 0;
-    //int Col_Sheet_top3 = 0;
-    //int Col_Sheet_top4 = 0;
-    //int Col_Sheet_top5 = 0;
-    //int Col_Sheet_top6 = 0;
-    //int Col_Sheet_top7 = 0;
-    //int Col_Sheet_top8 = 0;
-    //
-    //int Col_Sheet_bot1 = 0;
-    //int Col_Sheet_bot2 = 0;
-    //int Col_Sheet_bot3 = 0;
-    //int Col_Sheet_bot4 = 0;
-    //int Col_Sheet_bot5 = 0;
-    //int Col_Sheet_bot6 = 0;
-    //int Col_Sheet_bot7 = 0;
-    //int Col_Sheet_bot8 = 0;
-    //
-    //int Col_Sheet_day = 0;
-    //int Col_Sheet_month = 0;
-    //int Col_Sheet_year = 0;
-    //int Col_Sheet_cassetteno = 0;
-    //int Col_Sheet_sheetincassette = 0;
-    //int Col_Sheet_pos = 0;
-    //
-    //int Col_Sheet_timeforplateheat = 0;
-    //int Col_Sheet_prestostartcomp = 0;
-    //int Col_Sheet_slab = 0;
-    //int Col_Sheet_subsheet = 0;
-//}
 
 
 //Номер колонки в таблице листов
@@ -351,12 +239,14 @@ int Col_Sheet_sheetincassette = 0;
 int Col_Sheet_timeforplateheat = 0;
 int Col_Sheet_prestostartcomp = 0;
 int Col_Sheet_temperature = 0;
+int Col_Sheet_correct = 0;
+int Col_Sheet_pdf = 0;
 #pragma endregion
 
 //Получаем список колонов в таблице sheet
 void GetColSheet(PGresult* res)
 {
-    if(!Col_Sheet_prestostartcomp)
+    if(!Col_Sheet_pdf)
     {
         int nFields = PQnfields(res);
         for(int j = 0; j < nFields; j++)
@@ -415,6 +305,9 @@ void GetColSheet(PGresult* res)
             else if(l == "timeforplateheat") Col_Sheet_timeforplateheat = j;
             else if(l == "prestostartcomp") Col_Sheet_prestostartcomp = j;
             else if(l == "temperature") Col_Sheet_temperature = j;
+            else if(l == "correct") Col_Sheet_correct = j;
+            else if(l == "pdf") Col_Sheet_pdf = j;
+            
             
         }
     }
@@ -492,6 +385,8 @@ DLLRESULT FilterSheet()
             sheet.TimeForPlateHeat = conn_kpvl.PGgetvalue(res, l, Col_Sheet_timeforplateheat);
             sheet.PresToStartComp = conn_kpvl.PGgetvalue(res, l, Col_Sheet_prestostartcomp);
             sheet.Temperature = conn_kpvl.PGgetvalue(res, l, Col_Sheet_temperature);
+            sheet.Correct = conn_kpvl.PGgetvalue(res, l, Col_Sheet_correct);
+            sheet.Pdf = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pdf);
             AllSheet.push_back(sheet);
             AddHistoriSheet(false);
         }
@@ -503,162 +398,6 @@ DLLRESULT FilterSheet()
         SendDebug("conn_kpvl", FilterComand);
     }
 
-
-    //if(Col_Sheet_prestostartcomp == 0)
-    //{
-    //    std::string connand = "SELECT column_name, ordinal_position FROM information_schema.columns WHERE table_name = 'sheet' ORDER BY ordinal_position;";
-    //    PGresult* res = conn_kpvl.PGexec(connand);
-    //    SendDebug("conn_kpvl", connand);
-    //    if(PQresultStatus(res) == PGRES_TUPLES_OK)
-    //    {
-    //        int line = PQntuples(res);
-    //        int nFields = PQnfields(res);
-    //        for(int l = 0; l < line; l++)
-    //        {
-    //            std::string column = conn_kpvl.PGgetvalue(res, l, 0);
-    //            int position = atoi(conn_kpvl.PGgetvalue(res, l, 1).c_str());
-    //
-    //            if("create_at" == column)Col_Sheet_create_at = position - 1;
-    //            else if("zone" == column)Col_Sheet_zone = position - 1;
-    //            else if("pos" == column)Col_Sheet_pos = position - 1;
-    //            else if("id" == column)Col_Sheet_id = position - 1;
-    //            else if("datatime_end" == column)Col_Sheet_datatime_end = position - 1;
-    //            else if("datatime_all" == column)Col_Sheet_datatime_all = position - 1;
-    //            else if("alloy" == column)Col_Sheet_alloy = position - 1;
-    //            else if("thikness" == column)Col_Sheet_thikness = position - 1;
-    //            else if("melt" == column)Col_Sheet_melt = position - 1;
-    //            else if("slab" == column)Col_Sheet_slab = position - 1;
-    //            else if("partno" == column)Col_Sheet_partno = position - 1;
-    //            else if("pack" == column)Col_Sheet_pack = position - 1;
-    //            else if("sheet" == column)Col_Sheet_sheet = position - 1;
-    //            else if("subsheet" == column)Col_Sheet_subsheet = position - 1;
-    //            else if("temper" == column)Col_Sheet_temper = position - 1;
-    //            else if("speed" == column)Col_Sheet_speed = position - 1;
-    //            else if("za_pt3" == column)Col_Sheet_za_pt3 = position - 1;
-    //            else if("za_te3" == column)Col_Sheet_za_te3 = position - 1;
-    //            else if("lampresstop" == column)Col_Sheet_lampresstop = position - 1;
-    //            else if("lampressbot" == column)Col_Sheet_lampressbot = position - 1;
-    //            else if("posclapantop" == column)Col_Sheet_posclapantop = position - 1;
-    //            else if("posclapanbot" == column)Col_Sheet_posclapanbot = position - 1;
-    //            else if("mask" == column)Col_Sheet_mask = position - 1;
-    //            else if("lam1posclapantop" == column)Col_Sheet_lam1posclapantop = position - 1;
-    //            else if("lam1posclapanbot" == column)Col_Sheet_lam1posclapanbot = position - 1;
-    //            else if("lam2posclapantop" == column)Col_Sheet_lam2posclapantop = position - 1;
-    //            else if("lam2posclapanbot" == column)Col_Sheet_lam2posclapanbot = position - 1;
-    //            else if("lam_te1" == column)Col_Sheet_lam_te1 = position - 1;
-    //            else if("news" == column)Col_Sheet_news = position - 1;
-    //            else if("top1" == column)Col_Sheet_top1 = position - 1;
-    //            else if("top2" == column)Col_Sheet_top2 = position - 1;
-    //            else if("top3" == column)Col_Sheet_top3 = position - 1;
-    //            else if("top4" == column)Col_Sheet_top4 = position - 1;
-    //            else if("top5" == column)Col_Sheet_top5 = position - 1;
-    //            else if("top6" == column)Col_Sheet_top6 = position - 1;
-    //            else if("top7" == column)Col_Sheet_top7 = position - 1;
-    //            else if("top8" == column)Col_Sheet_top8 = position - 1;
-    //            else if("bot1" == column)Col_Sheet_bot1 = position - 1;
-    //            else if("bot2" == column)Col_Sheet_bot2 = position - 1;
-    //            else if("bot3" == column)Col_Sheet_bot3 = position - 1;
-    //            else if("bot4" == column)Col_Sheet_bot4 = position - 1;
-    //            else if("bot5" == column)Col_Sheet_bot5 = position - 1;
-    //            else if("bot6" == column)Col_Sheet_bot6 = position - 1;
-    //            else if("bot7" == column)Col_Sheet_bot7 = position - 1;
-    //            else if("bot8" == column)Col_Sheet_bot8 = position - 1;
-    //            else if("day" == column)Col_Sheet_day = position - 1;
-    //            else if("month" == column)Col_Sheet_month = position - 1;
-    //            else if("year" == column)Col_Sheet_year = position - 1;
-    //            else if("cassetteno" == column)Col_Sheet_cassetteno = position - 1;
-    //            else if("sheetincassette" == column)Col_Sheet_sheetincassette = position - 1;
-    //            else if("start_at" == column)Col_Sheet_start_at = position - 1;
-    //            else if("timeforplateheat" == column)Col_Sheet_timeforplateheat = position - 1;
-    //            else if("prestostartcomp" == column)Col_Sheet_prestostartcomp = position - 1;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-    //        SendDebug("conn_kpvl", errc);
-    //        SendDebug("conn_kpvl", connand);
-    //    }
-    //}
-
-    //if(Col_Sheet_prestostartcomp == 0)
-    //{
-    //    std::string connand = "SELECT * FROM sheet WHERE id <= 1";
-    //    PGresult* res = conn_kpvl.PGexec(connand);
-    //    if(PQresultStatus(res) == PGRES_TUPLES_OK)
-    //    {
-    //        int line = PQntuples(res);
-    //        int nFields = PQnfields(res);
-    //
-    //        for(int position = 0; position < nFields; position++)
-    //        {
-    //            std::string column =  utf8_to_cp1251(PQfname(res, position));
-    //
-    //            //std::string column = conn_kpvl.PGgetvalue(res, l, 0);
-    //            //int position = atoi(conn_kpvl.PGgetvalue(res, l, 1).c_str());
-    //
-    //            if("create_at" == column)Col_Sheet_create_at = position;
-    //            else if("pos" == column)Col_Sheet_pos = position;
-    //            else if("id" == column)Col_Sheet_id = position;
-    //            else if("datatime_end" == column)Col_Sheet_datatime_end = position;
-    //            else if("datatime_all" == column)Col_Sheet_datatime_all = position;
-    //            else if("alloy" == column)Col_Sheet_alloy = position;
-    //            else if("thikness" == column)Col_Sheet_thikness = position;
-    //            else if("melt" == column)Col_Sheet_melt = position;
-    //            else if("slab" == column)Col_Sheet_slab = position;
-    //            else if("partno" == column)Col_Sheet_partno = position;
-    //            else if("pack" == column)Col_Sheet_pack = position;
-    //            else if("sheet" == column)Col_Sheet_sheet = position;
-    //            else if("subsheet" == column)Col_Sheet_subsheet = position;
-    //            else if("temper" == column)Col_Sheet_temper = position;
-    //            else if("speed" == column)Col_Sheet_speed = position;
-    //            else if("za_pt3" == column)Col_Sheet_za_pt3 = position;
-    //            else if("za_te3" == column)Col_Sheet_za_te3 = position;
-    //            else if("lampresstop" == column)Col_Sheet_lampresstop = position;
-    //            else if("lampressbot" == column)Col_Sheet_lampressbot = position;
-    //            else if("posclapantop" == column)Col_Sheet_posclapantop = position;
-    //            else if("posclapanbot" == column)Col_Sheet_posclapanbot = position;
-    //            else if("mask" == column)Col_Sheet_mask = position;
-    //            else if("lam1posclapantop" == column)Col_Sheet_lam1posclapantop = position;
-    //            else if("lam1posclapanbot" == column)Col_Sheet_lam1posclapanbot = position;
-    //            else if("lam2posclapantop" == column)Col_Sheet_lam2posclapantop = position;
-    //            else if("lam2posclapanbot" == column)Col_Sheet_lam2posclapanbot = position;
-    //            else if("lam_te1" == column)Col_Sheet_lam_te1 = position;
-    //            else if("news" == column)Col_Sheet_news = position;
-    //            else if("top1" == column)Col_Sheet_top1 = position;
-    //            else if("top2" == column)Col_Sheet_top2 = position;
-    //            else if("top3" == column)Col_Sheet_top3 = position;
-    //            else if("top4" == column)Col_Sheet_top4 = position;
-    //            else if("top5" == column)Col_Sheet_top5 = position;
-    //            else if("top6" == column)Col_Sheet_top6 = position;
-    //            else if("top7" == column)Col_Sheet_top7 = position;
-    //            else if("top8" == column)Col_Sheet_top8 = position;
-    //            else if("bot1" == column)Col_Sheet_bot1 = position;
-    //            else if("bot2" == column)Col_Sheet_bot2 = position;
-    //            else if("bot3" == column)Col_Sheet_bot3 = position;
-    //            else if("bot4" == column)Col_Sheet_bot4 = position;
-    //            else if("bot5" == column)Col_Sheet_bot5 = position;
-    //            else if("bot6" == column)Col_Sheet_bot6 = position;
-    //            else if("bot7" == column)Col_Sheet_bot7 = position;
-    //            else if("bot8" == column)Col_Sheet_bot8 = position;
-    //            else if("day" == column)Col_Sheet_day = position;
-    //            else if("month" == column)Col_Sheet_month = position;
-    //            else if("year" == column)Col_Sheet_year = position;
-    //            else if("cassetteno" == column)Col_Sheet_cassetteno = position;
-    //            else if("sheetincassette" == column)Col_Sheet_sheetincassette = position;
-    //            else if("start_at" == column)Col_Sheet_start_at = position;
-    //            else if("timeforplateheat" == column)Col_Sheet_timeforplateheat = position;
-    //            else if("prestostartcomp" == column)Col_Sheet_prestostartcomp = position;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-    //        SendDebug("conn_kpvl", errc);
-    //        SendDebug("conn_kpvl", FilterComand);
-    //    }
-    //    PQclear(res);
-    //}
 return 0;
 }
 
@@ -668,16 +407,7 @@ std::string strDay;
 std::string strCassetteNo = "1";
 
 BOOL bFilterData = TRUE;
-//
-//std::string FindTag(std::string name)
-//{
-//    for(auto t : AllTag)
-//    {
-//        //if(t->Name == name) return t.content;
-//    }
-//    return "";
-//}
-//
+
 void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno)
 {
     strYear = std::to_string(stryear);
@@ -694,7 +424,9 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     FilterComand += "month = '" + strMonth + "' AND ";
     FilterComand += "day = '" + strDay + "' AND ";
     FilterComand += "cassetteno = '" + strCassetteNo + "' ";
-
+#ifndef _DEBUG
+    FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
+#endif
     DataFilterSheet = "Год = " + strYear + ", ";
     DataFilterSheet += "Месяц = " + strMonth + ", ";
     DataFilterSheet += "День = " + strDay + ", ";
@@ -726,6 +458,9 @@ void FilterDataTimeSheet()
     FilterComand += "'" + DataStartSheet + "'";
     FilterComand += " AND create_at <= ";
     FilterComand += "'" + DataStopSheet + " 23:59:59.999' ";
+#ifndef _DEBUG
+    FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
+#endif
     FilterComand += "ORDER BY create_at DESC";
     FilterSheet();
     bFilterData = TRUE;
@@ -791,16 +526,7 @@ LRESULT OnHeader_Layout(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, U
     return ret;
 }
 
-std::map<std::string, std::string> NamePos ={
-    //{0, "На входе" },
-    //{1, "1-я часть печи"},
-    //{2, "2-я часть печи"},
-    //{3, "Закалка"},
-    //{4, "Охлаждение"},
-    //{5, "Выдача"},
-    //{6, "Кантовка"},
-    //{7, "В касете"},
-};
+std::map<std::string, std::string> NamePos ={};
 
 
 
@@ -844,28 +570,6 @@ void GetCassete(TSheet& p, TCassette& cassette)
         for(int l = 0; l < line; l++)
         {
             GetCassette(res, cassette, l);
-            //cassette.Create_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::create_at));
-            //cassette.Id = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::id);
-            //cassette.Event = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::event);
-            //cassette.Day = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::day);
-            //cassette.Month = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::month);
-            //cassette.Year = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::year);
-            //cassette.CassetteNo = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::cassetteno);
-            //cassette.SheetInCassette = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::sheetincassette);
-            //cassette.Close_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::close_at));
-            //cassette.Peth = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::peth);
-            //cassette.Run_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::run_at));
-            //cassette.Error_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::error_at));
-            //cassette.End_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::end_at));
-            //cassette.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::delete_at));
-
-            //cassette.TempRef = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::tempref);
-            //cassette.PointTime_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointtime_1);
-            //cassette.PointRef_1 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointref_1);
-            //cassette.TimeProcSet = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::timeprocset);
-            //cassette.PointDTime_2 = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::pointdtime_2);
-            //cassette.f_temper = conn_kpvl.PGgetvalue(res, l, casCassette::emCassette::f_temper);
-
         }
     }
     else
@@ -877,138 +581,6 @@ void GetCassete(TSheet& p, TCassette& cassette)
     PQclear(res);
 
 }
-
-////Отрисовка текста
-//LRESULT DrawGraffStat(HWND hWnd, PAINTSTRUCT ps, int TT)
-//{
-//    char szBuff[MAX_STRING] = "";
-//    GetWindowText(hWnd, szBuff, 255);
-//    if(strlen(szBuff))
-//    {
-//        SIZE siz;
-//        GetTextExtentPoint32(ps.hdc, szBuff, (int)strlen(szBuff), &siz);
-//        if(siz.cx < ps.rcPaint.right - ps.rcPaint.left)
-//        {
-//            char* s = szBuff;
-//            int coco = 1;
-//            while(s && *s) { if(*(s++) == '\n')coco++; }
-//            coco *= siz.cy / 2;
-//
-//            int y = (ps.rcPaint.bottom - ps.rcPaint.top) / 2;
-//            ps.rcPaint.top = y - coco;
-//            ps.rcPaint.bottom = y + coco;
-//            ps.rcPaint.left++;
-//            ps.rcPaint.right--;
-//            //DrawTextA(pDIS->hDC, szBuff, -1, &pDIS->rcItem, TT | DT_WORDBREAK | DT_VCENTER);
-//        }
-//        SetBkMode(ps.hdc, TRANSPARENT);
-//        DrawTextA(ps.hdc, szBuff, -1, &ps.rcPaint, TT | DT_WORDBREAK | DT_VCENTER);
-//    }
-//    return 0;
-//}
-//
-//std::deque<double> test;
-//
-////Отрисовка статичного окна
-//LRESULT DrawStatic(LPDRAWITEMSTRUCT pDIS)
-//{
-//    HBRUSH* br = (HBRUSH*)GetWindowLongPtr(pDIS->hwndItem, GWLP_USERDATA);
-//    HDC hdc = pDIS->hDC;
-//    if(br)
-//        FillRect(pDIS->hDC, &pDIS->rcItem, *br);
-//    else
-//        FillRect(pDIS->hDC, &pDIS->rcItem, TitleBrush3);
-//
-//    DWORD style = GetWindowStyle(pDIS->hwndItem);
-//
-//    //int size = DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct"].size();
-//    //if(size)
-//    //{
-//        //DeleteFile("Test.csv");
-//        //LRESULT times = DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct"].back().f;
-//        //for(auto D : DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct"])
-//        //{
-//        //    std::ofstream F("Test.csv", std::ios::binary | std::ios::out | std::ios::app | std::ios::ate);
-//        //    if(F.is_open())
-//        //    {
-//        //        F << "'";
-//        //        F << D.d;
-//        //        F << ";";
-//        //        F << D.f;
-//        //        F << "\n";
-//        //        F.close();
-//        //    }
-//        //}
-//    //}
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct"];
-//    //
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct"];
-//    //DataTemp["|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct"];
-//    //
-//    //if(DataTempSet1.size())
-//    //{
-//    //    float maxTemp = -1000;
-//    //    float minTemp = 0;
-//    //    for(auto x : DataTempSet1)
-//    //    {
-//    //        maxTemp = max(x, maxTemp);
-//    //    }
-//    //
-//    //
-//    //    float yCountTemp = DataTempSet1.size();
-//    //    float yCountPoint = pDIS->rcItem.right - pDIS->rcItem.left;
-//    //
-//    //    float yK = yCountPoint / yCountTemp - 10;
-//    //
-//    //    float xCountTemp = maxTemp;
-//    //    float xCountPoint = pDIS->rcItem.bottom - pDIS->rcItem.top - 10;
-//    //
-//    //    float xK = xCountPoint / xCountTemp;
-//    //
-//    //    test.erase(test.begin(), test.end());
-//    //    MoveToEx(pDIS->hDC, 0, pDIS->rcItem.bottom - pDIS->rcItem.top, NULL);
-//    //    for(int i = 0; i < yCountPoint; i++)
-//    //    {
-//    //        double ii;
-//    //        int t = modf(i / yK, &ii);
-//    //
-//    //        float df = DataTempSet1[t];
-//    //        float ff = (df * xK) + 5.0;
-//    //        test.push_back(ff);
-//    //        LineTo(pDIS->hDC, ff, i + 5);
-//    //    }
-//    //}
-//    //
-//    //
-//    //LineTo(hdc, 3, 190);
-//    //
-//    //
-//    //int Al = DT_CENTER;
-//    //if((style & MYSS_LEFT) == MYSS_LEFT)Al = DT_LEFT;
-//    //if((style & MYSS_RIGHT) == MYSS_RIGHT)Al = DT_RIGHT;
-//    //SetTextColor(pDIS->hDC, RGB(0, 0, 0));
-//    //DrawTextStat(pDIS, Al);
-//
-//    return 0;
-//}
-//
-////Проверка стиля для отрисовки окна
-//LRESULT DrawItem(LPDRAWITEMSTRUCT pDIS)
-//{
-//    char szBuff[MAX_STRING] = "";
-//    GetClassName(pDIS->hwndItem, szBuff, MAX_STRING);
-//    CharUpper(szBuff);
-//    if(boost::iequals(szStat, szBuff))
-//        return DrawStatic(pDIS);
-//
-//    return 0;
-//}
-
 
 
 LRESULT GetTM(std::string datatime, std::tm& TM)
@@ -1047,25 +619,11 @@ LRESULT GetTM(std::string datatime, std::tm& TM)
 
 float GetDataTempSheet(TSheet& p, std::string name, int pos)
 {
-    //std::string command = "SELECT content, content_at FROM TAG WHERE name = '" + name + "';";
-    //float first = 0;
-    //PGresult* res = conn_kpvl.PGexec(command);
-    //SendDebug("conn_kpvl", command);
-    //if(PQresultStatus(res) == PGRES_TUPLES_OK)
-    //{
-    //    int line = PQntuples(res);
-    //    if(line)
-    //    {
-    //        int nFields = PQnfields(res);
-    //        std::string F = conn_kpvl.PGgetvalue(res, 0, 0);
-    //        first = (float)atof(F.c_str());
-    //    }
-    //}
     float temp = 0;
-    std::string command = "SELECT create_at, content FROM todos WHERE id_name = (SELECT id_name FROM tag WHERE name = '" + name + "') AND";
-    command += " create_at >= '" + p.Start_at + "' AND";
-    command += " create_at <= '" + p.DataTime_End + "'";
-    command += " ORDER BY create_at;";
+    std::string command = "SELECT create_at, content FROM todos WHERE id_name = (SELECT id_name FROM tag WHERE name = '" + name + "') AND ";
+    command += "create_at >= '" + p.Start_at + "' AND ";
+    command += "create_at <= '" + p.DataTime_End + "' ";
+    command += "ORDER BY create_at;";
     PGresult* res = conn_kpvl.PGexec(command);
     SendDebug("conn_kpvl", command);
     if(PQresultStatus(res) == PGRES_TUPLES_OK)
@@ -1103,125 +661,6 @@ float GetDataTempSheet(TSheet& p, std::string name, int pos)
     }
     return temp;
 }
-
-
-//void GetTemperSheet(HWND hWnd, LPARAM lParam)
-//{
-//    if(lParam >= 0 && lParam < (int)AllSheet.size())
-//    {
-//        TSheet& p = AllSheet[lParam];
-//        {
-//            SetWindowText(GetDlgItem(hWnd, IDC_pAlloy), p.Alloy.c_str());           //Марка стали
-//            SetWindowText(GetDlgItem(hWnd, IDC_pThikness), p.Thikness.c_str());     //Толщина листа
-//            SetWindowText(GetDlgItem(hWnd, IDC_pMelt), p.Melt.c_str());             //Плавка
-//            SetWindowText(GetDlgItem(hWnd, IDC_pPartNo), p.PartNo.c_str());         //Партия
-//            SetWindowText(GetDlgItem(hWnd, IDC_pPack), p.Pack.c_str());             //Пачка
-//            SetWindowText(GetDlgItem(hWnd, IDC_pSheet), p.Sheet.c_str());           //Лист
-//            SetWindowText(GetDlgItem(hWnd, IDC_pSlab), "0");                        //Сляб
-//
-//            std::vector <std::string>split;
-//            std::string DataTime = p.Start_at;
-//            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
-//            if(split.size() == 2)
-//            {
-//                SetWindowText(GetDlgItem(hWnd, IDC_pSheetDate), split[0].c_str());  //Дата
-//                SetWindowText(GetDlgItem(hWnd, IDC_pSheetTime), split[1].c_str());  //Время
-//            }
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT11), p.TimeForPlateHeat.c_str());//Задание Время нахождения листа в закалочной печи. мин
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT12), p.DataTime_All.c_str());    //Факт Время нахождения листа в закалочной печи. мин
-//
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT13), p.Temper.c_str());          //Задание Температуры закалки
-//            
-//
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT15), p.PresToStartComp.c_str()); //Задание Давления воды
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT16), p.Za_PT3.c_str());          //Факт Давления воды
-//
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT17), p.Za_TE3.c_str());         //Факт Температура воды, °С
-//        }
-//        DataTempSheet.erase(DataTempSheet.begin(), DataTempSheet.end());
-//        if(p.Start_at.length()/* && p.DataTime_End.length()*/)
-//        {
-//            int line = 0;
-//            //GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1", 2); //Задание Температуры закалки
-//                                                  //Application.GenSeqFromHmi.Data.TempSet1
-//
-//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu", 3);
-//
-//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct", 4);
-//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct", 5);
-//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct", 6);
-//            GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct", 7);
-//
-//            float t21 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct", 8);
-//            float t22 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct", 9);
-//            float t23 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct", 10);
-//            float t24 = GetDataTempSheet(p, "|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct", 11);
-//            float t = (float)((t21 + t22 + t23 + t24) / 4.0);
-//            char ss[256];
-//            sprintf(ss, "%0.1f", t);
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT14), ss);                        //Факт Температуры закалки
-//
-//            #define COUNT_COLUMN_SHEET 12
-//            int iItemServ = 0;
-//            //std::vector<float>first[COUNT_COLUMN_SHEET] = {
-//            float first[COUNT_COLUMN_SHEET]{
-//                0, 0,
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.GenSeqFromHmi.Data.TempSet1").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.AI_Hmi_210.Hmi.Za_TE4.AI_eu").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_1.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_2.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_3.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr_4.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_1.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_2.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_3.ToHmi.TAct").c_str()),
-//                (float)atof(FindTag("|var|PLC210 OPC-UA.Application.Hmi210_1.Htr2_4.ToHmi.TAct").c_str()),
-//            };
-//
-//            //int iItemServ = 0;
-//            for(auto& d : DataTempSheet)
-//            {
-//                char ss[256];
-//                sprintf_s(ss, 256, "%d", iItemServ + 1);
-//
-//                LV_ITEM lvi ={0};
-//                lvi.mask = LVIF_TEXT;
-//                lvi.pszText = (LPSTR)ss;
-//                lvi.cchTextMax = 255;
-//                lvi.iItem = (int)iItemServ;
-//                lvi.lParam = NULL;
-//                LRESULT ret = ListView_InsertItem(ListSheetTemp, &lvi);
-//
-//                ListView_SetItemText(ListSheetTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
-//                for(int i = 2; i < COUNT_COLUMN_SHEET; i++)
-//                {
-//                    BOOL end = FALSE;
-//                    for(auto& s : d.second)
-//                    {
-//                        if(s.t == i)
-//                        {
-//                            char ss[256];
-//                            sprintf_s(ss, 256, "%.1f", s.f);
-//                            ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
-//                            first[i] = s.f;
-//                            end = TRUE;
-//                            break;
-//                        }
-//                    }
-//                    if(!end)
-//                    {
-//                        char ss[256];
-//                        sprintf_s(ss, 256, "%.1f", first[i]);
-//                        ListView_SetItemText(ListSheetTemp, lvi.iItem, i, (LPSTR)ss);
-//                    }
-//                }
-//                iItemServ++;
-//            }
-//        }
-//    }
-//}
-
-
 
 
 void GetDataTempCassete(TCassette& p, std::string name, int pos)
@@ -1264,119 +703,12 @@ void GetDataTempCassete(TCassette& p, std::string name, int pos)
     }
 }
 
-//void GetTemperCassette(HWND hWnd, LPARAM lParam)
-//{
-//    if(lParam >= 0 && lParam < (int)AllSheet.size())
-//    {
-//        TSheet& p = AllSheet[lParam];
-//        {
-//            TCassette cassette;
-//            GetCassete(p, cassette);
-//
-//            //GetTM(std::string datatime, std::tm & TM)
-//            std::vector <std::string>split;
-//            std::string DataTime = cassette.Run_at;
-//            boost::split(split, DataTime, boost::is_any_of(" "), boost::token_compress_on);
-//            if(split.size() == 2)
-//            {
-//                SetWindowText(GetDlgItem(hWnd, IDC_pCassetteDate), split[0].c_str());
-//                SetWindowText(GetDlgItem(hWnd, IDC_pCasseteTime), split[1].c_str());
-//            }
-//
-//            //Время нагрева до температуры отпуска, мин
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT18), cassette.PointTime_1.c_str());  //Задание
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT19), "");                            //Факт
-//
-//            //Время выдержки при заданной температуре, мин
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT20), cassette.PointDTime_2.c_str()); //Задание
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT21), "");                            //Факт
-//
-//            //Температура отпуска, °С
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT22), cassette.PointRef_1.c_str());   //Задание
-//            SetWindowText(GetDlgItem(hWnd, IDC_EDIT23), cassette.f_temper.c_str());                 //Факт. За 5 минут лдо конца отпуска
-//
-//            float first[6] ={0, 0,0, 0,0, 0};
-//            DataTempCassette.erase(DataTempCassette.begin(), DataTempCassette.end());
-//            int iItemServ = 0;
-//            if(cassette.Run_at.length())
-//            {
-//                if(atoi(cassette.Peth.c_str()) == 1)
-//                {
-//                    float t1 = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.ProcTimeMin").c_str());      //REAL Время до окончания процесса, мин TimeToProcEnd
-//                    
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef", 2);    //Заданное значение температуры
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct", 3);    //Фактическое значение температуры
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1", 4);         //Термопара 1
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2", 5);         //Термопара 2
-//
-//                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempRef").c_str());
-//                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.TempAct").c_str());
-//                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T1").c_str());
-//                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.T2").c_str());
-//                }
-//                if(atoi(cassette.Peth.c_str()) == 2)
-//                {
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef", 2);    //Заданное значение температуры
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct", 3);    //Фактическое значение температуры
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1", 4);         //Термопара 1
-//                    GetDataTempCassete(cassette, "|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2", 5);         //Термопара 2
-//
-//                    first[2] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempRef").c_str());
-//                    first[3] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.TempAct").c_str());
-//                    first[4] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T1").c_str());
-//                    first[5] = (float)atof(FindTag("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.T2").c_str());
-//                }
-//
-//                for(auto& d : DataTempCassette)
-//                {
-//                    char ss[256];
-//                    sprintf_s(ss, 256, "%d", iItemServ + 1);
-//
-//                    LV_ITEM lvi ={0};
-//                    lvi.mask = LVIF_TEXT;
-//                    lvi.pszText = (LPSTR)ss;
-//                    lvi.cchTextMax = 255;
-//                    lvi.iItem = (int)iItemServ;
-//                    lvi.lParam = NULL;// param;
-//                    LRESULT ret = ListView_InsertItem(ListCasseteTemp, &lvi);
-//
-//                    ListView_SetItemText(ListCasseteTemp, lvi.iItem, 1, (LPSTR)d.first.c_str());
-//                    for(int i = 2; i < 6; i++)
-//                    {
-//                        BOOL end = FALSE;
-//                        for(auto& s : d.second)
-//                        {
-//                            if(s.t == i)
-//                            {
-//                                char ss[256];
-//                                sprintf_s(ss, 256, "%.1f", s.f);
-//                                ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
-//                                first[i] = s.f;
-//                                end = TRUE;
-//                                break;
-//                            }
-//                        }
-//                        if(!end)
-//                        {
-//                            char ss[256];
-//                            sprintf_s(ss, 256, "%.1f", first[i]);
-//                            ListView_SetItemText(ListCasseteTemp, lvi.iItem, i, (LPSTR)ss);
-//                        }
-//
-//                    }
-//                    iItemServ++;
-//                }
-//            }
-//        }
-//    }
-//}
-
 //BOOL CenterWindow2(HWND hwndChild, HWND hwndParent);
 DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
 {
-    #define Stat03Flag WS_CHILD | WS_VISIBLE | WS_BORDER | SS_OWNERDRAW | SS_CENTERIMAGE | DT_SINGLELINE
+    //#define Stat03Flag WS_CHILD | WS_VISIBLE | WS_BORDER | SS_OWNERDRAW | SS_CENTERIMAGE | DT_SINGLELINE
 
-    #define Flag WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_NOSORTHEADER
+    #define Flag WS_CHILD | WS_VISIBLE | WS_BORDER | LVS_REPORT | LVS_NOSORTHEADER | LVS_SINGLESEL
 
     ListSheetTemp = CreateWindowEx(0, "SysListView32", "", Flag,   17, 125, 680, 195, hDlg, (HMENU)hEdit_Sheet, hInstance, nullptr);
     ListCasseteTemp = CreateWindowEx(0, "SysListView32", "", Flag, 17, 350, 680, 165, hDlg, (HMENU)hEdit_Sheet, hInstance, nullptr);
@@ -1443,105 +775,138 @@ DLLRESULT CALLBACK SheetPasportProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
     return 0;
 }
 
+//Клик правой кнопкой мыши
+LRESULT RightClickSheet(LPNM_LISTVIEW pnm)
+{
+    HWND hwndLV = pnm->hdr.hwndFrom;
+    LV_ITEM lvi;
+    lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+    if(lvi.iItem == -1) return FALSE;
+    TCassette& cassette = AllCassette[lvi.iItem];
+    //if(cassette.Event != "7")
+    //    DisplayContextMenu(hWnd, IDR_MENU2);
+    //else
+    //    DisplayContextMenu(hWnd, IDR_MENU3);
+    return 0;
+}
+
+//Двойной клик мыши
+LRESULT DoubleClickSheet(HWND hWnd, LPNM_LISTVIEW pnm)
+{
+    HWND hwndLV = pnm->hdr.hwndFrom;
+    int item = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+    if(item >= 0 && item < (int)AllSheet.size())
+    {
+        TSheet p = AllSheet[item];
+        if(p.Pdf.length())
+        {
+            std::string url = "\\\\" + m_dbhost + "\\" + p.Pdf;
+            boost::replace_all(url, "/", "\\");
+            ShellExecute(NULL, "open", url.c_str(), NULL, NULL, SW_SHOWNORMAL);
+        }
+        else
+            MessageBox(hWnd, "Лист еще небыл на отпуске", "Ошибка", MB_OK | MB_ICONWARNING | MB_APPLMODAL);
+        //PrintPdf(p);
+    }
+    return 0;
+}
+
+//Вывод информации листа
+LRESULT DispInfoSheet(LPARAM lParam)
+{
+    LV_DISPINFO* plvdi = (LV_DISPINFO*)lParam;
+    
+    int item = plvdi->item.iItem;
+    int subItem = plvdi->item.iSubItem;
+    if(item >= 0 && item < (int)AllSheet.size())
+    {
+        if(plvdi->item.mask & LVIF_TEXT)
+        {
+            TSheet& p = AllSheet[item];
+            {
+                if(subItem == casSheet::NN)         lstrcpy(plvdi->item.pszText, std::to_string(item + 1).c_str());
+                ELSEIF (casSheet::ID, p.id.c_str());
+                ELSEIF (casSheet::DataTime, p.DataTime.c_str());
+                ELSEIF (casSheet::Start_at, p.Start_at.c_str());
+                ELSEIF (casSheet::DataTime_End, p.DataTime_End.c_str());
+                ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
+
+                //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
+                else if(subItem == casSheet::Pos) lstrcpyA(plvdi->item.pszText, NamePos[p.Pos].c_str());
+
+                ELSEIF (casSheet::Alloy, p.Alloy.c_str());
+                ELSEIF (casSheet::Thikness, p.Thikness.c_str());
+
+                ELSEIF (casSheet::Melt, p.Melt.c_str());
+                ELSEIF (casSheet::Slab, p.Slab.c_str());
+                ELSEIF (casSheet::PartNo, p.PartNo.c_str());
+                ELSEIF (casSheet::Pack, p.Pack.c_str());
+                ELSEIF (casSheet::Sheet, p.Sheet.c_str());
+                ELSEIF (casSheet::SubSheet, p.SubSheet.c_str());
+                ELSEIF (casSheet::Temper, p.Temper.c_str());
+                ELSEIF (casSheet::Temperature, p.Temperature.c_str());
+
+                ELSEIF (casSheet::Speed, p.Speed.c_str());
+                ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
+                ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
+
+                ELSEIF (casSheet::LamPressTop, p.LaminPressTop.c_str());
+                ELSEIF (casSheet::LamPressBot, p.LaminPressBot.c_str());
+
+                ELSEIF (casSheet::PosClapanTop, p.PosClapanTop.c_str());
+                ELSEIF (casSheet::PosClapanBot, p.PosClapanBot.c_str());
+                ELSEIF (casSheet::Mask, p.Mask.c_str());
+                ELSEIF (casSheet::Lam1PosClapanTop, p.Lam1PosClapanTop.c_str());
+                ELSEIF (casSheet::Lam1PosClapanBot, p.Lam1PosClapanBot.c_str());
+                ELSEIF (casSheet::Lam2PosClapanTop, p.Lam2PosClapanTop.c_str());
+                ELSEIF (casSheet::Lam2PosClapanBot, p.Lam2PosClapanBot.c_str());
+
+                ELSEIF (casSheet::Lam_TE1, p.LAM_TE1.c_str());
+
+
+                ELSEIF (casSheet::News, p.News.c_str());
+
+                ELSEIF (casSheet::Top1, p.Top1.c_str());
+                ELSEIF (casSheet::Top2, p.Top2.c_str());
+                ELSEIF (casSheet::Top3, p.Top3.c_str());
+                ELSEIF (casSheet::Top4, p.Top4.c_str());
+                ELSEIF (casSheet::Top5, p.Top5.c_str());
+                ELSEIF (casSheet::Top6, p.Top6.c_str());
+                ELSEIF (casSheet::Top7, p.Top7.c_str());
+                ELSEIF (casSheet::Top8, p.Top8.c_str());
+
+                ELSEIF (casSheet::Bot1, p.Bot1.c_str());
+                ELSEIF (casSheet::Bot2, p.Bot2.c_str());
+                ELSEIF (casSheet::Bot3, p.Bot3.c_str());
+                ELSEIF (casSheet::Bot4, p.Bot4.c_str());
+                ELSEIF (casSheet::Bot5, p.Bot5.c_str());
+                ELSEIF (casSheet::Bot6, p.Bot6.c_str());
+                ELSEIF (casSheet::Bot7, p.Bot7.c_str());
+                ELSEIF (casSheet::Bot8, p.Bot8.c_str());
+
+                ELSEIF (casSheet::Day, p.Day.c_str());
+                ELSEIF (casSheet::Month, p.Month.c_str());
+                ELSEIF (casSheet::Year, p.Year.c_str());
+                ELSEIF (casSheet::CassetteNo, p.CassetteNo.c_str());
+                ELSEIF (casSheet::SheetInCassette, p.SheetInCassette.c_str());
+                ELSEIF (casSheet::TimeForPlateHeat, p.TimeForPlateHeat.c_str()); //Время сигнализации окончания нагрева, мин
+                ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
+                ELSEIF (casSheet::Correct, p.Correct.c_str());  //
+                ELSEIF (casSheet::Pdf, p.Pdf.c_str());  //
+                //ELSEIF (casSheet::TempWatTankCool, p.TempWatTankCool.c_str());  //Температура закалочной воды для вкл.охлаждения
+
+            }
+        }
+    }
+    return 0;
+}
 
 LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
-    if(pnm->hdr.code == NM_DBLCLK)
-    {
-        HWND hwndLV = pnm->hdr.hwndFrom;
-        int item = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
-        if(item >= 0 && item < (int)AllSheet.size())
-        {
-            TSheet p = AllSheet[item];
-            PrintPdf(p);
-        }
-    }
-    else if(pnm->hdr.code == LVN_GETDISPINFO)
-    {
-        LV_DISPINFO* plvdi = (LV_DISPINFO*)lParam;
-
-        int item = plvdi->item.iItem;
-        int subItem = plvdi->item.iSubItem;
-        if(item >= 0 && item < (int)AllSheet.size())
-        {
-            if(plvdi->item.mask & LVIF_TEXT)
-            {
-                TSheet& p = AllSheet[item];
-                {
-                    if(subItem == casSheet::NN)         lstrcpy(plvdi->item.pszText, std::to_string(item + 1).c_str());
-                    ELSEIF (casSheet::ID, p.id.c_str());
-                    ELSEIF (casSheet::DataTime, p.DataTime.c_str());
-                    ELSEIF (casSheet::Start_at, p.Start_at.c_str());
-                    ELSEIF (casSheet::DataTime_End, p.DataTime_End.c_str());
-                    ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
-
-                    //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
-                    else if(subItem == casSheet::Pos) lstrcpyA(plvdi->item.pszText, NamePos[p.Pos].c_str());
-
-                    ELSEIF (casSheet::Alloy, p.Alloy.c_str());
-                    ELSEIF (casSheet::Thikness, p.Thikness.c_str());
-
-                    ELSEIF (casSheet::Melt, p.Melt.c_str());
-                    ELSEIF (casSheet::Slab, p.Slab.c_str());
-                    ELSEIF (casSheet::PartNo, p.PartNo.c_str());
-                    ELSEIF (casSheet::Pack, p.Pack.c_str());
-                    ELSEIF (casSheet::Sheet, p.Sheet.c_str());
-                    ELSEIF (casSheet::SubSheet, p.SubSheet.c_str());
-                    ELSEIF (casSheet::Temper, p.Temper.c_str());
-                    ELSEIF (casSheet::Temperature, p.Temperature.c_str());
-                    
-                    ELSEIF (casSheet::Speed, p.Speed.c_str());
-                    ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
-                    ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
-
-                    ELSEIF (casSheet::LamPressTop, p.LaminPressTop.c_str());
-                    ELSEIF (casSheet::LamPressBot, p.LaminPressBot.c_str());
-
-                    ELSEIF (casSheet::PosClapanTop, p.PosClapanTop.c_str());
-                    ELSEIF (casSheet::PosClapanBot, p.PosClapanBot.c_str());
-                    ELSEIF (casSheet::Mask, p.Mask.c_str());
-                    ELSEIF (casSheet::Lam1PosClapanTop, p.Lam1PosClapanTop.c_str());
-                    ELSEIF (casSheet::Lam1PosClapanBot, p.Lam1PosClapanBot.c_str());
-                    ELSEIF (casSheet::Lam2PosClapanTop, p.Lam2PosClapanTop.c_str());
-                    ELSEIF (casSheet::Lam2PosClapanBot, p.Lam2PosClapanBot.c_str());
-
-                    ELSEIF (casSheet::Lam_TE1, p.LAM_TE1.c_str());
-
-
-                    ELSEIF (casSheet::News, p.News.c_str());
-
-                    ELSEIF (casSheet::Top1, p.Top1.c_str());
-                    ELSEIF (casSheet::Top2, p.Top2.c_str());
-                    ELSEIF (casSheet::Top3, p.Top3.c_str());
-                    ELSEIF (casSheet::Top4, p.Top4.c_str());
-                    ELSEIF (casSheet::Top5, p.Top5.c_str());
-                    ELSEIF (casSheet::Top6, p.Top6.c_str());
-                    ELSEIF (casSheet::Top7, p.Top7.c_str());
-                    ELSEIF (casSheet::Top8, p.Top8.c_str());
-
-                    ELSEIF (casSheet::Bot1, p.Bot1.c_str());
-                    ELSEIF (casSheet::Bot2, p.Bot2.c_str());
-                    ELSEIF (casSheet::Bot3, p.Bot3.c_str());
-                    ELSEIF (casSheet::Bot4, p.Bot4.c_str());
-                    ELSEIF (casSheet::Bot5, p.Bot5.c_str());
-                    ELSEIF (casSheet::Bot6, p.Bot6.c_str());
-                    ELSEIF (casSheet::Bot7, p.Bot7.c_str());
-                    ELSEIF (casSheet::Bot8, p.Bot8.c_str());
-
-                    ELSEIF (casSheet::Day, p.Day.c_str());
-                    ELSEIF (casSheet::Month, p.Month.c_str());
-                    ELSEIF (casSheet::Year, p.Year.c_str());
-                    ELSEIF (casSheet::CassetteNo, p.CassetteNo.c_str());
-                    ELSEIF (casSheet::SheetInCassette, p.SheetInCassette.c_str());
-                    ELSEIF (casSheet::TimeForPlateHeat, p.TimeForPlateHeat.c_str()); //Время сигнализации окончания нагрева, мин
-                    ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
-                    //ELSEIF (casSheet::TempWatTankCool, p.TempWatTankCool.c_str());  //Температура закалочной воды для вкл.охлаждения
-
-                }
-            }
-        }
-    }
+    if(pnm->hdr.code == NM_RCLICK)return RightClickSheet(pnm);
+    else if(pnm->hdr.code == NM_DBLCLK) return DoubleClickSheet(hWnd, pnm);
+    else if(pnm->hdr.code == LVN_GETDISPINFO)DispInfoSheet(lParam);
     return 0;
 }
 
@@ -1734,11 +1099,11 @@ LRESULT CALLBACK WndProcHeadListViewSheet(HWND hWnd, UINT message, WPARAM wParam
 
 void InitListSheet()
 {
-    #define Flag WS_CHILD | WS_VISIBLE | WS_BORDER /*| WS_CLIPSIBLINGS | WS_CLIPCHILDREN*/ | LVS_REPORT | LVS_NOSORTHEADER
+    #define FlagSheet WS_CHILD | WS_VISIBLE | WS_BORDER /*| WS_CLIPSIBLINGS | WS_CLIPCHILDREN*/ | LVS_REPORT | LVS_NOSORTHEADER | LVS_OWNERDRAWFIXED | LVS_SINGLESEL
 
     RECT rc;
     GetClientRect(SheetWindow, &rc);
-    ListSheet = CreateWindowEx(0, "SysListView32", "", Flag, 0, 20, rc.right - rc.left, rc.bottom - rc.top - 40, SheetWindow, (HMENU)hEdit_Sheet, hInstance, nullptr);
+    ListSheet = CreateWindowEx(0, "SysListView32", "", FlagSheet, 0, 20, rc.right - rc.left, rc.bottom - rc.top - 40, SheetWindow, (HMENU)hEdit_Sheet, hInstance, nullptr);
 
     if(!ListSheet)
         throw std::exception(std::string("Ошибка создания окна : ListSheet").c_str());
@@ -1797,6 +1162,7 @@ LRESULT CALLBACK WinProcSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
     if(message == WM_CLOSE)SheetWindow = NULL;
     if(message == WM_COMMAND)return CommandSheet(hWnd, wParam);
     if(message == WM_MDIACTIVATE)return ActivateSheet(hWnd, message, wParam, lParam);
+    if(message == WM_DRAWITEM)return LISTPAINT::DrawItem(hWnd, message, wParam, lParam);
     return DefMDIChildProc(hWnd, message, wParam, lParam);
 }
 

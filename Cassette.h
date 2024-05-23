@@ -71,18 +71,19 @@ enum Cassete{
     //Close_at,
     Peth,
     Run_at,
-    End_at,
+    //End_at,
     Finish_at,
     Error_at,
+    //Delete_at,
     PointRef_1,     //Уставка температуры
     f_temper,       //Факт температуры за 5 минут до конца отпуска
 
-    PointTime_1,    //Время разгона
+    PointTime_1,    //Время нагрева
     HeatAcc,        //Факт время нагрева
-    TimeProcSet,    //Полное время процесса (уставка), мин
-    Total,          //Факт общее время
     PointDTime_2,   //Время выдержки
     HeatWait,       //Факт время выдержки
+    TimeProcSet,    //Полное время процесса (уставка), мин
+    Total,          //Факт общее время
 };
 typedef struct TCassette{
     std::string Id = "";

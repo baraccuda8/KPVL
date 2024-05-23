@@ -157,6 +157,11 @@
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>date /T &gt;date.txt
+time /T &gt;&gt;date.txt
+</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -181,6 +186,11 @@
       <AdditionalDependencies>Psapi.lib;Haru$(PlatformArchitecture)$(PlatformToolset)_$(Configuration).lib;Wininet.lib;wsock32.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>MSVCRTD.LIB</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PreBuildEvent>
+      <Command>date /T &gt;date.txt
+time /T &gt;&gt;date.txt
+</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Calendar.cpp" />
@@ -228,6 +238,9 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="arial.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="date.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -76,17 +76,26 @@ extern HBRUSH TitleBrush3;
 //темносин€€ заливка
 extern HBRUSH TitleBrush4;
 
+//extern COLORREF m_clrText;
+//extern COLORREF m_clrTextBk;
+
+
 #define ELSEIF(_s, _d) else if(subItem == _s) lstrcpy(plvdi->item.pszText, _d)
 
 void DisplayContextMenu(HWND hwnd, int ID);
 
-#ifdef _WIN64
-#pragma comment(lib, "libxl64.lib")
-//#define SIZE_MAX 0xffffffffffffffff
-#define DLLRESULT LRESULT
-#else
-#pragma comment(lib, "libxl32.lib")
-//#define SIZE_MAX 0xffffffff
-#define DLLRESULT INT_PTR
-#endif
+namespace LISTPAINT{
+    enum TItemRectType2{
+        Bounds        = LVIR_BOUNDS,     // Entire boundary (icon and label)
+        Icons         = LVIR_ICON,       // Only the icon
+        Label         = LVIR_LABEL,      // Only the label
+        SelectBounds  = LVIR_SELECTBOUNDS// Union of Icon+Label but no colmns
+    };
 
+
+    LPCTSTR MakeShortString(HDC hdc, LPCTSTR lpszLong, int nColumnLen, int nOffset);
+    BOOL GetItemRect(HWND hwnd, int index, RECT* r, TItemRectType2 type);
+    BOOL GetColumn(HWND hwnd, int index, LV_COLUMN* column);
+    LRESULT DrawItem(HWND, UINT, WPARAM, LPARAM lParam);
+
+}

@@ -8,6 +8,7 @@ void SendDebug(std::string fun, std::string cons, std::string ss);
 //void encode(byte* pText, int len);
 std::string GetStringData(std::string d);
 char* CmdFileSaveXlsx(HWND hWnd, char* SaveFilename);
+void GetRessusce(int ID, const char* DATE, LPVOID* pLockedResource, DWORD* dwResourceSize);
 bool LoadRessurse(std::string fname, int ID);
 
 

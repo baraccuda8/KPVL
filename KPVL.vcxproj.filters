@@ -116,4 +116,7 @@
       <Filter>Файлы ресурсов</Filter>
     </Font>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="date.txt" />
+  </ItemGroup>
 </Project>

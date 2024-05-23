@@ -50,6 +50,30 @@ std::string utf8_to_cp1251(std::string str)
     return str;
 }
 
+
+void GetRessusce(int ID, const char* DATE, LPVOID* pLockedResource, DWORD* dwResourceSize)
+{
+    if(!pLockedResource || !dwResourceSize)
+        throw std::exception(__FUN("GetRessusce Error Parametr"));
+
+    HRSRC hResource = FindResource(hInstance, MAKEINTRESOURCE(ID), DATE);
+    if(!hResource)
+        throw std::exception(__FUN("!FindResource"));
+
+    HGLOBAL hLoadedResource = LoadResource(hInstance, hResource);
+    if(!hLoadedResource)
+        throw std::exception(__FUN("!hLoadedResource"));
+
+    *pLockedResource = LockResource(hLoadedResource);
+    if(!*pLockedResource)
+        throw std::exception(__FUN("!*pLockedResource"));
+
+    *dwResourceSize = SizeofResource(hInstance, hResource);
+    if(!*dwResourceSize)
+        throw std::exception(__FUN("!*dwResourceSize"));
+
+    UnlockResource(hLoadedResource);
+}
 bool LoadRessurse(std::string fname, int ID)
 {
     HGLOBAL hLoadedResource = NULL;

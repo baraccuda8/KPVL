@@ -24,6 +24,8 @@ GUID guidGif ={};
 GUID guidTiff ={};
 GUID guidPng ={};
 
+std::string Version = "Программа\r\nКомплекс Подготовки Высокопрочного Листа\r\nВерсия 2.0\r\n\r\nСоздана ";
+
 
 //std::string lpCassetteDir = "Cassette";
 std::string lpLogDir = "Log";
@@ -101,7 +103,6 @@ void CheckAllDir()
 }
 
 
-
 //Добавить колонку в ListBox
 LRESULT AddColumn(HWND hwndSheet, size_t i, ListTitle* l)
 {
@@ -172,6 +173,33 @@ LRESULT OpenCASSETTE()
     return 0;
 }
 
+
+
+// Обработчик сообщений для окна "О программе".
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch(message)
+    {
+        case WM_INITDIALOG:
+        {
+            SetWindowText(GetDlgItem(hDlg, IDC_VERSION), Version.c_str());
+            //sprintf_s(sFormat, 100, "%04d-%02d-%02d %02d:%02d. Версия: ", TM.tm_year + 1900, TM.tm_mon + 1, TM.tm_mday, TM.tm_hour, TM.tm_min);
+            CenterWindow(hDlg, GlobalWindow);
+
+            return (INT_PTR)TRUE;
+        }
+        case WM_COMMAND:
+            if(LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+            {
+                EndDialog(hDlg, LOWORD(wParam));
+                return (INT_PTR)TRUE;
+            }
+            break;
+    }
+    return (INT_PTR)FALSE;
+}
+
 LRESULT Command(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     int command = LOWORD(wParam);
@@ -185,7 +213,7 @@ LRESULT Command(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     if(command == IDM_WINDOWTILEV)return SendMessage(MidiClientWindow, WM_MDITILE, MDITILE_VERTICAL, 0);
     if(command == IDM_WINDOWCASCADE)return SendMessage(MidiClientWindow, WM_MDICASCADE, 0, 0);
     if(command == IDM_WINDOWICONS)return SendMessage(MidiClientWindow, WM_MDIICONARRANGE, 0, 0);
-
+    if(command == ID_40026) DialogBox(hInstance, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
 
     if(command == ID_EXIT) return Quit();
     return DefFrameProc(hWnd, MidiClientWindow, message, wParam, lParam);
@@ -230,6 +258,13 @@ HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 224, 255));
 
 //темносиняя заливка
 HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
+
+//Светло серая заливка
+HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));
+
+//COLORREF m_clrText = 0x00FFFFFF; // (COLORREF)GetStockObject(WHITE_BRUSH);
+//COLORREF m_clrTextBk = (COLORREF)GetStockObject(LTGRAY_BRUSH);
+
 
 HRESULT GetGdiplusEncoderClsid(const std::wstring& format, GUID* pGuid)
 {
@@ -318,6 +353,122 @@ void InitFont()
     Font[emFont::Font16] = CreateFont(nHeight16, 0, 0, 0, FW_BLACK, FALSE, FALSE, FALSE, DEFAULT_CHARSET, OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, ANTIALIASED_QUALITY, 0, "Arial");
 }
 
+namespace LISTPAINT{
+
+    
+
+
+    LPCTSTR MakeShortString(HDC hdc, LPCTSTR lpszLong, int nColumnLen, int nOffset)
+    {
+        static TCHAR szThreeDots[]="...";
+        SIZE sizeLP;
+        int nStringLen=lstrlen(lpszLong);
+
+        GetTextExtentPoint(hdc, lpszLong, nStringLen, &sizeLP);
+        if(nStringLen == 0 || sizeLP.cx + nOffset <= nColumnLen)return(lpszLong);
+
+        static TCHAR szShort[MAX_PATH];
+
+        lstrcpy(szShort, lpszLong);
+
+        GetTextExtentPoint(hdc, szThreeDots, sizeof(szThreeDots), &sizeLP);
+        int nAddLen=sizeLP.cx;
+
+        for(int i=nStringLen - 1; i > 0; i--)
+        {
+            szShort[i]=0;
+            GetTextExtentPoint(hdc, szShort, i, &sizeLP);
+            if(sizeLP.cx + nOffset + nAddLen <= nColumnLen)
+                break;
+        }
+
+        lstrcat(szShort, szThreeDots);
+
+        return(szShort);
+    }
+
+    BOOL GetItemRect(HWND hwnd, int index, RECT* r, TItemRectType2 type)
+    {
+        r->left = type;
+        return SendMessage(hwnd, LVM_GETITEMRECT, index, (LPARAM)r) != 0;
+    }
+
+    BOOL GetColumn(HWND hwnd, int index, LV_COLUMN* column)
+    {
+        return SendMessage(hwnd, LVM_GETCOLUMN, index, (LPARAM)column) != 0;
+    }
+
+    LRESULT DrawItem(HWND, UINT, WPARAM, LPARAM lParam)
+    {
+        LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
+        LV_ITEM lvi;
+        LV_COLUMN lvc;
+        RECT    rc, rcLabel;
+        char szBuff[1024];
+        LPCTSTR pszText;
+
+
+        lvi.mask=LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
+        lvi.iItem=lpdis->itemID;
+        lvi.iSubItem=0;
+        lvi.pszText=szBuff;
+        lvi.cchTextMax=sizeof(szBuff);
+        lvi.stateMask=0xFFFF;
+        SendMessage(lpdis->hwndItem, LVM_GETITEM, 0, (LPARAM)&lvi);
+
+        BOOL bSelected=lvi.state & LVIS_SELECTED;
+        bSelected = bSelected || (lvi.state & LVIS_DROPHILITED);
+
+        GetItemRect(lpdis->hwndItem, lpdis->itemID, &rc, Bounds);
+        SetBkMode(lpdis->hDC, 1);
+
+        COLORREF clrTextSave = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+
+
+        if(bSelected)
+        {
+            FillRect(lpdis->hDC, &rc, TitleBrush2);
+        }
+        else
+        {
+            if(lvi.iItem % 2)
+                FillRect(lpdis->hDC, &rc, TitleBrush5);
+            else
+                FillRect(lpdis->hDC, &rc, TitleBrush1);
+        }
+
+
+        //ImageList_DrawEx(hIL, lvi.iImage, lpdis->hDC, rc.left, rc.top, 16, 16, CLR_DEFAULT, CLR_DEFAULT, ILD_TRANSPARENT);
+
+        rc.bottom += 1;
+        rc.right = rc.left;
+
+        lvc.mask=LVCF_FMT | LVCF_WIDTH;
+
+        SelectObject(lpdis->hDC, Font[emFont::Font10]);
+
+        for(int nColumn=0; GetColumn(lpdis->hwndItem, nColumn, &lvc); nColumn++)
+        {
+            ListView_GetItemText(lpdis->hwndItem, lpdis->itemID, nColumn, szBuff, sizeof(szBuff));
+            //nJustify = DT_LEFT;
+
+            ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
+            rcLabel.left += 2;
+            rcLabel.right -= 2;
+
+            pszText=MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
+
+            DrawText(lpdis->hDC, pszText, -1, &rcLabel, DT_CENTER | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER);
+        }
+
+
+        //if(bSelected)SetBkColor(lpdis->hDC, (ULONG)clrBkSave);
+        //SetTextColor(lpdis->hDC, (ULONG)clrTextSave);
+
+        return TRUE;
+    }
+
+};
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -361,7 +512,7 @@ BOOL CenterWindow(HWND hwndChild, HWND hwndParent)
 {
     RECT rcChild, rcParent;
     int  cxChild, cyChild, cxParent, cyParent, cxScreen, cyScreen, xNew, yNew;
-    HDC  hdc;
+    //HDC  hdc;
 
     GetWindowRect(hwndChild, &rcChild);
     cxChild = rcChild.right - rcChild.left;
@@ -371,10 +522,18 @@ BOOL CenterWindow(HWND hwndChild, HWND hwndParent)
     cxParent = rcParent.right - rcParent.left;
     cyParent = rcParent.bottom - rcParent.top;
 
-    hdc = GetDC(hwndChild);
-    cxScreen = GetDeviceCaps(hdc, HORZRES);
-    cyScreen = GetDeviceCaps(hdc, VERTRES);
-    ReleaseDC(hwndChild, hdc);
+    //hdc = GetDC(NULL);
+
+    int XV = GetSystemMetrics(SM_XVIRTUALSCREEN);
+    int YV = GetSystemMetrics(SM_YVIRTUALSCREEN);
+    int CXV = GetSystemMetrics(SM_CXVIRTUALSCREEN);
+    int CYV = GetSystemMetrics(SM_CYVIRTUALSCREEN);
+
+    cxScreen = CXV - XV;
+    cyScreen = CYV - YV;
+    //cxScreen = GetDeviceCaps(hdc, SM_CXVIRTUALSCREEN);
+    //cyScreen = GetDeviceCaps(hdc, SM_CYVIRTUALSCREEN);
+    //ReleaseDC(NULL, hdc);
 
     xNew = rcParent.left + (cxParent - cxChild) / 2;
     if(xNew < 0)xNew = 0; 
@@ -660,6 +819,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
 
         if(!hInstance)
             throw std::runtime_error((FUNCTION_LINE_NAME + std::string("Ошибка запуска программы : hInstance = NULL")).c_str());
+
+        char* pLockedResource = NULL;
+        DWORD dwResourceSize = 0;
+        GetRessusce(IDR_TXT1, "TXT", (LPVOID*)&pLockedResource, &dwResourceSize);
+        std::string f = pLockedResource;
+        boost::replace_all(f, "\r\n", "");
+
+        Version += f;
+        //boost::replace_all(Version, "  ", " ");
+        //boost::replace_last(Version, " ", "");
+        
 
         CurrentDir();
         CheckDir(lpLogDir);

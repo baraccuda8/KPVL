@@ -119,6 +119,8 @@ typedef struct TSheet{
     std::string PresToStartComp = "";  //Уставка давления для запуска комперссора
     //std::string TempWatTankCool = "";  //Температура закалочной воды для вкл.охлаждения
     std::string Temperature = "";        //Средняя температура 2-части печи закалки
+    std::string Correct = "";
+    std::string Pdf = "";
 
     TSheet()
     {
@@ -205,6 +207,8 @@ namespace casSheet{
         Bot6,
         Bot7,
         Bot8,
+        Correct,
+        Pdf,
     };
 };
 
@@ -341,4 +345,5 @@ extern int Col_Sheet_sheetincassette;
 extern int Col_Sheet_timeforplateheat;
 extern int Col_Sheet_prestostartcomp;
 extern int Col_Sheet_temperature;
+extern int Col_Sheet_pdf;
 #pragma endregion

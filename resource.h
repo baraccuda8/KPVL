@@ -14,7 +14,9 @@
 #define IDR_MENU2                       117
 #define IDR_MENU3                       118
 #define IDD_DIALOG5                     119
+#define IDD_ABOUTBOX                    120
 #define IDR_DAT2                        123
+#define IDR_TXT1                        125
 #define IDC_EDIT1                       1001
 #define IDC_EDIT2                       1002
 #define IDC_EDIT3                       1003
@@ -40,6 +42,7 @@
 #define IDC_STATIC2                     1035
 #define IDC_STATIC3                     1038
 #define IDC_LIST2                       1039
+#define IDC_VERSION                     1040
 #define IDC_BUTTON1                     11003
 #define IDC_BUTTON2                     11004
 #define IDC_pSheet                      11006
@@ -83,14 +86,16 @@
 #define ID_POP_APRIL                    40022
 #define ID_POP_40023                    40023
 #define ID_POP_40024                    40024
+#define ID_40025                        40025
+#define ID_40026                        40026
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        124
-#define _APS_NEXT_COMMAND_VALUE         40025
-#define _APS_NEXT_CONTROL_VALUE         1040
+#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_COMMAND_VALUE         40027
+#define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

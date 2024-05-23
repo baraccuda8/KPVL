@@ -106,3 +106,14 @@ typedef struct {
 }ListTitle;
 
 #endif //PCH_H
+
+#ifdef _WIN64
+#pragma comment(lib, "libxl64.lib")
+//#define SIZE_MAX 0xffffffffffffffff
+#define DLLRESULT LRESULT
+#else
+#pragma comment(lib, "libxl32.lib")
+//#define SIZE_MAX 0xffffffff
+#define DLLRESULT INT_PTR
+#endif
+

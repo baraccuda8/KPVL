@@ -125,7 +125,7 @@ public:
 		//conn.PGDisConnection();
 	};
 
-	void GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Value* val);
+	void GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, int ID);
 	void SqlTempActKPVL(T_SqlTemp& tr);
 
 	void DrawBottom(Gdiplus::Graphics& temp, Gdiplus::RectF& Rect, Gdiplus::Color& clor, T_SqlTemp& st, int64_t mind, int64_t maxd, double mint, double maxt);;
@@ -208,10 +208,10 @@ void PdfClass::GetSheet()
 			for(int l = 0; l < line; l++)
 			{
 				TSheet sheet;
-				sheet.DataTime = GetStringData(conn.PGgetvalue(res, l, Col_Sheet_create_at));
+				sheet.DataTime = /*GetStringData*/(conn.PGgetvalue(res, l, Col_Sheet_create_at));
 				sheet.Pos = conn.PGgetvalue(res, l, Col_Sheet_pos);
 				sheet.id = conn.PGgetvalue(res, l, Col_Sheet_id);
-				sheet.DataTime_End = GetStringData(conn.PGgetvalue(res, l, Col_Sheet_datatime_end));
+				sheet.DataTime_End = /*GetStringData*/(conn.PGgetvalue(res, l, Col_Sheet_datatime_end));
 				sheet.DataTime_All = conn.PGgetvalue(res, l, Col_Sheet_datatime_all);
 				sheet.Alloy = conn.PGgetvalue(res, l, Col_Sheet_alloy);
 				sheet.Thikness = conn.PGgetvalue(res, l, Col_Sheet_thikness);
@@ -264,7 +264,7 @@ void PdfClass::GetSheet()
 				sheet.CassetteNo = conn.PGgetvalue(res, l, Col_Sheet_cassetteno);
 				sheet.SheetInCassette = conn.PGgetvalue(res, l, Col_Sheet_sheetincassette);
 
-				sheet.Start_at = GetStringData(conn.PGgetvalue(res, l, Col_Sheet_start_at));
+				sheet.Start_at = /*GetStringData*/(conn.PGgetvalue(res, l, Col_Sheet_start_at));
 				sheet.TimeForPlateHeat = conn.PGgetvalue(res, l, Col_Sheet_timeforplateheat);
 				sheet.PresToStartComp = conn.PGgetvalue(res, l, Col_Sheet_prestostartcomp);
 				sheet.Temperature = conn.PGgetvalue(res, l, Col_Sheet_temperature);
@@ -278,7 +278,7 @@ void PdfClass::GetSheet()
 #endif
 }
 
-void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Value* val)
+void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, int ID)
 {
 #ifdef SAWEDEBUG 
 	SendDebug(">>TEST", FUNCTION_LINE_NAME);
@@ -288,10 +288,10 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Va
 		std::tm TM_Temp ={0};
 		std::string sBegTime2 = Start;
 		std::stringstream sde;
-		sde << "SELECT max(create_at) FROM todos WHERE id_name = " << val->ID;
+		sde << "SELECT DISTINCT ON (id) create_at FROM todos WHERE id_name = " << ID;
 		sde << " AND create_at <= '";
 		sde << Start;
-		sde << "';";
+		sde << "' ORDER BY id DESC LIMIT 1;";
 		std::string comand = sde.str();
 		PGresult* res = conn.PGexec(comand);
 		if(PQresultStatus(res) == PGRES_TUPLES_OK)
@@ -305,11 +305,11 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Va
 
 
 		std::stringstream sdt;
-		sdt << "SELECT create_at, content FROM todos WHERE id_name = " << val->ID;
+		sdt << "SELECT DISTINCT ON (id) create_at, content FROM todos WHERE id_name = " << ID;
 		if(sBegTime2.length())	sdt << " AND create_at >= '" << sBegTime2 << "'";
 		if(Stop.length())	sdt << " AND create_at <= '" << Stop << "'";
 
-		sdt << " ORDER BY create_at ASC;";
+		sdt << " ORDER BY id ASC;";
 
 		comand = sdt.str();
 		res = conn.PGexec(comand);
@@ -325,12 +325,12 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Va
 				DataTimeOfString(Start, FORMATTIME, TM_Temp);
 				TM_Temp.tm_year -= 1900;
 				TM_Temp.tm_mon -= 1;
-				tr[GetStringData(Start)] = std::pair(mktime(&TM_Temp), f);
+				tr[Start] = std::pair(mktime(&TM_Temp), f);
 
 
 				for(int l = 0; l < line; l++)
 				{
-					std::string sData = GetStringData(conn.PGgetvalue(res, l, 0));
+					std::string sData = conn.PGgetvalue(res, l, 0);
 
 					if(Start <= sData)
 					{
@@ -349,7 +349,7 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, Va
 				DataTimeOfString(Stop, FORMATTIME, TM_Temp);
 				TM_Temp.tm_year -= 1900;
 				TM_Temp.tm_mon -= 1;
-				tr[GetStringData(Stop)] = std::pair(mktime(&TM_Temp), f);
+				tr[Stop] = std::pair(mktime(&TM_Temp), f);
 			}
 		}
 		else
@@ -405,7 +405,7 @@ void PdfClass::SqlTempActKPVL(T_SqlTemp& tr)
 				SrTemp = 0.0f;
 				for(int l = 0; l < line; l++)
 				{
-					std::string sData = GetStringData(conn.PGgetvalue(res, l, 0));
+					std::string sData = conn.PGgetvalue(res, l, 0);
 					std::string sTemp = conn.PGgetvalue(res, l, 1);
 					float f =  std::stof(sTemp);
 
@@ -761,6 +761,17 @@ void PdfClass::DrawFurn(HPDF_REAL left, HPDF_REAL top, HPDF_REAL w)
 	SendDebug(">>TEST", FUNCTION_LINE_NAME);
 	try
 	{
+#if _DEBUG
+		std::stringstream ssd;
+		ssd << "Печь № " << Cassette.Peth << " Кассета № ";
+		ssd << std::setw(4) << std::setfill('0') << Cassette.Year << "-";
+		ssd << std::setw(2) << std::setfill('0') << Cassette.Month << "-";
+		ssd << std::setw(2) << std::setfill('0') << Cassette.Day << "-";
+		ssd << std::setw(2) << std::setfill('0') << Cassette.CassetteNo;
+		draw_text_rect (page, left, top - 0 , w, YP, ssd.str().c_str());
+		top -= 25;
+#endif // _DEBUG
+
 		std::string ss = Cassette.Run_at;
 		std::vector <std::string>split;
 		boost::split(split, ss, boost::is_any_of(" "), boost::token_compress_on);
@@ -965,6 +976,7 @@ void PdfClass::DrawFurnPDF()
  //График температуры отпуска
 		DrawFurn(410, Height - 290, Width - 432);
 		draw_text(page, 20, Height - 270, "Отпуск");
+
 		HPDF_Page_Rectangle(page, 20, Height - 410, 374, 140);
 		HPDF_Page_Stroke(page);
 		std::fstream ifs(furnImage, std::fstream::binary | std::fstream::in);
@@ -1015,19 +1027,26 @@ PdfClass::PdfClass(TSheet& sheet, bool view)
 
 			if(Cassette.Run_at.length() && Cassette.Finish_at.length())
 			{
+				int Ref_ID = 0;
+				int Act_ID = 0;
+
 				//Первая отпускная печь
 				if(P == 1)
 				{
-					GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, ForBase_RelFurn_1.TempRef);
-					GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, ForBase_RelFurn_1.TempAct);
+					Ref_ID = std::stoi(ForBase_RelFurn_1.TempRef->ID);
+					Act_ID = std::stoi(ForBase_RelFurn_1.TempAct->ID);
 				}
 
 				//Вторая отпускная печь
 				if(P == 2)
 				{
-					GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, ForBase_RelFurn_2.TempRef);
-					GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, ForBase_RelFurn_2.TempAct);
+					Ref_ID = std::stoi(ForBase_RelFurn_2.TempRef->ID);
+					Act_ID = std::stoi(ForBase_RelFurn_2.TempAct->ID);
 				}
+
+				if(Ref_ID) GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, Ref_ID);
+				if(Act_ID) GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, Act_ID);
+
 			}
 
 
@@ -1036,7 +1055,7 @@ PdfClass::PdfClass(TSheet& sheet, bool view)
 		}
 
 		//Закалка
-		GetTempRef(Sheet.Start_at, Sheet.DataTime_End, TempRef, GenSeqFromHmi.TempSet1);
+		GetTempRef(Sheet.Start_at, Sheet.DataTime_End, TempRef, std::stoi(GenSeqFromHmi.TempSet1->ID));
 		SqlTempActKPVL(TempAct);
 
 		//Рисуем график KPVL
@@ -1097,18 +1116,26 @@ PdfClass::PdfClass(TCassette& TC)
 		if(Cassette.Run_at.length() && Cassette.Finish_at.length())
 		{
 		//Первая отпускная печь
+			int Ref_ID = 0;
+			int Act_ID = 0;
+
+			//Первая отпускная печь
 			if(P == 1)
 			{
-				GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, ForBase_RelFurn_1.TempRef);
-				GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, ForBase_RelFurn_1.TempAct);
+				Ref_ID = std::stoi(ForBase_RelFurn_1.TempRef->ID);
+				Act_ID = std::stoi(ForBase_RelFurn_1.TempAct->ID);
 			}
 
 			//Вторая отпускная печь
 			if(P == 2)
 			{
-				GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, ForBase_RelFurn_2.TempRef);
-				GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, ForBase_RelFurn_2.TempAct);
+				Ref_ID = std::stoi(ForBase_RelFurn_2.TempRef->ID);
+				Act_ID = std::stoi(ForBase_RelFurn_2.TempAct->ID);
 			}
+
+			if(Ref_ID) GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnRef, Ref_ID);
+			if(Act_ID) GetTempRef(Cassette.Run_at, Cassette.Finish_at, FurnAct, Act_ID);
+
 		}
 		//Рисуем график FURN
 		PaintGraff(FurnAct, FurnRef, furnImage);
@@ -1129,7 +1156,7 @@ PdfClass::PdfClass(TCassette& TC)
 
 			//Закалка
 			TempRef.erase(TempRef.begin(), TempRef.end());
-			GetTempRef(Sheet.Start_at, Sheet.DataTime_End, TempRef, GenSeqFromHmi.TempSet1);
+			GetTempRef(Sheet.Start_at, Sheet.DataTime_End, TempRef, std::stoi(GenSeqFromHmi.TempSet1->ID));
 
 			//TempAct.erase(TempAct.begin(), TempAct.end());
 			SqlTempActKPVL(TempAct);

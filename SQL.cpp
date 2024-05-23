@@ -290,141 +290,23 @@ void GetTag()
 }
 
 
-//DWORD WINAPI GetTagContent(LPVOID pv)
-//{
-//    try
-//    {
-//        Run=TRUE;
-//        //GetTag();
-//        while(Run)
-//        {
-//            std::string command = "SELECT name, content, create_at FROM tag ORDER BY id";
-//            PGresult* res = conn_tags.PGexec(command);
-//            //SendDebug("conn_tags", command);
-//            if(PQresultStatus(res) == PGRES_TUPLES_OK)
-//            {
-//                int line = PQntuples(res);
-//                for(int l = 0; l < line; l++)
-//                {
-//                    std::string id_name = conn_kpvl.PGgetvalue(res, l, 0);
-//                    std::string content = conn_kpvl.PGgetvalue(res, l, 1);
-//                    std::string content_at = conn_kpvl.PGgetvalue(res, l, 2);
-//                    for(auto& id : AllTag)
-//                    {
-//                        if(id.id_name == id_name)
-//                        {
-//                            id.content = content;
-//                            id.content_at = content_at;
-//                            break;
-//                        }
-//                    }
-//                    //AllTag.push_back(tag);
-//                }
-//            }
-//            else
-//            {
-//                std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-//                SendDebug("conn_kpvl", errc);
-//                SendDebug("conn_kpvl", command);
-//            }
-//            PQclear(res);
-//            int r = 0;
-//            while(Run && r++ < 10) //10 секунд
-//                Sleep(1000);
-//        }
-//    }
-//    catch(std::exception& exc)
-//    {
-//        WinErrorExit(NULL, exc.what());
-//    }
-//    catch(...)
-//    {
-//        WinErrorExit(NULL, "Unknown error.");
-//    }
-//
-//    return 0;
-//}
+
 
 namespace SETALLOY{
-    //typedef struct sde{
-    //    std::string id = "";
-    //    std::string alloy = "";
-    //    std::string thikness = "";
-    //}sde;
-    //std::vector<sde> SDE;
+
 
 
     void GetAlloy()
     {
-        //std::string command = "SELECT id, alloy, thikness FROM sheet";
-        //PGresult* res = conn_tags.PGexec(command);
-        //if(PQresultStatus(res) == PGRES_TUPLES_OK)
-        //{
-        //    int line = PQntuples(res);
-        //    for(int l = 0; l < line; l++)
-        //    {
-        //        sde s;
-        //        s.id = conn_kpvl.PGgetvalue(res, l, 0);;
-        //        s.alloy = conn_kpvl.PGgetvalue(res, l, 1);;
-        //        s.thikness = conn_kpvl.PGgetvalue(res, l, 2);;
-        //        SDE.push_back(s);
-        //    }
-        //}
-        //else
-        //{
-        //    std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-        //    SendDebug("conn_kpvl", errc);
-        //    SendDebug("conn_kpvl", command);
-        //}
-        //PQclear(res);
     }
 
     void SetAlloy(std::string command)
     {
-        //PGresult* res = conn_tags.PGexec(command);
-        //if(PQresultStatus(res) == PGRES_TUPLES_OK)
-        //{
-        //    int line = PQntuples(res);
-        //    for(int l = 0; l < line; l++)
-        //    {
-        //        sde s;
-        //        s.id = conn_kpvl.PGgetvalue(res, l, 0);
-        //        s.alloy = conn_kpvl.PGgetvalue(res, l, 1);
-        //        s.thikness = conn_kpvl.PGgetvalue(res, l, 2);
-        //        SDE.push_back(s);
-        //    }
-        //}
-        //else
-        //{
-        //    std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-        //    SendDebug("conn_kpvl", errc);
-        //    SendDebug("conn_kpvl", command);
-        //}
-        //PQclear(res);
     }
 
     void Reloc()
     {
         GetAlloy();
-        //for(auto s : SDE)
-        //{
-        //    std::vector <std::string>split_alloy;
-        //    std::string DataTime = s.alloy;
-        //    boost::split(split_alloy, DataTime, boost::is_any_of(" ("), boost::token_compress_on);
-        //    if(split_alloy.size() == 2)
-        //        s.alloy = split_alloy[0];
-
-        //    std::vector <std::string>split_thikness;
-        //    DataTime = s.thikness;
-        //    boost::split(split_thikness, DataTime, boost::is_any_of(" ("), boost::token_compress_on);
-        //    if(split_thikness.size() == 2)
-        //        s.thikness = split_thikness[0];
-
-        //    std::string command = "UPDATE sheet SET alloy = '" + s.alloy + "', ";
-        //    command += "thikness = '" + s.thikness + "'";
-        //    command += " WHERE id = " + s.id;
-        //    SetAlloy(command);
-        //}
     }
 }
 
@@ -464,8 +346,6 @@ void SaveConnect()
         << m_dbpass;
 
     std::string p = pass.str();
-    //byte* b = (byte*)&p.c_str()[0];
-    //encode((byte*)&p.c_str()[0], (int)p.length());
 
     std::ofstream s(SQLFileName, std::ios::binary | std::ios::out | std::ios::trunc);
     if(s.is_open())
@@ -568,6 +448,7 @@ void ItitTag()
             {evCassete::Error, "Авария"},
             {evCassete::End, "Конец"},
             {evCassete::History, "Из базы"},
+            {evCassete::Delete, "Удален"},
         };
 
         std::stringstream ss;
