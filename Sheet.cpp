@@ -42,9 +42,12 @@ HWND FilterHwndSheetData = NULL;
 HWND FilterHwndSheetID = NULL;
 HWND UpdateHwndSheet = NULL;
 HWND SaveHwndSheetList = NULL;
+HWND BaseHwndSheetList = NULL;
 HWND ListSheetTemp = NULL;
 HWND ListCasseteTemp = NULL;
 HWND FilterHwndSheet = NULL;
+
+
 
 std::string strTitleSheet = "Лист";
 std::string strClassSheet = "ClassSheet";
@@ -92,6 +95,7 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::ID, { "ID", 50 }},
     {casSheet::DataTime, { "Дата время\nсоздания листа", LL0 }},
     {casSheet::Start_at, { "Дата время\nзагрузки в печь", LL0 }},
+    {casSheet::SecondPos_at, { "Дата время\nво второй зоне", LL0 }},
     //{casSheet::Zone, { "Лист\nнайден в", 100 }},
     {casSheet::Pos, { "Текущая\nпозиция", 100 }},
     {casSheet::News, { "Кантовка", L2 }},
@@ -126,6 +130,7 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
 
     {casSheet::Lam_TE1, { "Температура\nводы\nв поддоне. С°", LL1 }},
 
+    {casSheet::Hour, { "ID листа\nЧас", L1 }},
     {casSheet::Day, { "ID листа\nДень", L1 }},
     {casSheet::Month, { "ID листа\nМесяц", L1 }},
     {casSheet::Year, { "ID листа\nГод", L1 }},
@@ -166,6 +171,9 @@ void SizeListSheet(HWND List, LPARAM lParam)
     int cx = LOWORD(lParam);
     int cy = HIWORD(lParam);
     MoveWindow(List, 0, 20, cx, cy - 20, true);
+
+    SetWindowPos(BaseHwndSheetList, HWND_TOP, cx - 150, 0, 0, 0, SWP_NOSIZE);
+    
     //MoveWindow(SaveHwndSheetList, cx-150, 0, 150, 20, true);
     
 }
@@ -241,12 +249,15 @@ int Col_Sheet_prestostartcomp = 0;
 int Col_Sheet_temperature = 0;
 int Col_Sheet_correct = 0;
 int Col_Sheet_pdf = 0;
+int Col_Sheet_SecondPos_at = 0;
+int Col_Sheet_hour = 0;
+
 #pragma endregion
 
 //Получаем список колонов в таблице sheet
 void GetColSheet(PGresult* res)
 {
-    if(!Col_Sheet_pdf)
+    if(!Col_Sheet_hour)
     {
         int nFields = PQnfields(res);
         for(int j = 0; j < nFields; j++)
@@ -307,8 +318,9 @@ void GetColSheet(PGresult* res)
             else if(l == "temperature") Col_Sheet_temperature = j;
             else if(l == "correct") Col_Sheet_correct = j;
             else if(l == "pdf") Col_Sheet_pdf = j;
-            
-            
+            else if(l == "secondpos_at") Col_Sheet_SecondPos_at = j;
+            else if(l == "hour") Col_Sheet_hour = j;
+
         }
     }
 }
@@ -375,6 +387,7 @@ DLLRESULT FilterSheet()
             sheet.Bot7 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot7);
             sheet.Bot8 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot8);
 
+            sheet.Hour = conn_kpvl.PGgetvalue(res, l, Col_Sheet_hour);
             sheet.Day = conn_kpvl.PGgetvalue(res, l, Col_Sheet_day);
             sheet.Month = conn_kpvl.PGgetvalue(res, l, Col_Sheet_month);
             sheet.Year = conn_kpvl.PGgetvalue(res, l, Col_Sheet_year);
@@ -387,6 +400,8 @@ DLLRESULT FilterSheet()
             sheet.Temperature = conn_kpvl.PGgetvalue(res, l, Col_Sheet_temperature);
             sheet.Correct = conn_kpvl.PGgetvalue(res, l, Col_Sheet_correct);
             sheet.Pdf = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pdf);
+            sheet.SecondPos_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_SecondPos_at));
+            
             AllSheet.push_back(sheet);
             AddHistoriSheet(false);
         }
@@ -397,6 +412,7 @@ DLLRESULT FilterSheet()
         SendDebug("conn_kpvl", errc);
         SendDebug("conn_kpvl", FilterComand);
     }
+    EnableWindow(BaseHwndSheetList, false);
 
 return 0;
 }
@@ -425,7 +441,7 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     FilterComand += "day = '" + strDay + "' AND ";
     FilterComand += "cassetteno = '" + strCassetteNo + "' ";
 #ifndef _DEBUG
-    FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
+    //FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
 #endif
     DataFilterSheet = "Год = " + strYear + ", ";
     DataFilterSheet += "Месяц = " + strMonth + ", ";
@@ -459,7 +475,7 @@ void FilterDataTimeSheet()
     FilterComand += " AND create_at <= ";
     FilterComand += "'" + DataStopSheet + " 23:59:59.999' ";
 #ifndef _DEBUG
-    FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
+    //FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
 #endif
     FilterComand += "ORDER BY create_at DESC";
     FilterSheet();
@@ -778,11 +794,11 @@ DLLRESULT CALLBACK SheetPasportProc(HWND hDlg, UINT message, WPARAM wParam, LPAR
 //Клик правой кнопкой мыши
 LRESULT RightClickSheet(LPNM_LISTVIEW pnm)
 {
-    HWND hwndLV = pnm->hdr.hwndFrom;
-    LV_ITEM lvi;
-    lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
-    if(lvi.iItem == -1) return FALSE;
-    TCassette& cassette = AllCassette[lvi.iItem];
+    //HWND hwndLV = pnm->hdr.hwndFrom;
+    //LV_ITEM lvi;
+    //lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+    //if(lvi.iItem == -1) return FALSE;
+    //TCassette& cassette = AllCassette[lvi.iItem];
     //if(cassette.Event != "7")
     //    DisplayContextMenu(hWnd, IDR_MENU2);
     //else
@@ -806,7 +822,6 @@ LRESULT DoubleClickSheet(HWND hWnd, LPNM_LISTVIEW pnm)
         }
         else
             MessageBox(hWnd, "Лист еще небыл на отпуске", "Ошибка", MB_OK | MB_ICONWARNING | MB_APPLMODAL);
-        //PrintPdf(p);
     }
     return 0;
 }
@@ -826,9 +841,11 @@ LRESULT DispInfoSheet(LPARAM lParam)
             {
                 if(subItem == casSheet::NN)         lstrcpy(plvdi->item.pszText, std::to_string(item + 1).c_str());
                 ELSEIF (casSheet::ID, p.id.c_str());
-                ELSEIF (casSheet::DataTime, p.DataTime.c_str());
-                ELSEIF (casSheet::Start_at, p.Start_at.c_str());
-                ELSEIF (casSheet::DataTime_End, p.DataTime_End.c_str());
+                ELSEIF (casSheet::DataTime, GetDataTimeStr(p.DataTime).c_str());
+                ELSEIF (casSheet::Start_at, GetDataTimeStr(p.Start_at).c_str());
+                ELSEIF (casSheet::SecondPos_at, GetDataTimeStr(p.SecondPos_at).c_str());
+                
+                ELSEIF (casSheet::DataTime_End, GetDataTimeStr(p.DataTime_End).c_str());
                 ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
 
                 //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
@@ -884,14 +901,15 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Bot7, p.Bot7.c_str());
                 ELSEIF (casSheet::Bot8, p.Bot8.c_str());
 
-                ELSEIF (casSheet::Day, p.Day.c_str());
-                ELSEIF (casSheet::Month, p.Month.c_str());
                 ELSEIF (casSheet::Year, p.Year.c_str());
+                ELSEIF (casSheet::Month, p.Month.c_str());
+                ELSEIF (casSheet::Day, p.Day.c_str());
+                ELSEIF (casSheet::Hour, p.Hour.c_str());
                 ELSEIF (casSheet::CassetteNo, p.CassetteNo.c_str());
                 ELSEIF (casSheet::SheetInCassette, p.SheetInCassette.c_str());
                 ELSEIF (casSheet::TimeForPlateHeat, p.TimeForPlateHeat.c_str()); //Время сигнализации окончания нагрева, мин
                 ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
-                ELSEIF (casSheet::Correct, p.Correct.c_str());  //
+                ELSEIF (casSheet::Correct, GetDataTimeStr(p.Correct).c_str());  //
                 ELSEIF (casSheet::Pdf, p.Pdf.c_str());  //
                 //ELSEIF (casSheet::TempWatTankCool, p.TempWatTankCool.c_str());  //Температура закалочной воды для вкл.охлаждения
 
@@ -901,10 +919,152 @@ LRESULT DispInfoSheet(LPARAM lParam)
     return 0;
 }
 
+int EditItem = 0;
+int EditSubItem = 0;
+
+
+//LRESULT OldSubProcCombo = NULL;
+//LRESULT APIENTRY SubProcCombo(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//    //if(message == CBN_SELCHANGE)return DestroyWindow(hWnd);
+//    if(message == WM_KILLFOCUS)
+//    {
+//        DestroyWindow(hWnd);
+//        InvalidateRect(GetParent(hWnd), NULL, 0);
+//        //return 0;
+//    }
+//    //if(message == WM_COMMAND)
+//    //{
+//    //        if(((WORD)(((DWORD_PTR)(wParam)) & 0xffff)) == CBN_KILLFOCUS);
+//    //        {
+//    //            //HWND hwndComboBox = (HWND)lParam;
+//    //            DestroyWindow(hWnd);
+//    //        }
+//    //}
+//    return CallWindowProc((WNDPROC)OldSubProcCombo, hWnd, message, wParam, lParam);
+//}
+
+
+LRESULT ListSheetSubCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+    HWND hwndComboBox = (HWND)lParam;
+    WORD command = HIWORD(wParam);
+    switch(command)
+    {
+        //case CBN_SELCHANGE:
+        //{
+        //    int t = 0;
+        //    break;
+        //}
+        //case CBN_CLOSEUP:
+        //{
+        //    int t = 0;
+        //    break;
+        //}
+        case CBN_SELENDOK:
+        {
+
+            LPARAM t = SendMessage(hwndComboBox, CB_GETCURSEL, 0, 0);
+            SendMessage(hWnd, WM_USER, USER_COMBO_COMMAND, t);
+            //int tt = 0;
+        }
+        case CBN_SELENDCANCEL:
+        {
+            //int t = 0;
+        }
+        case CBN_KILLFOCUS:
+        {
+            DestroyWindow(hwndComboBox);
+        }
+        break;
+    }
+    return 0;
+}
+
+LRESULT LeftClickSheet(LPNM_LISTVIEW pnm)
+{
+    if(
+        pnm->iSubItem == casSheet::Pos ||
+        pnm->iSubItem == casSheet::News ||
+        pnm->iSubItem == casSheet::Year ||
+        pnm->iSubItem == casSheet::Month ||
+        pnm->iSubItem == casSheet::Day ||
+        pnm->iSubItem == casSheet::Hour ||
+        pnm->iSubItem == casSheet::CassetteNo || 
+        pnm->iSubItem == casSheet::SheetInCassette
+        )
+    {
+        char szBuff[1024];
+        HWND hwndLV = pnm->hdr.hwndFrom;
+        LV_ITEM lvi;
+        lvi.iItem = pnm->iItem; // ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+        if(lvi.iItem == -1) return FALSE;
+        lvi.iSubItem = pnm->iSubItem;
+        lvi.pszText = szBuff;
+        lvi.cchTextMax = 255;
+        lvi.mask = LVIF_TEXT;
+        ListView_GetItem(hwndLV, &lvi);
+
+
+        EditItem = pnm->iItem;
+        EditSubItem = pnm->iSubItem;
+
+        RECT r1;
+        ListView_GetSubItemRect(hwndLV, EditItem, EditSubItem, LVIR_LABEL, &r1);
+
+
+        if(pnm->iSubItem == casSheet::Pos)
+        {
+            HWND hcombo = CreateWindowEx(0, "COMBOBOX", "", CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
+            int i=0; 
+
+
+            std::vector <std::string>namepos={
+                "1-я часть печи",
+                "2-я часть печи",
+                "Закалка",
+                "Охлаждение",
+                "Выдача",
+                "Кантовка",
+                "В касете",
+                "Потерян",
+            };
+
+            for(auto a : namepos)
+                SendMessage(hcombo, CB_INSERTSTRING, -1, (LPARAM)a.c_str());
+
+            int Pos = Stoi(AllSheet[EditItem].Pos);
+            if(Pos <= 7)
+                SendMessage(hcombo, CB_SETCURSEL, Pos - 1, 0);
+            else
+                SendMessage(hcombo, CB_SETCURSEL, 6, 0);
+
+            SetWindowPos(hcombo, HWND_TOP, 0, 0, r1.right - r1.left, (r1.bottom - r1.top) * (i + 1) + 5, SWP_NOMOVE | SWP_NOZORDER);
+            SendMessage(hcombo, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
+            //OldSubProcCombo = SetWindowLongPtr(hcombo, GWLP_WNDPROC, (LONG_PTR)SubProcCombo);
+            SendMessage(hcombo, CB_SHOWDROPDOWN, TRUE, 0);
+            SetFocus(hcombo);
+        }
+        else
+        {
+            HWND hwEdit = CreateWindowEx(0, "EDIT", szBuff, WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
+            //SetWindowLong(hwEdit, GWLP_USERDATA, (ULONG)this);
+            SendMessage(hwEdit, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
+
+            OldSubProc = SetWindowLongPtr(hwEdit, GWLP_WNDPROC, (LONG_PTR)SubProc);
+            SetFocus(hwEdit);
+        }
+    }
+    return 0;
+}
+
+
 LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
-    if(pnm->hdr.code == NM_RCLICK)return RightClickSheet(pnm);
+
+    if(pnm->hdr.code == NM_CLICK)return LeftClickSheet(pnm);
+    else if(pnm->hdr.code == NM_RCLICK)return RightClickSheet(pnm);
     else if(pnm->hdr.code == NM_DBLCLK) return DoubleClickSheet(hWnd, pnm);
     else if(pnm->hdr.code == LVN_GETDISPINFO)DispInfoSheet(lParam);
     return 0;
@@ -1097,6 +1257,87 @@ LRESULT CALLBACK WndProcHeadListViewSheet(HWND hWnd, UINT message, WPARAM wParam
     return DefSubclassProc(hWnd, message, wParam, lParam);
 }
 
+LRESULT OldListSheetSubProc = NULL;
+LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    if(message == WM_USER && wParam == USER_COMBO_COMMAND)
+    {
+        if(EditItem >= 0 && EditItem < AllSheet.size())
+        {
+            TSheet& p = AllSheet[EditItem];
+            int Pos = (int)lParam + 1;
+            if(Pos <= 7)
+            {
+                if(Stoi(p.Pos) != Pos)
+                {
+                    p.Pos = std::to_string(Pos);
+                    p.Edit = true;
+                }
+            }
+            else if(Stoi(p.Pos) <= 7)
+            {
+                p.Pos = "10";
+                p.Edit = true;
+            }
+            EnableWindow(BaseHwndSheetList, p.Edit);
+        }
+        //int t = 0;
+    }
+    if(message == WM_USER && wParam == USER_EDIT_COMMAND && lParam)
+    {
+        char* buff = (char*)lParam;
+        if(EditItem >= 0 && EditItem < AllSheet.size())
+        {
+            TSheet& p = AllSheet[EditItem];
+            //if(EditSubItem == casSheet::Pos)            p.Pos = buff;
+            if(EditSubItem == casSheet::News && p.News != buff)
+            {
+                p.News = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::Year && p.Year != buff)
+            {
+                p.Year = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::Month && p.Month != buff)
+            {
+                p.Month = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::Day && p.Day != buff)
+            {
+                p.Day = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::Hour && p.Hour != buff)
+            {
+                p.Hour = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::CassetteNo && p.CassetteNo != buff)
+            {
+                p.CassetteNo = buff;
+                p.Edit = true;
+            }
+            if(EditSubItem == casSheet::SheetInCassette && p.SheetInCassette != buff)
+            {
+                p.SheetInCassette = buff;
+                p.Edit = true;
+            }
+
+            //if(p.Edit)
+            EnableWindow(BaseHwndSheetList, p.Edit);
+        }
+        GlobalUnlock((HGLOBAL)lParam);
+        GlobalFree((HGLOBAL)lParam);
+    }
+    if(message == WM_COMMAND)ListSheetSubCommand(hWnd, wParam, lParam);
+
+    return CallWindowProc((WNDPROC)OldListSheetSubProc, hWnd, message, wParam, lParam);
+}
+
+
 void InitListSheet()
 {
     #define FlagSheet WS_CHILD | WS_VISIBLE | WS_BORDER /*| WS_CLIPSIBLINGS | WS_CLIPCHILDREN*/ | LVS_REPORT | LVS_NOSORTHEADER | LVS_OWNERDRAWFIXED | LVS_SINGLESEL
@@ -1108,6 +1349,7 @@ void InitListSheet()
     if(!ListSheet)
         throw std::exception(std::string("Ошибка создания окна : ListSheet").c_str());
 
+    OldListSheetSubProc = SetWindowLongPtr(ListSheet, GWLP_WNDPROC, (LONG_PTR)ListSheetSubProc);
 
     hHeaderSheet = ListView_GetHeader(ListSheet);
 
@@ -1145,14 +1387,153 @@ LRESULT SaveSheetList(HWND hWnd)
     return 0;
 }
 
-LRESULT CommandSheet(HWND hWnd, WPARAM wParam)
+
+LRESULT BaseSheetList(HWND hWnd)
 {
-    WORD command = LOWORD(wParam);
-    if(command == 110) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, FilterSheetDataProc);
-    if(command == 111) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG3), hWnd, FilterSheetIDProc);
-    if(command == 112) return FilterSheet();
-    if(command == 113) return SaveSheetList(hWnd);
+    if(MessageBox(hWnd, "Вы уверяны что хотите сохранить изменения в базу?", "Внимание!", MB_YESNO | MB_ICONQUESTION) == IDYES)
+    {
+        
+        FilterSheet();
+    }
+
     return 0;
+}
+
+LRESULT CommandSheet(HWND hWnd, WPARAM wParam, LPARAM lParam)
+{
+    WORD command = HIWORD(wParam);
+    WORD commandId = LOWORD(wParam);
+    if(commandId == 110) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG2), hWnd, FilterSheetDataProc);
+    if(commandId == 111) return DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG3), hWnd, FilterSheetIDProc);
+    if(commandId == 112) return FilterSheet();
+    if(commandId == 113) return SaveSheetList(hWnd);
+    if(commandId == 115) return BaseSheetList(hWnd);
+
+    
+    return 0;
+}
+
+
+LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
+{
+    LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
+    LV_ITEM lvi;
+    LV_COLUMN lvc;
+    RECT    rc, rcLabel;
+    char szBuff[1024];
+    LPCTSTR pszText;
+
+
+    lvi.mask=LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
+    lvi.iItem=lpdis->itemID;
+    lvi.iSubItem=0;
+    lvi.pszText=szBuff;
+    lvi.cchTextMax=sizeof(szBuff);
+    lvi.stateMask=0xFFFF;
+    SendMessage(lpdis->hwndItem, LVM_GETITEM, 0, (LPARAM)&lvi);
+
+    if(lvi.iItem >= 0 && lvi.iItem < (int)AllSheet.size())
+    {
+        TSheet& p = AllSheet[lvi.iItem];
+
+        int pos = Stoi(p.Pos);
+
+        BOOL bSelected=lvi.state & LVIS_SELECTED;
+        bSelected = bSelected || (lvi.state & LVIS_DROPHILITED);
+
+        LISTPAINT::GetItemRect(lpdis->hwndItem, lpdis->itemID, &rc, LISTPAINT::Bounds);
+        SetBkMode(lpdis->hDC, 1);
+
+        COLORREF clrTextSave = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+        
+        if(bSelected)
+        {
+            FillRect(lpdis->hDC, &rc, TitleBrush4);
+            if(p.Edit)
+                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
+            else
+                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+        }
+        else
+        {
+            if(p.Edit)
+                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
+
+            if(pos == 7)
+            {
+                if(p.Pdf.length())
+                {
+#ifdef _DEBUG
+                    if(!p.Correct.length())
+                        FillRect(lpdis->hDC, &rc, TitleBrush6); //Светло зеленая заливка
+                    else
+#endif // _DEBUG
+                        if(lvi.iItem % 2)
+                        {
+                            FillRect(lpdis->hDC, &rc, TitleBrush5);
+                        }
+                        else
+                        {
+                            FillRect(lpdis->hDC, &rc, TitleBrush1);
+                        }
+
+                        //{
+                        //    FillRect(lpdis->hDC, &rc, TitleBrush9); //темно зеленая заливка
+                        //}
+
+                }
+                else if(p.Correct.length())
+                {
+                    FillRect(lpdis->hDC, &rc, TitleBrush3); //светлосиняя заливка
+                }
+                else
+                {
+                    FillRect(lpdis->hDC, &rc, TitleBrush7); //Светло желтая заливка
+                }
+            }
+            else if(pos >= 10)
+            {
+                FillRect(lpdis->hDC, &rc, TitleBrush8);
+            }
+            else if(lvi.iItem % 2)
+            {
+                FillRect(lpdis->hDC, &rc, TitleBrush5);
+            }
+            else
+            {
+                FillRect(lpdis->hDC, &rc, TitleBrush1);
+            }
+        }
+
+
+        //ImageList_DrawEx(hIL, lvi.iImage, lpdis->hDC, rc.left, rc.top, 16, 16, CLR_DEFAULT, CLR_DEFAULT, ILD_TRANSPARENT);
+
+        rc.bottom += 1;
+        rc.right = rc.left;
+
+        lvc.mask=LVCF_FMT | LVCF_WIDTH;
+
+        SelectObject(lpdis->hDC, Font[emFont::Font10]);
+
+        for(int nColumn=0; LISTPAINT::GetColumn(lpdis->hwndItem, nColumn, &lvc); nColumn++)
+        {
+            ListView_GetItemText(lpdis->hwndItem, lpdis->itemID, nColumn, szBuff, sizeof(szBuff));
+            //nJustify = DT_LEFT;
+
+            ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
+            rcLabel.left += 2;
+            rcLabel.right -= 2;
+
+            pszText=LISTPAINT::MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
+
+            DrawText(lpdis->hDC, pszText, -1, &rcLabel, DT_CENTER | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER);
+        }
+
+
+        //if(bSelected)SetBkColor(lpdis->hDC, (ULONG)clrBkSave);
+        //SetTextColor(lpdis->hDC, (ULONG)clrTextSave);
+    }
+    return TRUE;
 }
 
 LRESULT CALLBACK WinProcSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -1160,9 +1541,9 @@ LRESULT CALLBACK WinProcSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPa
     if(message == WM_NOTIFY) return OnNotifySheet(hWnd, message, wParam, lParam);
     if(message == WM_SIZE)SizeListSheet(ListSheet, lParam);
     if(message == WM_CLOSE)SheetWindow = NULL;
-    if(message == WM_COMMAND)return CommandSheet(hWnd, wParam);
+    if(message == WM_COMMAND)return CommandSheet(hWnd, wParam, lParam);
     if(message == WM_MDIACTIVATE)return ActivateSheet(hWnd, message, wParam, lParam);
-    if(message == WM_DRAWITEM)return LISTPAINT::DrawItem(hWnd, message, wParam, lParam);
+    if(message == WM_DRAWITEM)return DrawItemSheet(hWnd, message, wParam, lParam);
     return DefMDIChildProc(hWnd, message, wParam, lParam);
 }
 
@@ -1265,6 +1646,9 @@ void SheetInitInstance()
     if(!FilterHwndSheet)
         throw std::exception(std::string("Ошибка создания окна : Филтер").c_str());
 
+    BaseHwndSheetList = CreateWindowExA(0, "BUTTON", "Сохранить в базу", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_DISABLED/* | BS_FLAT*/, 0, 0, 150, 20, SheetWindow, (HMENU)115, hInstance, NULL);
+    if(!BaseHwndSheetList)
+        throw std::exception(std::string("Ошибка создания окна : BaseHwndSheetList").c_str());
 
     //SELECT* FROM cassette WHERE delete_at IS NULL ORDER BY create_at DESC;
 

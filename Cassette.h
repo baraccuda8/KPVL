@@ -58,23 +58,31 @@ namespace casCassette{
     };
 };
 
+#define END_AT
 enum Cassete{
     NN,
     Id,
     Event,
     Create_at,
+#ifdef _DEBUG
+    Close_at,
+#endif
     Year,
     Month,
     Day,
+    Hour,
     CassetteNo,
     SheetInCassette,
-    //Close_at,
     Peth,
     Run_at,
-    //End_at,
+#ifdef _DEBUG
+    End_at,
+#endif
     Finish_at,
     Error_at,
-    //Delete_at,
+#ifdef _DEBUG
+    Delete_at,
+#endif
     PointRef_1,     //Уставка температуры
     f_temper,       //Факт температуры за 5 минут до конца отпуска
 
@@ -84,11 +92,14 @@ enum Cassete{
     HeatWait,       //Факт время выдержки
     TimeProcSet,    //Полное время процесса (уставка), мин
     Total,          //Факт общее время
+    Correct,
+    Pdf
 };
 typedef struct TCassette{
     std::string Id = "";
     std::string Create_at = "";
     std::string Event = "";
+    std::string Hour = "";
     std::string Day = "";
     std::string Month = "";
     std::string Year = "";
@@ -110,6 +121,8 @@ typedef struct TCassette{
     std::string HeatAcc = "";           //Факт время нагрева
     std::string HeatWait = "";          //Факт время выдержки
     std::string Total = "";             //Факт общее время
+    std::string Correct = "";          //Факт время выдержки
+    std::string Pdf = "";             //Факт общее время
 }TCassette;
 
 namespace cas4{
@@ -118,6 +131,7 @@ namespace cas4{
         Year = 1,
         Month,
         Day,
+        Hour,
         CassetteNo,
         SheetInCassette,
         Close,

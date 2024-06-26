@@ -76,6 +76,27 @@ extern HBRUSH TitleBrush3;
 //темносиняя заливка
 extern HBRUSH TitleBrush4;
 
+//Светло серая заливка
+extern HBRUSH TitleBrush5;
+
+//Светло зеленая заливка
+extern HBRUSH TitleBrush6;
+
+//Светло желтая заливка
+extern HBRUSH TitleBrush7;
+
+//Светло красная заливка
+extern HBRUSH TitleBrush8;
+
+//темно зеленая заливка
+extern HBRUSH TitleBrush9;
+
+//Светло красная заливка
+extern HBRUSH TitleBrush10;
+
+//Красная заливка
+extern HBRUSH TitleBrush11;
+
 //extern COLORREF m_clrText;
 //extern COLORREF m_clrTextBk;
 
@@ -99,3 +120,37 @@ namespace LISTPAINT{
     LRESULT DrawItem(HWND, UINT, WPARAM, LPARAM lParam);
 
 }
+
+#define USER_EDIT_COMMAND 1010101
+#define USER_COMBO_COMMAND 2010101
+
+extern LRESULT OldSubProc;
+LRESULT APIENTRY SubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+
+inline int Stoi(std::string input)
+{
+    std::optional<int> out = 0;
+    try
+    {
+        return std::stoi(input);
+    }
+    catch(...)
+    {
+    }
+    return 0;
+}
+
+inline float Stof(std::string input)
+{
+    try
+    {
+        return std::stof(input);
+    }
+    catch(...)
+    {
+    }
+    return 0.0f;
+}
+
+std::string GetDataTimeStr(std::string str);
+std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime);

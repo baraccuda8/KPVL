@@ -148,6 +148,42 @@ LRESULT Size(LPARAM lParam)
 }
 
 
+LRESULT OldSubProc = NULL;
+LRESULT APIENTRY SubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+       //if(message == WM_CREATE)
+       //{
+       //	SendMessage(hWnd, WM_SETFONT, SendMessage(GetWindow(hWnd, GW_OWNER), WM_GETFONT, 0, 0), 0);
+       //}
+       //else
+    VK_LEFT;
+    if(message == WM_CHAR)
+        switch(wParam)
+        {
+            case VK_RETURN: //Сохранить
+            {
+                ULONG len = GetWindowTextLength(hWnd);
+                HANDLE hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len + 2);
+                char* buff = (char*)GlobalLock(hMem);
+                GetWindowText(hWnd, buff, len + 1);
+                SendMessage(GetParent(hWnd), WM_USER, USER_EDIT_COMMAND, (LPARAM)buff);
+                //Param* p = (Param*)GetWindowLong(hWnd, GWL_USERDATA);
+                //if(p)
+                //{
+                //    char* buff = new char[len + 2];
+                //    memset(buff, 0, len + 2);
+                //    GetWindowText(hWnd, buff, len + 1);
+                //    p->SetEditor(buff);
+                //}
+            }
+            case VK_ESCAPE: //Отмена
+                return DestroyWindow(hWnd);
+                break;
+        }
+    if(message == WM_KILLFOCUS)return DestroyWindow(hWnd);
+
+    return CallWindowProc((WNDPROC)OldSubProc, hWnd, message, wParam, lParam);
+}
 
 
 LRESULT OpenKPVL()
@@ -251,16 +287,34 @@ HBRUSH TitleBrush0 = CreateSolidBrush(RGB(0, 0, 0));
 HBRUSH TitleBrush1 = CreateSolidBrush(RGB(255, 255, 255));
 
 //синяя заливка
-HBRUSH TitleBrush2 = CreateSolidBrush(RGB(192, 192, 255));
+HBRUSH TitleBrush2 = CreateSolidBrush(RGB(177, 99, 177));
 
-//светлосиняя заливка
-HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 224, 255));
+//светлозеленая заливка
+HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 255, 224));
 
 //темносиняя заливка
 HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
 
 //Светло серая заливка
 HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));
+
+//Светло зеленая заливка
+HBRUSH TitleBrush6 = CreateSolidBrush(RGB(99, 177, 99));
+
+//Светло желтая заливка
+HBRUSH TitleBrush7 = CreateSolidBrush(RGB(255, 255, 224));
+
+//Светло красная заливка
+HBRUSH TitleBrush8 = CreateSolidBrush(RGB(255, 224, 255));
+
+//темно зеленая заливка
+HBRUSH TitleBrush9 = CreateSolidBrush(RGB(99, 255, 99));
+
+//Светло красная заливка
+HBRUSH TitleBrush10 = CreateSolidBrush(RGB(224, 99, 99));
+
+//Красная заливка
+HBRUSH TitleBrush11 = CreateSolidBrush(RGB(224, 0, 0));
 
 //COLORREF m_clrText = 0x00FFFFFF; // (COLORREF)GetStockObject(WHITE_BRUSH);
 //COLORREF m_clrTextBk = (COLORREF)GetStockObject(LTGRAY_BRUSH);
@@ -469,6 +523,80 @@ namespace LISTPAINT{
     }
 
 };
+
+std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime)
+{
+    outDate = "";
+    outTime = "";
+    boost::regex xRegEx("^(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}:\\d{2}:\\d{2}).*");
+    boost::match_results<std::string::const_iterator>what;
+    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
+    if(what.size() > 4)
+    {
+        std::string year = what[1].str();
+        std::string month = what[2].str();
+        std::string day = what[3].str();
+        if(what[4].length())
+            outTime = what[4].str();
+        if(day.length() && month.length() && year.length())
+            outDate = day + "-" + month + "-" + year;
+    }
+    if(outDate.length() && outTime.length())
+        return outDate + " " + outTime;
+    else
+    {
+        if(outDate.length())
+        {
+            return outDate;
+        }
+        else
+        {
+            if(outTime.length())
+            {
+                outTime;
+            }
+        }
+    }
+    return "";
+}
+
+std::string GetDataTimeStr(std::string str)
+{
+    std::string outDate = "";
+    std::string outTime = "";
+    boost::regex xRegEx("^(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}:\\d{2}:\\d{2}).*");
+    boost::match_results<std::string::const_iterator>what;
+    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
+    if(what.size() > 4)
+    {
+        std::string year = what[1].str();
+        std::string month = what[2].str();
+        std::string day = what[3].str();
+        if(what[4].length())
+            outTime = what[4].str();
+        if(day.length() && month.length() && year.length())
+            outDate = day + "-" + month + "-" + year;
+    }
+    if(outDate.length() && outTime.length())
+        return outDate + " " + outTime;
+    else
+    {
+        if(outDate.length())
+        {
+            return outDate;
+        }
+        else
+        {
+            if(outTime.length())
+            {
+                outTime;
+            }
+        }
+    }
+    return "";
+}
+
+
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {

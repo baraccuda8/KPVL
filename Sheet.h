@@ -57,71 +57,73 @@
 
 typedef struct TSheet{
 
-    std::string id = "";
-    std::string DataTime = "";
-    std::string Start_at = "";
-    std::string DataTime_End = "";
-    std::string DataTime_All = "";
-    std::string Zone = "";
-    std::string Alloy = "";
-    std::string Thikness = "";
-    std::string Melt = "";
-    std::string Slab = "";
-    std::string PartNo = "";
-    std::string Pack = "";
-    std::string Sheet = "";
-    std::string SubSheet = "";
-    std::string Temper = "";
-    std::string Speed = "";
+    bool Edit = false;
+    std::string id = "";                //Уникальный номер
+    std::string DataTime = "";          //Дата, время создание листа
+    std::string Start_at = "";          //Дата, время загрузки листа в закалочную печь
+    std::string DataTime_End = "";      //Дата, время выдачи листа из закалочной печи
+    std::string Pos = "";               //Текущая позиция листа
+    std::string DataTime_All = "";      //Продолжительность закалки, мин
+    //std::string Zone = "";              //
+    std::string Alloy = "";             //Марка стали
+    std::string Thikness = "";          //Толщина листа, мм
+    std::string Melt = "";              //Плавка
+    std::string Slab = "";              //Номер сляба
+    std::string PartNo = "";            //Партия
+    std::string Pack = "";              //Пачка
+    std::string Sheet = "";             //Номер листа
+    std::string SubSheet = "";          //Номер подлиста
+    std::string Temper = "";            //Уставка температуры
+    std::string Speed = "";             //Скорость выгрузки
 
-    std::string Za_PT3 = "";
-    std::string Za_TE3 = "";
+    std::string Za_PT3 = "";            //Давление воды в баке
+    std::string Za_TE3 = "";            //Температура воды в баке
 
-    std::string LaminPressTop = "";
-    std::string LaminPressBot = "";
-    std::string PosClapanTop = "";
-    std::string PosClapanBot = "";
-    std::string Mask = "";
+    std::string LaminPressTop = "";     //Давление в верхнем коллекторе
+    std::string LaminPressBot = "";     //Давление в нижнем коллекторе
+    std::string PosClapanTop = "";      //Клапан. Скоростная секция. Верх
+    std::string PosClapanBot = "";      //Клапан. Скоростная секция. Низ
+    std::string Mask = "";              //Режим работы клапана
 
-    std::string Lam1PosClapanTop = "";
-    std::string Lam1PosClapanBot = "";
-    std::string Lam2PosClapanTop = "";
-    std::string Lam2PosClapanBot = "";
+    std::string Lam1PosClapanTop = "";  //Клапан. Ламинарная секция 1. Верх
+    std::string Lam1PosClapanBot = "";  //Клапан. Ламинарная секция 1. Низ
+    std::string Lam2PosClapanTop = "";  //Клапан. Ламинарная секция 2. Верх
+    std::string Lam2PosClapanBot = "";  //Клапан. Ламинарная секция 2. Низ
 
-    std::string LAM_TE1 = "";
-    std::string News = "";
-    std::string Top1 = "";
-    std::string Top2 = "";
-    std::string Top3 = "";
-    std::string Top4 = "";
-    std::string Top5 = "";
-    std::string Top6 = "";
-    std::string Top7 = "";
-    std::string Top8 = "";
+    std::string LAM_TE1 = "";           //Температура воды в поддоне
+    std::string News = "";              //Признак кантовки
+    std::string Top1 = "";              //Отклонения от плоскостности листа До кантовки 1
+    std::string Top2 = "";              //Отклонения от плоскостности листа До кантовки 2
+    std::string Top3 = "";              //Отклонения от плоскостности листа До кантовки 3
+    std::string Top4 = "";              //Отклонения от плоскостности листа До кантовки 4
+    std::string Top5 = "";              //Отклонения от плоскостности листа До кантовки 5
+    std::string Top6 = "";              //Отклонения от плоскостности листа До кантовки 6
+    std::string Top7 = "";              //Отклонения от плоскостности листа До кантовки 7
+    std::string Top8 = "";              //Отклонения от плоскостности листа До кантовки 8
 
-    std::string Bot1 = "";
-    std::string Bot2 = "";
-    std::string Bot3 = "";
-    std::string Bot4 = "";
-    std::string Bot5 = "";
-    std::string Bot6 = "";
-    std::string Bot7 = "";
-    std::string Bot8 = "";
+    std::string Bot1 = "";              //Отклонения от плоскостности листа После кантовки 1
+    std::string Bot2 = "";              //Отклонения от плоскостности листа После кантовки 2
+    std::string Bot3 = "";              //Отклонения от плоскостности листа После кантовки 3
+    std::string Bot4 = "";              //Отклонения от плоскостности листа После кантовки 4
+    std::string Bot5 = "";              //Отклонения от плоскостности листа После кантовки 5
+    std::string Bot6 = "";              //Отклонения от плоскостности листа После кантовки 6
+    std::string Bot7 = "";              //Отклонения от плоскостности листа После кантовки 7
+    std::string Bot8 = "";              //Отклонения от плоскостности листа После кантовки 8
 
-    std::string Year = "";
-    std::string Month = "";
-    std::string Day = "";
-    std::string CassetteNo = "";
-    std::string SheetInCassette = "";
-    std::string Pos = "";
+    std::string Hour = "";
+    std::string Day = "";               //ID Листа День
+    std::string Month = "";             //ID Листа Месяц
+    std::string Year = "";              //ID Листа Год
+    std::string CassetteNo = "";        //ID Листа Касета
+    std::string SheetInCassette = "";   //ID Листа Лист
 
-    std::string TimeForPlateHeat = ""; //Время сигнализации окончания нагрева, мин
-    std::string PresToStartComp = "";  //Уставка давления для запуска комперссора
-    //std::string TempWatTankCool = "";  //Температура закалочной воды для вкл.охлаждения
-    std::string Temperature = "";        //Средняя температура 2-части печи закалки
-    std::string Correct = "";
-    std::string Pdf = "";
-
+    std::string TimeForPlateHeat = ""; //Время сигнализации окончания нагрева, мин (Задание Время кончания нагрева)
+    std::string PresToStartComp = "";  //Уставка давления для запуска комперссора (Задание давления воды)
+    //std::string TempWatTankCool = "";   //Температура закалочной воды для вкл.охлаждения
+    std::string Temperature = "";       //Средняя температура 2-части печи закалки (Средняя температура 2-части печи закалки)
+    std::string Correct = "";           //Время корректировки
+    std::string Pdf = "";               //Путь к файлу PDF
+    std::string SecondPos_at = "";      //Время прехода во вторую зону
     TSheet()
     {
     };
@@ -145,6 +147,7 @@ namespace casSheet{
         ID = 1,
         DataTime = 2,
         Start_at, 
+        SecondPos_at, 
         //Zone,
         Pos,
         News,
@@ -162,6 +165,13 @@ namespace casSheet{
         Pack,
         Sheet,
         SubSheet,
+
+        Year,
+        Month,
+        Day,
+        Hour,
+        CassetteNo,
+        SheetInCassette,
 
 
         Temper,
@@ -184,11 +194,12 @@ namespace casSheet{
 
         Lam_TE1,
 
-        Year,
-        Month,
-        Day,
-        CassetteNo,
-        SheetInCassette,
+        //Year,
+        //Month,
+        //Day,
+        //Hour,
+        //CassetteNo,
+        //SheetInCassette,
 
         Top1,
         Top2,

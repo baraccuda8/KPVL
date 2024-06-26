@@ -288,13 +288,16 @@ bool AddSheet(Sheet* sheet, int row, TSheet& St)
  //WriteRect(sheet, row, cas::DataTime, St.Start_at, atoi(St.News.c_str()) ? numFormat[0] : numFormat[8]);
 
  //St.Start_at
-    std::vector <std::string>split;
-    boost::split(split, St.Start_at, boost::is_any_of(" "), boost::token_compress_on);
-    if(split.size() == 2)
-    {
-        if(!WriteRect(sheet, row, cas::Data, split[0], numFormat[0])) return false;
-        if(!WriteRect(sheet, row, cas::Time, split[1], numFormat[0])) return false;
-    }
+    std::string date;
+    std::string time;
+    GetDataTimeStr(St.Start_at, date, time);
+    //std::vector <std::string>split;
+    //boost::split(split, St.Start_at, boost::is_any_of(" "), boost::token_compress_on);
+    //if(split.size() == 2)
+    //{
+        if(!WriteRect(sheet, row, cas::Data, date, numFormat[0])) return false;
+        if(!WriteRect(sheet, row, cas::Time, time, numFormat[0])) return false;
+    //}
     if(!WriteRect(sheet, row, cas::Alloy, St.Alloy, numFormat[0])) return false;
     if(!WriteRect(sheet, row, cas::Thikness, St.Thikness, numFormat[0])) return false;
     if(!WriteRect(sheet, row, cas::Melt, St.Melt, numFormat[5])) return false;
