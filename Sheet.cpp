@@ -188,7 +188,7 @@ void AddHistoriSheet(bool begin)
     //    InvalidateRect(hwndSheet, NULL, FALSE);
 }
 
-std::string FilterComand = "SELECT * FROM sheet ORDER BY create_at DESC;";
+std::string FilterComand = "SELECT * FROM sheet ORDER BY start_at DESC;";
 
 
 
@@ -455,7 +455,7 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     //FilterComand += "month = '" + strMonth + "' AND ";
     //FilterComand += "day = '" + strDay + "' AND ";
     //FilterComand += "cassetteno = '" + strCassetteNo + "' ";
-    FilterComand += "ORDER BY create_at DESC";
+    FilterComand += "ORDER BY start_at DESC";
     FilterComand += ";";
     FilterSheet();
     
@@ -470,14 +470,14 @@ void FilterDataTimeSheet()
     SetWindowText(FilterHwndSheet, DataFilterSheet.c_str());
 
     FilterComand = "SELECT * FROM sheet ";
-    FilterComand += "WHERE create_at >= ";
+    FilterComand += "WHERE start_at >= ";
     FilterComand += "'" + DataStartSheet + "'";
-    FilterComand += " AND create_at <= ";
+    FilterComand += " AND start_at <= ";
     FilterComand += "'" + DataStopSheet + " 23:59:59.999' ";
 #ifndef _DEBUG
     //FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
 #endif
-    FilterComand += "ORDER BY create_at DESC";
+    FilterComand += "ORDER BY start_at DESC";
     FilterSheet();
     bFilterData = TRUE;
 }
@@ -574,7 +574,7 @@ void GetCassete(TSheet& p, TCassette& cassette)
     FilterComand1 += "month = '" + strMonth + "' AND ";
     FilterComand1 += "day = '" + strDay + "' AND ";
     FilterComand1 += "cassetteno = '" + strCassetteNo + "' ";
-    FilterComand1 += "ORDER BY create_at DESC";
+    FilterComand1 += "ORDER BY run_at DESC";
     FilterComand1 += ";";
 
     PGresult* res = conn_kpvl.PGexec(FilterComand1);
