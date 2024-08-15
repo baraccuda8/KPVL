@@ -249,6 +249,7 @@ void FilterDataTimeCassette()
     //comand += "delete_at IS NULL AND ";
     FilterUpdateComand += "create_at >= '" + DataStartCassette + "' ";
     FilterUpdateComand += "AND create_at <= '" + DataStopCassette + " 23:59:59.999' ";
+    FilterUpdateComand += "AND sheetincassette <> 0 ";
 #ifndef _DEBUG
     //FilterUpdateComand += " AND pdf IS NOT NULL ";
 #endif
@@ -357,6 +358,7 @@ DLLRESULT CALLBACK FilterCassetteIDProc(HWND hWnd, UINT message, WPARAM wParam, 
 //Клик правой кнопкой мыши
 LRESULT RightClickCassette(LPNM_LISTVIEW pnm)
 {
+
     HWND hwndLV = pnm->hdr.hwndFrom;
     LV_ITEM lvi;
     lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
@@ -366,6 +368,7 @@ LRESULT RightClickCassette(LPNM_LISTVIEW pnm)
     //    DisplayContextMenu(hWnd, IDR_MENU2);
     //else
     //    DisplayContextMenu(hWnd, IDR_MENU3);
+
     return 0;
 }
 
@@ -375,7 +378,7 @@ LRESULT DoubleClickCassette(LPNM_LISTVIEW pnm)
     if(pnm->iItem >= 0 && pnm->iItem < (int)AllCassette.size())
     {
         TCassette& p = AllCassette[pnm->iItem];
-        FilterIDCasseteSheet(atoi(p.Year.c_str()), atoi(p.Month.c_str()), atoi(p.Day.c_str()), atoi(p.CassetteNo.c_str()));
+        FilterIDCasseteSheet(atoi(p.Year.c_str()), atoi(p.Month.c_str()), atoi(p.Day.c_str()), atoi(p.Hour.c_str()), atoi(p.CassetteNo.c_str()));
     }
     return 0;
 }
@@ -472,10 +475,12 @@ LRESULT LeftClickCassette(LPNM_LISTVIEW pnm)
 LRESULT OnNotifyCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
-    if(pnm->hdr.code == NM_RCLICK)return RightClickCassette(pnm);
-    else if(pnm->hdr.code == NM_CLICK)return LeftClickCassette(pnm);
-    else if(pnm->hdr.code == NM_DBLCLK) return DoubleClickCassette(pnm);
-    else if(pnm->hdr.code == LVN_GETDISPINFO)return DispInfoCassette(lParam);
+#ifdef _DEBUG
+    if(pnm->hdr.code == NM_RCLICK)return RightClickCassette(pnm); else 
+    if(pnm->hdr.code == NM_CLICK)return LeftClickCassette(pnm); else 
+#endif
+    if(pnm->hdr.code == NM_DBLCLK) return DoubleClickCassette(pnm); else 
+    if(pnm->hdr.code == LVN_GETDISPINFO)return DispInfoCassette(lParam);
 
     return 0;
 }

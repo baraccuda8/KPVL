@@ -299,7 +299,8 @@ void SheetInitApplication();
 void SheetInitInstance();
 
 //void FilterIDCasseteSheet(TCassette& p);
-void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);
+//void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);
+void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strhour, int strcassetteno);
 
 //Номер колонки в таблице листов
 #pragma region //Номер колонки в таблице листов

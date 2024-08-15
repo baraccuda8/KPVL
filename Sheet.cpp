@@ -172,7 +172,9 @@ void SizeListSheet(HWND List, LPARAM lParam)
     int cy = HIWORD(lParam);
     MoveWindow(List, 0, 20, cx, cy - 20, true);
 
+#ifdef _DEBUG
     SetWindowPos(BaseHwndSheetList, HWND_TOP, cx - 150, 0, 0, 0, SWP_NOSIZE);
+#endif
     
     //MoveWindow(SaveHwndSheetList, cx-150, 0, 150, 20, true);
     
@@ -420,15 +422,17 @@ return 0;
 std::string strYear;
 std::string strMonth;
 std::string strDay;
+std::string strHour;
 std::string strCassetteNo = "1";
 
 BOOL bFilterData = TRUE;
 
-void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno)
+void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strhour, int strcassetteno)
 {
     strYear = std::to_string(stryear);
     strMonth = std::to_string(strmonth);
     strDay = std::to_string(strday);
+    strHour = std::to_string(strhour);
     strCassetteNo = std::to_string(strcassetteno);
 
     
@@ -439,6 +443,7 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     FilterComand +=  "year = '" + strYear + "' AND ";
     FilterComand += "month = '" + strMonth + "' AND ";
     FilterComand += "day = '" + strDay + "' AND ";
+    FilterComand += "hour = '" + strHour + "' AND ";
     FilterComand += "cassetteno = '" + strCassetteNo + "' ";
 #ifndef _DEBUG
     //FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
@@ -446,6 +451,7 @@ void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassette
     DataFilterSheet = "Год = " + strYear + ", ";
     DataFilterSheet += "Месяц = " + strMonth + ", ";
     DataFilterSheet += "День = " + strDay + ", ";
+    DataFilterSheet += "Час = " + strHour + ", ";
     DataFilterSheet += "Кассета = " + strCassetteNo;
 
     //DataFilterSheet = FilterComand;
@@ -1063,10 +1069,12 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
 
-    if(pnm->hdr.code == NM_CLICK)return LeftClickSheet(pnm);
-    else if(pnm->hdr.code == NM_RCLICK)return RightClickSheet(pnm);
-    else if(pnm->hdr.code == NM_DBLCLK) return DoubleClickSheet(hWnd, pnm);
-    else if(pnm->hdr.code == LVN_GETDISPINFO)DispInfoSheet(lParam);
+#ifdef _DEBUG
+    if(pnm->hdr.code == NM_CLICK)return LeftClickSheet(pnm); else 
+    if(pnm->hdr.code == NM_RCLICK)return RightClickSheet(pnm); else 
+#endif
+    if(pnm->hdr.code == NM_DBLCLK) return DoubleClickSheet(hWnd, pnm); else 
+    if(pnm->hdr.code == LVN_GETDISPINFO)DispInfoSheet(lParam);
     return 0;
 }
 
@@ -1156,7 +1164,7 @@ DLLRESULT CommandFilterIDSheetDialog(HWND hWnd, WPARAM wParam)
             return MessageBox(hWnd, (std::string(errordata) + " " + datatest).c_str(), "Ошибка", 0);
 
 
-        FilterIDCasseteSheet(atoi(ssYear), atoi(ssMonth), atoi(ssDay), atoi(ssCassetteNo));
+        FilterIDCasseteSheet(atoi(ssYear), atoi(ssMonth), atoi(ssDay), atoi("0"), atoi(ssCassetteNo));
 
         EndDialog(hWnd, FALSE);
     }
@@ -1279,7 +1287,7 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 p.Pos = "10";
                 p.Edit = true;
             }
-            EnableWindow(BaseHwndSheetList, p.Edit);
+            //EnableWindow(BaseHwndSheetList, p.Edit);
         }
         //int t = 0;
     }
@@ -1327,7 +1335,7 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
 
             //if(p.Edit)
-            EnableWindow(BaseHwndSheetList, p.Edit);
+            //EnableWindow(BaseHwndSheetList, p.Edit);
         }
         GlobalUnlock((HGLOBAL)lParam);
         GlobalFree((HGLOBAL)lParam);
@@ -1646,9 +1654,11 @@ void SheetInitInstance()
     if(!FilterHwndSheet)
         throw std::exception(std::string("Ошибка создания окна : Филтер").c_str());
 
+#ifdef _DEBUG
     BaseHwndSheetList = CreateWindowExA(0, "BUTTON", "Сохранить в базу", WS_CHILD | WS_VISIBLE | WS_BORDER | WS_DISABLED/* | BS_FLAT*/, 0, 0, 150, 20, SheetWindow, (HMENU)115, hInstance, NULL);
     if(!BaseHwndSheetList)
         throw std::exception(std::string("Ошибка создания окна : BaseHwndSheetList").c_str());
+#endif
 
     //SELECT* FROM cassette WHERE delete_at IS NULL ORDER BY create_at DESC;
 
