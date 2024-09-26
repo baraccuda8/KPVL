@@ -57,12 +57,15 @@ std::map <int, ListTitle> Cassette_Collumn ={
     {Cassete::Peth, {"Печь", 50}},
     {Cassete::Run_at, { "Начало отпуска", 130 }},
 #ifdef _DEBUG
-    {Cassete::Close_at, { "Кассета закрыта", 130 }},
-    {Cassete::End_at, { "Конец отпуска", 130 }},
+    //{Cassete::Close_at, { "Кассета закрыта", 130 }},
+    {Cassete::End_at, { "End_at", 130 }},
+    {Cassete::Finish_at, { "Finish_at", 130 }},//{ "Финиш отпуска", 130 }},
     {Cassete::Delete_at, { "Удалена", 130 }},
+#else
+    {Cassete::Finish_at, { "Конец  отпуска", 130 }},//{ "Финиш отпуска", 130 }},
 #endif
-    {Cassete::Finish_at, { "Конец отпуска", 130 }},//{ "Финиш отпуска", 130 }},
-    {Cassete::Error_at, { "Ошибка отпуска", 130 }},
+
+    //{Cassete::Error_at, { "Ошибка отпуска", 130 }},
     //{Cassete::Delete_at, {"Удален", 130}},
     {Cassete::HeatAcc, {"Факт время\nнагрева", 100 }},
     {Cassete::HeatWait, {"Факт время\nвыдержки", 100 }},
@@ -412,14 +415,14 @@ LRESULT DispInfoCassette(LPARAM lParam)
                 if(plvdi->item.iSubItem == Cassete::SheetInCassette)   lstrcpy(plvdi->item.pszText, p.SheetInCassette.c_str());
 
 #ifdef _DEBUG
-                if(plvdi->item.iSubItem == Cassete::Close_at)          lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Close_at).c_str());    //Закрытие касеты
+                //if(plvdi->item.iSubItem == Cassete::Close_at)          lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Close_at).c_str());    //Закрытие касеты
                 if(plvdi->item.iSubItem == Cassete::End_at)            lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.End_at).c_str());      //Конец отпуска
                 if(plvdi->item.iSubItem == Cassete::Delete_at)         lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Delete_at).c_str());    //Закрытие касеты
 #endif
                 if(plvdi->item.iSubItem == Cassete::Peth)              lstrcpy(plvdi->item.pszText, p.Peth.c_str());        //Печь
                 if(plvdi->item.iSubItem == Cassete::Run_at)            lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Run_at).c_str());      //Начало отпуска
                 if(plvdi->item.iSubItem == Cassete::Finish_at)         lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Finish_at).c_str());   //Финиш процесса
-                if(plvdi->item.iSubItem == Cassete::Error_at)          lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Error_at).c_str());    //Ошибка отпуска
+                //if(plvdi->item.iSubItem == Cassete::Error_at)          lstrcpy(plvdi->item.pszText, GetDataTimeStr(p.Error_at).c_str());    //Ошибка отпуска
                 if(plvdi->item.iSubItem == Cassete::HeatAcc)           lstrcpy(plvdi->item.pszText, p.HeatAcc.c_str());     //Факт время нагрева
                 if(plvdi->item.iSubItem == Cassete::HeatWait)          lstrcpy(plvdi->item.pszText, p.HeatWait.c_str());    //Факт время выдержки
                 if(plvdi->item.iSubItem == Cassete::Total)             lstrcpy(plvdi->item.pszText, p.Total.c_str());       //Факт общее время

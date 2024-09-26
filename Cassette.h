@@ -65,7 +65,7 @@ enum Cassete{
     Event,
     Create_at,
 #ifdef _DEBUG
-    Close_at,
+    //Close_at,
 #endif
     Year,
     Month,
@@ -79,7 +79,7 @@ enum Cassete{
     End_at,
 #endif
     Finish_at,
-    Error_at,
+    //Error_at,
 #ifdef _DEBUG
     Delete_at,
 #endif
