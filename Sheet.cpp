@@ -1587,7 +1587,7 @@ void SheetInitInstance()
     sprintf_s(sFormat, 50, "%04d-%02d-%02d", TM.tm_year + 1900, TM.tm_mon + 1, TM.tm_mday);
     DataStopSheet = sFormat;
 
-    timer = (time_t)difftime(timer, 60 * 60 * 24); // минус 1 день //4 мес€ца = 10540800
+    timer = (time_t)difftime(timer, 60 * 60 * 24 * 7); // минус 7 дней //4 мес€ца = 10540800
     localtime_s(&TM, &timer);
     sprintf_s(sFormat, 50, "%04d-%02d-%02d", TM.tm_year + 1900, TM.tm_mon + 1, TM.tm_mday);
     DataStartSheet = sFormat;

@@ -244,10 +244,10 @@ void FilterDataTimeCassette()
     FilterUpdateComand = "SELECT * FROM cassette ";
     FilterUpdateComand += "WHERE ";
 #ifndef _DEBUG
-    //FilterUpdateComand += "event = 5 AND "
+    //FilterUpdateComand += "event = 5 AND ";
 #endif
-        //"finish_at <> to_timestamp('0') AND "
-        ;
+    //"finish_at <> to_timestamp('0') AND "
+    
     //Если не нужны удаленные в ручную то
     //comand += "delete_at IS NULL AND ";
     FilterUpdateComand += "create_at >= '" + DataStartCassette + "' ";
@@ -256,7 +256,7 @@ void FilterDataTimeCassette()
 #ifndef _DEBUG
     //FilterUpdateComand += " AND pdf IS NOT NULL ";
 #endif
-    FilterUpdateComand += "ORDER BY event, create_at DESC";
+    FilterUpdateComand += "ORDER BY event, run_at DESC";
     FilterUpdate();
 
     //FilterDataTimeCassette();
@@ -855,7 +855,7 @@ void CassetteInitInstance()
     sprintf_s(sFormat, 50, "%04d-%02d-%02d", TM.tm_year + 1900, TM.tm_mon + 1, TM.tm_mday);
     DataStopCassette = sFormat;
 
-    timer = (time_t)difftime(timer, 60 * 60 * 24); // минус 1 день //4 месяца = 10540800
+    timer = (time_t)difftime(timer, 60 * 60 * 24 * 7); // минус 7 дней //4 месяца = 10540800
     localtime_s(&TM, &timer);
     sprintf_s(sFormat, 50, "%04d-%02d-%02d", TM.tm_year + 1900, TM.tm_mon + 1, TM.tm_mday);
     DataStartCassette = sFormat;
