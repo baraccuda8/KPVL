@@ -22,7 +22,7 @@ namespace casCassette{
             pointref_1,         //Уставка температуры
             timeprocset,        //Полное время процесса (уставка), мин
             pointdtime_2,       //Время выдержки
-            f_temper,           //Факт температуры за 5 минут до конца отпуска
+            facttemper,           //Факт температуры за 5 минут до конца отпуска
             HeatAcc,           //Факт время нагрева
             HeatWait,          //Факт время выдержки
             Total,             //Факт общее время
@@ -47,7 +47,7 @@ namespace casCassette{
         Delete_at,
         Peth,
         PointRef_1,         //Уставка температуры
-        f_temper,           //Факт температуры за 5 минут до конца отпуска
+        FactTemper,           //Факт температуры за 5 минут до конца отпуска
         PointTime_1,        //Время разгона
         TimeProcSet,        //Полное время процесса (уставка), мин
         PointDTime_2,       //Время выдержки
@@ -82,9 +82,12 @@ enum Cassete{
     //Error_at,
 #ifdef _DEBUG
     Delete_at,
+    Correct,
+    Pdf,
+    Return_at,
 #endif
     PointRef_1,     //Уставка температуры
-    f_temper,       //Факт температуры за 5 минут до конца отпуска
+    FactTemper,       //Факт температуры за 5 минут до конца отпуска
 
     PointTime_1,    //Время нагрева
     HeatAcc,        //Факт время нагрева
@@ -92,8 +95,6 @@ enum Cassete{
     HeatWait,       //Факт время выдержки
     TimeProcSet,    //Полное время процесса (уставка), мин
     Total,          //Факт общее время
-    Correct,
-    Pdf
 };
 typedef struct TCassette{
     std::string Id = "";
@@ -116,13 +117,14 @@ typedef struct TCassette{
     std::string PointRef_1 = "";        //Уставка температуры
     std::string TimeProcSet = "";       //Полное время процесса (уставка), мин
     std::string PointDTime_2 = "";      //Время выдержки
-    std::string f_temper = "";          //Факт температуры за 5 минут до конца отпуска
+    std::string FactTemper = "";          //Факт температуры за 5 минут до конца отпуска
     std::string Finish_at = "";         //Завершение процесса + 15 минут
     std::string HeatAcc = "";           //Факт время нагрева
     std::string HeatWait = "";          //Факт время выдержки
     std::string Total = "";             //Факт общее время
     std::string Correct = "";          //Факт время выдержки
     std::string Pdf = "";             //Факт общее время
+    std::string Return_at = "";             //Вернули в список
 }TCassette;
 
 namespace cas4{
@@ -139,13 +141,14 @@ namespace cas4{
         Error,
         End,
         Delete,
+        Return_at,
         Peth,
         //TempRef,      //Заданное значение температуры
         PointTime_1,    //Время разгона
         PointRef_1,     //Уставка температуры
         TimeProcSet,    //Полное время процесса (уставка), мин
         PointDTime_2,   //Время выдержки
-        f_temper,       //Факт температуры за 5 минут до конца отпуска
+        FactTemper,       //Факт температуры за 5 минут до конца отпуска
 
     };
 };

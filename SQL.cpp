@@ -464,6 +464,55 @@ void ItitTag()
 
 }
 
+#define TEST
+#ifdef TEST
+void Test()
+{
+    std::string comand = "SELECT id, year, month, day, hour, cassetteno FROM cassette WHERE CAST(year AS integer) >= 2024 AND CAST(month AS integer) < 8 ORDER BY id";
+    PGresult* res = conn_kpvl.PGexec(comand);
+    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    {
+        std::string id, year, month, day, hour, cassetteno;
+        int line = PQntuples(res);
+        for(int l = 0; l < line; l++)
+        {
+            id = conn_kpvl.PGgetvalue(res, l, 0);
+            year = conn_kpvl.PGgetvalue(res, l, 1);
+            month = conn_kpvl.PGgetvalue(res, l, 2);
+            day = conn_kpvl.PGgetvalue(res, l, 3);
+            hour = conn_kpvl.PGgetvalue(res, l, 4);
+            cassetteno = conn_kpvl.PGgetvalue(res, l, 5);
+
+            {
+                std::stringstream ssd1;
+                ssd1 << "UPDATE sheet SET hour = " << hour;
+                ssd1 << " WHERE";
+                ssd1 << " year = '" << year << "' AND";
+                ssd1 << " month = '" << month << "' AND";
+                ssd1 << " day = '" << day << "' AND";
+                ssd1 << " cassetteno = " << cassetteno << ";";
+                SETUPDATESQL(conn_dops, ssd1);
+            }
+
+            {
+                std::stringstream ssd2;
+                ssd2 << "UPDATE cassette SET sheetincassette = ";
+                    ssd2 << "(SELECT COUNT(*) FROM sheet";
+                    ssd2 << " WHERE";
+                    ssd2 << " year = '" << year << "' AND";
+                    ssd2 << " month = '" << month << "' AND";
+                    ssd2 << " day = '" << day << "' AND";
+                    ssd2 << " hour = '" << hour << "' AND";
+                    ssd2 << " cassetteno = " << cassetteno << ") ";
+                ssd2 << " WHERE id = " << id << ";";
+                SETUPDATESQL(conn_dops, ssd2);
+            }
+        }
+    }
+
+}
+#endif
+
 bool InitSQL()
 {
     try
@@ -499,6 +548,9 @@ bool InitSQL()
             //SETALLOY::Reloc();
             //Sleep(3000);
             ItitTag();
+#ifdef TEST
+            //Test();
+#endif
             //hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
         }
     }

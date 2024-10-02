@@ -122,7 +122,7 @@ LRESULT AddItem(HWND hwndSheet, bool begin)
 {
     LRESULT iItemServ = begin ? 0 : ListView_GetItemCount(hwndSheet);
     LV_ITEM lvi ={0};
-    lvi.mask = LVIF_PARAM | LVIF_TEXT;
+    lvi.mask = /*LVIF_PARAM |*/ LVIF_TEXT;
     lvi.pszText = LPSTR_TEXTCALLBACK;// (LPSTR)name;
     lvi.cchTextMax = 255;
     lvi.iItem = (int)iItemServ;
@@ -147,7 +147,7 @@ LRESULT Size(LPARAM lParam)
     return 0;
 }
 
-
+std::string Edits = "";
 LRESULT OldSubProc = NULL;
 LRESULT APIENTRY SubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -156,25 +156,17 @@ LRESULT APIENTRY SubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
        //	SendMessage(hWnd, WM_SETFONT, SendMessage(GetWindow(hWnd, GW_OWNER), WM_GETFONT, 0, 0), 0);
        //}
        //else
-    VK_LEFT;
+    //VK_LEFT;
     if(message == WM_CHAR)
         switch(wParam)
         {
             case VK_RETURN: //Сохранить
             {
                 ULONG len = GetWindowTextLength(hWnd);
-                HANDLE hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len + 2);
+                HANDLE hMem = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, len + 3);
                 char* buff = (char*)GlobalLock(hMem);
-                GetWindowText(hWnd, buff, len + 1);
+                GetWindowText(hWnd, buff, len + 2);
                 SendMessage(GetParent(hWnd), WM_USER, USER_EDIT_COMMAND, (LPARAM)buff);
-                //Param* p = (Param*)GetWindowLong(hWnd, GWL_USERDATA);
-                //if(p)
-                //{
-                //    char* buff = new char[len + 2];
-                //    memset(buff, 0, len + 2);
-                //    GetWindowText(hWnd, buff, len + 1);
-                //    p->SetEditor(buff);
-                //}
             }
             case VK_ESCAPE: //Отмена
                 return DestroyWindow(hWnd);
@@ -280,6 +272,9 @@ std::map<emFont, HFONT> Font;
 std::map<int, MYHICON>Icon;
 
 
+//темносиняя заливка
+HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
+
 //Черная заливка
 HBRUSH TitleBrush0 = CreateSolidBrush(RGB(0, 0, 0));
 
@@ -289,11 +284,14 @@ HBRUSH TitleBrush1 = CreateSolidBrush(RGB(255, 255, 255));
 //синяя заливка
 HBRUSH TitleBrush2 = CreateSolidBrush(RGB(177, 99, 177));
 
-//светлозеленая заливка
+
+
+//Розовая заливка
 HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 255, 224));
 
-//темносиняя заливка
-HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
+//синяя заливка
+HBRUSH TitleBrush13 = CreateSolidBrush(RGB(0, 177, 177));
+
 
 //Светло серая заливка
 HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));
@@ -302,7 +300,10 @@ HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));
 HBRUSH TitleBrush6 = CreateSolidBrush(RGB(99, 177, 99));
 
 //Светло желтая заливка
-HBRUSH TitleBrush7 = CreateSolidBrush(RGB(255, 255, 224));
+HBRUSH TitleBrush7 = CreateSolidBrush(RGB(255, 255, 192));
+
+//Темно желтая заливка
+HBRUSH TitleBrush12 = CreateSolidBrush(RGB(177, 177, 99));
 
 //Светло красная заливка
 HBRUSH TitleBrush8 = CreateSolidBrush(RGB(255, 224, 255));
@@ -597,6 +598,57 @@ std::string GetDataTimeStr(std::string str)
 }
 
 
+std::string GetDataTimeStr2(std::string str)
+{
+    std::string outDate = "";
+    std::string outTime = "";
+    boost::regex xRegEx("^(\\d{2})-(\\d{2})-(\\d{4}) (\\d{2}:\\d{2}:\\d{2}).*");
+    boost::match_results<std::string::const_iterator>what;
+    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
+    if(what.size() > 4)
+    {
+        std::string year = what[3].str();
+        std::string month = what[2].str();
+        std::string day = what[1].str();
+        if(what[4].length())
+            outTime = what[4].str();
+        if(day.length() && month.length() && year.length())
+            outDate = year + "-" + month + "-" + day;
+    }
+    if(outDate.length() && outTime.length())
+        return outDate + " " + outTime;
+    else
+    {
+        if(outDate.length())
+        {
+            return outDate;
+        }
+        else
+        {
+            if(outTime.length())
+            {
+                outTime;
+            }
+        }
+    }
+    return "";
+}
+
+std::string GetDataTimeString()
+{
+    std::time_t st = time(NULL);
+    tm curr_tm;
+    localtime_s(&curr_tm, &st);
+
+    std::stringstream sdt;
+    sdt << boost::format("%|04|-") % (curr_tm.tm_year + 1900);
+    sdt << boost::format("%|02|-") % (curr_tm.tm_mon + 1);
+    sdt << boost::format("%|02| ") % curr_tm.tm_mday;
+    sdt << boost::format("%|02|:") % curr_tm.tm_hour;
+    sdt << boost::format("%|02|:") % curr_tm.tm_min;
+    sdt << boost::format("%|02|") % curr_tm.tm_sec;
+    return sdt.str();
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -937,6 +989,16 @@ void CurrentDir()
 #endif
 }
 
+std::string MyName = "";
+void GetMyName()
+{
+    DWORD size = 256;
+    char buffer[256];
+    memset(buffer, 0, size);
+    GetComputerName(buffer, &size);
+    MyName = buffer;
+}
+
 //Глобальная функция
 int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
 {
@@ -958,7 +1020,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
         //boost::replace_all(Version, "  ", " ");
         //boost::replace_last(Version, " ", "");
         
-
+        GetMyName();
         CurrentDir();
         CheckDir(lpLogDir);
 

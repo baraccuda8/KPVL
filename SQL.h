@@ -8,17 +8,17 @@
 
 #define LOG_ERR_SQL(_l, _r, _c)\
 {\
-    SendDebug(_l, utf8_to_cp1251(PQresultErrorMessage(_r)));\
     SendDebug(_l, _c);\
+    SendDebug(_l, utf8_to_cp1251(PQresultErrorMessage(_r)));\
 }
 
 #define SETUPDATESQL(_c, _s) \
 {\
-    std::string comand = _s.str(); \
-    PGresult* res = _c.PGexec(comand); \
-    if(PQresultStatus(res) == PGRES_FATAL_ERROR)\
-        LOG_ERR_SQL(SQLLogger, res, comand); \
-    PQclear(res);\
+    std::string _comand = _s.str(); \
+    PGresult* _res = _c.PGexec(_comand); \
+    if(PQresultStatus(_res) == PGRES_FATAL_ERROR)\
+        LOG_ERR_SQL(SQLLogger, _res, _comand); \
+    PQclear(_res);\
 }
 
 
@@ -57,7 +57,7 @@ typedef struct T_cassette{
     //DINT Номер кассеты за день
     Value* CassetteNo;
 
-    std::string f_temper = "0";
+    std::string facttemper = "0";
 }T_cassette;
 
 typedef struct T_ForBase_RelFurn{

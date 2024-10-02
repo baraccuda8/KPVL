@@ -20,6 +20,7 @@
 
 #define SAWEDEBUG
 
+extern std::string MyName;
 //Перечисление фонтов от 6 до 16
 enum emFont {
     FontNull = -1,
@@ -67,7 +68,7 @@ extern HBRUSH TitleBrush0;
 //Белая заливка
 extern HBRUSH TitleBrush1;
 
-//синяя заливка
+//Розовая заливка
 extern HBRUSH TitleBrush2;
 
 //светлосиняя заливка
@@ -96,6 +97,12 @@ extern HBRUSH TitleBrush10;
 
 //Красная заливка
 extern HBRUSH TitleBrush11;
+
+//Темно желтая заливка
+extern HBRUSH TitleBrush12;
+
+//Синяя заливка
+extern HBRUSH TitleBrush13;
 
 //extern COLORREF m_clrText;
 //extern COLORREF m_clrTextBk;
@@ -152,5 +159,9 @@ inline float Stof(std::string input)
     return 0.0f;
 }
 
+std::string GetDataTimeString();
 std::string GetDataTimeStr(std::string str);
+std::string GetDataTimeStr2(std::string str);
+
 std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime);
+

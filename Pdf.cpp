@@ -797,7 +797,7 @@ void PdfClass::DrawFurn(HPDF_REAL left, HPDF_REAL top, HPDF_REAL w)
 
 		draw_text_rect (page, left + 0, top - 95, w, YP, "Температура отпуска, °С");
 		draw_text_rect (page, left + 270, top - 95, XP, YP, Cassette.PointRef_1);						//Задание
-		draw_text_rect (page, left + 340, top - 95, XP, YP, Cassette.f_temper);							//Факт
+		draw_text_rect (page, left + 340, top - 95, XP, YP, Cassette.FactTemper);							//Факт
 	}CATCH(AllLogger, FUNCTION_LINE_NAME);
 	SendDebug("<<TEST", FUNCTION_LINE_NAME);
 }
