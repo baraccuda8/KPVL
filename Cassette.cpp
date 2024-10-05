@@ -298,9 +298,10 @@ void FilterDataTimeCassette()
     //comand += "delete_at IS NULL AND ";
     FilterUpdateComand += "create_at >= '" + DataStartCassette + "' ";
     FilterUpdateComand += "AND create_at <= '" + DataStopCassette + " 23:59:59.999' ";
-    FilterUpdateComand += "AND sheetincassette <> 0 ";
 #ifndef _DEBUG
+    //FilterUpdateComand += "AND sheetincassette <> 0 ";
     //FilterUpdateComand += " AND pdf IS NOT NULL ";
+    FilterUpdateComand += " AND delete_at IS NULL ";
 #endif
     FilterUpdateComand += "ORDER BY event, run_at DESC, id DESC";
     FilterUpdate();
