@@ -289,19 +289,18 @@ void FilterDataTimeCassette()
 
     FilterUpdateComand = "SELECT * FROM cassette ";
     FilterUpdateComand += "WHERE ";
-#ifndef _DEBUG
-    //FilterUpdateComand += "event = 5 AND ";
-#endif
     //"finish_at <> to_timestamp('0') AND "
-    
+
     //Если не нужны удаленные в ручную то
     //comand += "delete_at IS NULL AND ";
     FilterUpdateComand += "create_at >= '" + DataStartCassette + "' ";
     FilterUpdateComand += "AND create_at <= '" + DataStopCassette + " 23:59:59.999' ";
+
 #ifndef _DEBUG
+    FilterUpdateComand += "AND delete_at IS NULL ";
+    //FilterUpdateComand += "event = 5 AND ";
     //FilterUpdateComand += "AND sheetincassette <> 0 ";
     //FilterUpdateComand += " AND pdf IS NOT NULL ";
-    FilterUpdateComand += " AND delete_at IS NULL ";
 #endif
     FilterUpdateComand += "ORDER BY event, run_at DESC, id DESC";
     FilterUpdate();

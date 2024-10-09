@@ -490,16 +490,13 @@ void FilterDataTimeSheet()
 
     FilterComand = "SELECT * FROM sheet ";
     FilterComand += "WHERE ";
-#ifndef _DEBUG
-    FilterComand += "delete_at IS NULL AND ";
-#endif
-
     FilterComand += "start_at >= ";
-    FilterComand += "'" + DataStartSheet + "'";
-    FilterComand += " AND start_at <= ";
+    FilterComand += "'" + DataStartSheet + "' ";
+    FilterComand += "AND start_at <= ";
     FilterComand += "'" + DataStopSheet + " 23:59:59.999' ";
     //FilterComand += "AND start_at = '2024-09-29 00:23:14'";
 #ifndef _DEBUG
+    FilterComand += "AND delete_at IS NULL ";
     //FilterComand += "AND pdf IS NOT NULL AND pdf <> '' ";
 #endif
     FilterComand += "ORDER BY start_at DESC";
