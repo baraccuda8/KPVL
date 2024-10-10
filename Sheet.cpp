@@ -98,6 +98,11 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::SecondPos_at, { "Дата время\nво второй зоне", LL0 }},
     //{casSheet::Zone, { "Лист\nнайден в", 100 }},
     {casSheet::Pos, { "Текущая\nпозиция", 100 }},
+
+#ifdef _DEBUG
+    {casSheet::Delete_at,  { "Удален", LL0 }},
+#endif
+
     {casSheet::News, { "Кан\nтовка", L0 }},
 
     {casSheet::DataTime_End, { "Дата время\nвыгрузки из печи", LL0 }},
@@ -253,13 +258,13 @@ int Col_Sheet_correct = 0;
 int Col_Sheet_pdf = 0;
 int Col_Sheet_SecondPos_at = 0;
 int Col_Sheet_hour = 0;
-
+int Col_Sheet_Delete_at = 0;
 #pragma endregion
 
 //Получаем список колонов в таблице sheet
 void GetColSheet(PGresult* res)
 {
-    if(!Col_Sheet_hour)
+    if(!Col_Sheet_Delete_at)
     {
         int nFields = PQnfields(res);
         for(int j = 0; j < nFields; j++)
@@ -322,6 +327,7 @@ void GetColSheet(PGresult* res)
             else if(l == "pdf") Col_Sheet_pdf = j;
             else if(l == "secondpos_at") Col_Sheet_SecondPos_at = j;
             else if(l == "hour") Col_Sheet_hour = j;
+            else if(l == "delete_at") Col_Sheet_Delete_at = j;
 
         }
     }
@@ -403,6 +409,7 @@ DLLRESULT FilterSheet()
             sheet.Correct = conn_kpvl.PGgetvalue(res, l, Col_Sheet_correct);
             sheet.Pdf = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pdf);
             sheet.SecondPos_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_SecondPos_at));
+            sheet.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_Delete_at));
             
             AllSheet.push_back(sheet);
             AddHistoriSheet(false);
@@ -945,6 +952,9 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
 
                 //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
+#ifdef _DEBUG
+                ELSEIF (casSheet::Delete_at, GetDataTimeStr(p.Delete_at).c_str());
+#endif
                 else if(subItem == casSheet::Pos) lstrcpyA(plvdi->item.pszText, NamePos[p.Pos].c_str());
 
                 ELSEIF (casSheet::Alloy, p.Alloy.c_str());

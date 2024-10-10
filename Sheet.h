@@ -124,6 +124,7 @@ typedef struct TSheet{
     std::string Correct = "";           //Время корректировки
     std::string Pdf = "";               //Путь к файлу PDF
     std::string SecondPos_at = "";      //Время прехода во вторую зону
+    std::string Delete_at = "";
     TSheet()
     {
     };
@@ -150,6 +151,9 @@ namespace casSheet{
         SecondPos_at, 
         //Zone,
         Pos,
+#ifdef _DEBUG
+        Delete_at, 
+#endif
         News,
         DataTime_End,
         DataTime_All,
@@ -358,4 +362,5 @@ extern int Col_Sheet_timeforplateheat;
 extern int Col_Sheet_prestostartcomp;
 extern int Col_Sheet_temperature;
 extern int Col_Sheet_pdf;
+extern int Col_Sheet_delete_at;
 #pragma endregion
