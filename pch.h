@@ -62,9 +62,7 @@
 
 #ifdef _WIN64
 #pragma comment(lib, "libxl64.lib")
-#pragma comment(lib, "libxl64.lib")
 #else
-#pragma comment(lib, "libxl32.lib")
 #pragma comment(lib, "libxl32.lib")
 #endif
 
