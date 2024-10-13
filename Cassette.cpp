@@ -765,9 +765,19 @@ bool UpdateCassette(std::string ss, std::string& vv)
     std::string old = vv;
     vv = ss;
     if(vv.length())
-        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
+    {
+        if(MapColl[CassetteSubItem] != "pdf")
+            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
+        else
+            ssd << "UPDATE cassette SET pdf = '" << vv << "' WHERE id = " << CassetteID->Id;
+    }
     else
-        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
+    {
+        if(MapColl[CassetteSubItem] != "pdf")
+            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
+        else
+            ssd << "UPDATE cassette SET pdf = DEFAULT WHERE id = " << CassetteID->Id;
+    }
 
     SaveUpdateLog(ssd, old);
     SETUPDATESQL(conn_kpvl, ssd);
@@ -779,7 +789,10 @@ bool UpdateCassette(LPARAM sd, std::string& vv)
     std::stringstream ssd;
     std::string old = vv;
     vv = std::to_string(sd + 1);
-    ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
+    if(MapColl[CassetteSubItem] != "pdf")
+        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
+    else
+        ssd << "UPDATE cassette SET " << MapColl[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
     CassetteID->Pdf = "";
 
     SaveUpdateLog(ssd, old);
