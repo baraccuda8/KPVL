@@ -5,41 +5,13 @@
 #include "Cassette.h"
 #include "Sheet.h"
 #include "SQL.h"
-
-
-//UPDATE cassette SET close_at = now() WHERE close_at IS NULL;
-//UPDATE cassette SET close_at = DEFAULT WHERE id = 9;
-//SELECT create_at, (SELECT name FROM tag WHERE tag.id = todos.id_name), content FROM todos WHERE id_name = 73 OR id_name = 79 ORDER BY create_at DESC;
-//SELECT to_char(create_at, 'YYY-MM-DD HH24:MI:SS'), (SELECT name FROM tag WHERE tag.id = todos.id_name), content FROM todos WHERE id_name = 73 OR id_name = 79 ORDER BY create_at DESC;
-//SELECT to_char(create_at, 'YYY-MM-DD HH24:MI:SS') AS "Дата Время", (SELECT name FROM tag WHERE tag.id = todos.id_name) AS "Переменная", content AS "Значение" FROM todos WHERE id_name = 73 OR id_name = 79 ORDER BY create_at DESC;
-
-//Функция							Тип результата				Описание													Пример
-//to_char(timestamp, text)			text						преобразует время в текст									to_char(current_timestamp, 'HH12:MI:SS')
-//to_char(interval, text)			text						преобразует интервал в текст								to_char(interval '15h 2m 12s', 'HH24:MI:SS')
-//to_char(int, text)				text						преобразует целое в текст									to_char(125, '999')
-//to_char(double precision, text)	text						преобразует плавающее одинарной / двойной точности в текст	to_char(125.8::real, '999D9')
-//to_char(numeric, text)			text						преобразует числовое значение в текст						to_char(-125.8, '999D99S')
-//to_date(text, text)				date						преобразует текст в дату									to_date('05 Dec 2000', 'DD Mon YYYY')
-//to_number(text, text)				numeric						преобразует текст в число									to_number('12,454.8-', '99G999D9S')
-//to_timestamp(text, text)			timestamp with time zone	преобразует строку во время									to_timestamp('05 Dec 2000', 'DD Mon YYYY')
-//to_timestamp(double precision)	timestamp with time zone	преобразует время в стиле Unix в стандартное время			to_timestamp(1284352323)
-//create_at | zone |  id | datatime_end | datatime_all |  alloy | thikness |   melt | partno | pack | sheet | temper | speed | za_pt3 | za_te3 | lampresstop | lampressbot | posclapantop | posclapanbot | mask | lam1posclapantop | lam1posclapanbot | lam2posclapantop | lam2posclapanbot | lam_te1 | news | top1 | top2 | top3 | top4 | top5 | top6 | top7 | top8 | bot1 | bot2 | bot3 | bot4 | bot5 | bot6 | bot7 | bot8 | day | month | year | cassetteno | sheetincassette | pos | 
-//SELECT to_char(created, 'YYY-MM-DD HH24:MI:SS') AS "Дата Время", (SELECT name FROM tag WHERE tag.id = todos.id_name) AS "Переменная", content AS "Значение" FROM todos WHERE id_name = 73 OR id_name = 79 ORDER BY created DESC;
-//WHERE delete_at IS NULL ORDER BY create_at DESC
+#include "LoginDlg.h"
 
 BOOL Run=TRUE;
-//Соединение с SQL базой
 PGConnection conn_kpvl;
 PGConnection conn_dops;
 PGConnection conn_tags;
 
-//Таблица марок листов
-//std::map <int, std::string>MapAlloyCode;
-
-//Таблица толщин листов
-//std::map <int, std::map<int, std::string>>MapThicknessCode;
-
-#define SQLFileName "PostgreSQL.dat"
 
 std::string m_dbhost = "localhost";
 std::string m_dbport = "5432";
@@ -48,7 +20,6 @@ std::string m_dbuser = "";
 std::string m_dbpass = "";
 
 
-//std::deque<TTag>AllTag;
 extern std::map<int, std::string> EventCassette;
 extern std::map<std::string, std::string> NamePos;
 
@@ -104,66 +75,11 @@ std::string PGConnection::PGgetvalue(PGresult* res, int l, int i)
     else return "";
 }
 
-
-DLLRESULT InitDialog(HWND hWnd)
+int PGConnection::PQntuples(PGresult* res)
 {
-    CenterWindow(hWnd, NULL);
-    SetWindowText(GetDlgItem(hWnd, IDC_EDIT1), m_dbhost.c_str());
-    SetWindowText(GetDlgItem(hWnd, IDC_EDIT2), m_dbport.c_str());
-    SetWindowText(GetDlgItem(hWnd, IDC_EDIT3), m_dbname.c_str());
-    SetWindowText(GetDlgItem(hWnd, IDC_EDIT4), m_dbuser.c_str());
-    SetWindowText(GetDlgItem(hWnd, IDC_EDIT5), m_dbpass.c_str());
-    return 0;
+    if(!connections) return 0;
+    return ::PQntuples(res);
 }
-
-DLLRESULT CommandDialog(HWND hWnd, WPARAM wParam)
-{
-    if(wParam == IDOK)
-    {
-        char ss[256];
-        GetWindowText(GetDlgItem(hWnd, IDC_EDIT1), ss, 256);    m_dbhost = ss;
-        GetWindowText(GetDlgItem(hWnd, IDC_EDIT2), ss, 256);    m_dbport = ss;
-        GetWindowText(GetDlgItem(hWnd, IDC_EDIT3), ss, 256);    m_dbname = ss;
-        GetWindowText(GetDlgItem(hWnd, IDC_EDIT4), ss, 256);    m_dbuser = ss;
-        GetWindowText(GetDlgItem(hWnd, IDC_EDIT5), ss, 256);    m_dbpass = ss;
-
-        if(conn_kpvl.Сonnection())
-        {
-            EndDialog(hWnd, FALSE);
-        }
-    }
-    if(wParam == IDCANCEL)
-    {
-        EndDialog(hWnd, FALSE);
-        Quit();
-    }
-    return 0;
-}
-
-DLLRESULT CALLBACK bagSave(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    if(message == WM_INITDIALOG)return InitDialog(hWnd);
-    if(message == WM_COMMAND) return CommandDialog(hWnd, wParam);
-    return (0);
-}
-
-
-
-#define AppFurn1 ForBase_RelFurn_1
-#define AppFurn2 ForBase_RelFurn_2
-#define AppCassette cassetteArray.cassette
-#define AppSelected1 cassetteArray.selected_cassetFurn1
-#define AppSelected2 cassetteArray.selected_cassetFurn2
-#define AppCassette1 cassetteArray.cassette[0]
-#define AppCassette2 cassetteArray.cassette[1]
-#define AppCassette3 cassetteArray.cassette[2]
-#define AppCassette4 cassetteArray.cassette[3]
-#define AppCassette5 cassetteArray.cassette[4]
-#define AppCassette6 cassetteArray.cassette[5]
-#define AppCassette7 cassetteArray.cassette[6]
-
-#define StrFurn1 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.")
-#define StrFurn2 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.")
 
 
 T_Hmi210_1 Hmi210_1;
@@ -291,50 +207,6 @@ void GetTag()
 }
 
 
-bool LoadConnect()
-{
-    char p[1024];
-    memset(p, 0, 1024);
-    std::ifstream s(SQLFileName, std::ios::binary | std::ios::in);
-    if(s.is_open())
-    {
-        s.read(p, 1024);
-        int len = (int)s.gcount();
-        s.close();
-        //encode((byte*)p, len);
-        std::vector <std::string>split;
-        boost::split(split, p, boost::is_any_of("\n"));
-        if(split.size() == 5)
-        {
-            m_dbhost = split[0];
-            m_dbport = split[1];
-            m_dbname = split[2];
-            m_dbuser = split[3];
-            m_dbpass = split[4];
-            return true;
-        }
-    }
-    return false;
-}
-
-void SaveConnect()
-{
-    std::stringstream pass;
-    pass << m_dbhost << std::endl
-        << m_dbport << std::endl
-        << m_dbname << std::endl
-        << m_dbuser << std::endl
-        << m_dbpass;
-
-    std::string p = pass.str();
-
-    std::ofstream s(SQLFileName, std::ios::binary | std::ios::out | std::ios::trunc);
-    if(s.is_open())
-    {
-        s << p;
-        s.close();
-    }
-}
 
 HANDLE hKPVLURI = NULL;
 //Серьезность	Код	Описание	Проект	Файл	Строка	Состояние подавления	Подробности
@@ -493,16 +365,16 @@ bool InitSQL()
 {
     try
     {
-        if(!LoadConnect())
+        if(!LoginDlg::LoadConnect())
         {
-            DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, bagSave);
+            DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, LoginDlg::bagSave);
             if(!conn_kpvl.Сonnection())
                 throw std::exception("Error SQL connection KPVL");
             if(!conn_dops.Сonnection())
                 throw std::exception("Error SQL connection dops");
             if(!conn_tags.Сonnection())
                 throw std::exception("Error SQL connection tags");
-            SaveConnect();
+            LoginDlg::SaveConnect();
             ItitTag();
         }
         else

@@ -248,15 +248,6 @@ void SendDebug(std::string fun, std::string cons, std::string ss)
 }
 
 
-
-std::string pKey = "õàáğàbarracudabarracudaõàáğà";
-
-//void encode(byte* pText, int len)
-//{
-//    for(int i = 0; i < len; i++)
-//        pText[i] = (byte)(pText[i] ^ pKey[i % pKey.length()]);
-//}
-
 std::string GetStringData(std::string d)
 {
     if(!d.size())return "";

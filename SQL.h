@@ -6,20 +6,34 @@
 //#include "resource.h"
 #define SQLLogger "SQLLogger"
 
-#define LOG_ERR_SQL(_l, _r, _c)\
-{\
+#define LOG_ERR_SQL(_l, _r, _c){\
     SendDebug(_l, _c);\
     SendDebug(_l, utf8_to_cp1251(PQresultErrorMessage(_r)));\
 }
 
-#define SETUPDATESQL(_c, _s) \
-{\
+#define SETUPDATESQL(_c, _s){\
     std::string _comand = _s.str(); \
     PGresult* _res = _c.PGexec(_comand); \
     if(PQresultStatus(_res) == PGRES_FATAL_ERROR)\
         LOG_ERR_SQL(SQLLogger, _res, _comand); \
     PQclear(_res);\
 }
+
+#define AppFurn1 ForBase_RelFurn_1
+#define AppFurn2 ForBase_RelFurn_2
+#define AppCassette cassetteArray.cassette
+#define AppSelected1 cassetteArray.selected_cassetFurn1
+#define AppSelected2 cassetteArray.selected_cassetFurn2
+#define AppCassette1 cassetteArray.cassette[0]
+#define AppCassette2 cassetteArray.cassette[1]
+#define AppCassette3 cassetteArray.cassette[2]
+#define AppCassette4 cassetteArray.cassette[3]
+#define AppCassette5 cassetteArray.cassette[4]
+#define AppCassette6 cassetteArray.cassette[5]
+#define AppCassette7 cassetteArray.cassette[6]
+
+#define StrFurn1 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_1.Data.")
+#define StrFurn2 std::string("|var|SPK107 (M01).Application.ForBase_RelFurn_2.Data.")
 
 
 
@@ -172,11 +186,7 @@ public:
 
     std::string PGgetvalue(PGresult* res, int l, int i);
 
-    int PQntuples(PGresult* res)
-    {
-        if(!connections) return 0;
-        return ::PQntuples(res);
-    }
+    int PQntuples(PGresult* res);
 
 private:
     //void establish_connection();
