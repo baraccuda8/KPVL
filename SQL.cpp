@@ -56,24 +56,25 @@ extern std::map<std::string, std::string> NamePos;
 bool PGConnection::Ñonnection(){
     try
     {
+        if(connections)return connections;
+
         m_connection = PQsetdbLogin(m_dbhost.c_str(), m_dbport.c_str(), NULL, NULL, m_dbname.c_str(), m_dbuser.c_str(), m_dbpass.c_str());
 
-        if(PQstatus(m_connection) != CONNECTION_OK && PQsetnonblocking(m_connection, 1) != 0)
+        ConnStatusType st = PQstatus(m_connection);
+        if(st != CONNECTION_OK && PQsetnonblocking(m_connection, 1) != 0)
         {
             connections = false;
-            SendDebug("conn_kpvl", "Îøèáêà ñîåäèíåíèÿ..." + m_dbhost + ":" + m_dbport);
             throw std::runtime_error(PQerrorMessage(m_connection));
         }
 
-        PGresult* res = PGexec("SET TIME ZONE 'Asia/Yekaterinburg';");
-        //SendDebug(con, "SET TIME ZONE 'Asia/Yekaterinburg';");
-        if(PQresultStatus(res) != PGRES_TUPLES_OK)
+        PGresult* res = PQexec(m_connection, "set time zone 'Asia/Yekaterinburg'");
+        ExecStatusType sd = PQresultStatus(res);
+        if(sd != PGRES_COMMAND_OK)
         {
             std::string errc = utf8_to_cp1251(PQresultErrorMessage(res));
-            SendDebug("conn_kpvl", errc);
+            throw std::runtime_error(errc);
         }
         PQclear(res);
-
 
         connections = true;
     }
@@ -128,7 +129,6 @@ DLLRESULT CommandDialog(HWND hWnd, WPARAM wParam)
 
         if(conn_kpvl.Ñonnection())
         {
-            //SaveConnect();
             EndDialog(hWnd, FALSE);
         }
     }
@@ -291,26 +291,6 @@ void GetTag()
 }
 
 
-
-
-namespace SETALLOY{
-
-
-
-    void GetAlloy()
-    {
-    }
-
-    void SetAlloy(std::string command)
-    {
-    }
-
-    void Reloc()
-    {
-        GetAlloy();
-    }
-}
-
 bool LoadConnect()
 {
     char p[1024];
@@ -418,11 +398,6 @@ void ItitTag()
             NamePos[it->first] = it->second;
         }
         SETUPDATESQL(conn_kpvl, ss);
-        //comand = ss.str();
-        //res = conn_kpvl.PGexec(comand);
-        //if(PQresultStatus(res) == PGRES_FATAL_ERROR)
-        //    LOG_ERR_SQL(SQLLogger, res, comand);
-        //PQclear(res);
     }
 #pragma endregion
 
@@ -523,36 +498,25 @@ bool InitSQL()
             DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, bagSave);
             if(!conn_kpvl.Ñonnection())
                 throw std::exception("Error SQL connection KPVL");
-            //Sleep(1000);
             if(!conn_dops.Ñonnection())
                 throw std::exception("Error SQL connection dops");
-            //Sleep(1000);
             if(!conn_tags.Ñonnection())
                 throw std::exception("Error SQL connection tags");
-            //Sleep(1000);
             SaveConnect();
             ItitTag();
-            //Sleep(3000);
-            //SETALLOY::Reloc();
-            //hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
         }
         else
         {
             if(!conn_kpvl.Ñonnection())
                 throw std::exception("Error SQL connection KPVL");
-            //Sleep(1000);
             if(!conn_dops.Ñonnection())
                 throw std::exception("Error SQL connection dops");
-            //Sleep(1000);
             if(!conn_tags.Ñonnection())
                 throw std::exception("Error SQL connection tags");
-            //SETALLOY::Reloc();
-            //Sleep(3000);
             ItitTag();
 #ifdef TEST
             //Test();
 #endif
-            //hKPVLURI = CreateThread(0, 0, GetTagContent, (LPVOID)0, 0, 0);
         }
     }
     catch(std::exception& exc)

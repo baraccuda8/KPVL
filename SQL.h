@@ -162,9 +162,9 @@ extern std::deque<Value*> AllTag;
 class PGConnection
 {
 public:
-    PGconn* m_connection;
-    bool connections;
-    PGConnection() { connections = false; };
+    PGconn* m_connection = NULL;
+    bool connections = false;
+    PGConnection() : connections(false) { };
     ~PGConnection(){ PQfinish(m_connection); };
     bool Ñonnection();
 
