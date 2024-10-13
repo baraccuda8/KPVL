@@ -57,14 +57,16 @@
 #pragma comment(linker,"/manifestdependency:\"type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #define FUNCTION_LINE_NAME std::string (std::string(" File: ") + std::string( __FILE__ ) + std::string("; Function: ") + std::string( __FUNCTION__ ) + std::string ("; Line ") + std::to_string(__LINE__) + std::string ("; "))
+#define __FUN(__s) (FUNCTION_LINE_NAME + "| " + __s).c_str()
 
 
 #ifdef _WIN64
 #pragma comment(lib, "libxl64.lib")
+#pragma comment(lib, "libxl64.lib")
 #else
 #pragma comment(lib, "libxl32.lib")
+#pragma comment(lib, "libxl32.lib")
 #endif
-
 
 
 #include <boost/thread.hpp>
@@ -87,9 +89,6 @@ using namespace boost::adaptors;
 //#include <opc/ua/subscription.h>
 //#include <opc/common/logger.h>
 
-//#define FUNCTION_LINE_NAME (std::string( __FUNCTION__ ) + std::string (":") + std::to_string(__LINE__))
-#define __FUN(__s) (FUNCTION_LINE_NAME + "| " + __s).c_str()
-
 #include "libxl.h"
 
 #include "resource.h"
@@ -103,9 +102,4 @@ typedef struct {
 
 #endif //PCH_H
 
-#ifdef _WIN64
-#pragma comment(lib, "libxl64.lib")
-#else
-#pragma comment(lib, "libxl32.lib")
-#endif
 
