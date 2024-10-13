@@ -41,11 +41,11 @@ PGConnection conn_tags;
 
 #define SQLFileName "PostgreSQL.dat"
 
-std::string m_dbhost = "192.168.9.63";
+std::string m_dbhost = "localhost";
 std::string m_dbport = "5432";
-std::string m_dbname = "kpvl";
-std::string m_dbuser = "user";
-std::string m_dbpass = "TutonHamon8*";
+std::string m_dbname = "";
+std::string m_dbuser = "";
+std::string m_dbpass = "";
 
 //std::deque<TTag>AllTag;
 extern std::map<int, std::string> EventCassette;
