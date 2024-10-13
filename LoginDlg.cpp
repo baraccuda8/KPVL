@@ -69,7 +69,7 @@ namespace LoginDlg
         }
     }
 
-    DLLRESULT InitDialog(HWND hWnd)
+    INT_PTR InitDialog(HWND hWnd)
     {
         CenterWindow(hWnd, NULL);
         SetWindowText(GetDlgItem(hWnd, IDC_EDIT1), m_dbhost.c_str());
@@ -80,7 +80,7 @@ namespace LoginDlg
         return 0;
     }
 
-    DLLRESULT CommandDialog(HWND hWnd, WPARAM wParam)
+    INT_PTR CommandDialog(HWND hWnd, WPARAM wParam)
     {
         if(wParam == IDOK)
         {
@@ -104,7 +104,7 @@ namespace LoginDlg
         return 0;
     }
 
-    DLLRESULT CALLBACK bagSave(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+    INT_PTR CALLBACK bagSave(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
         if(message == WM_INITDIALOG)return InitDialog(hWnd);
         if(message == WM_COMMAND) return CommandDialog(hWnd, wParam);

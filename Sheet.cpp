@@ -333,7 +333,7 @@ void GetColSheet(PGresult* res)
     }
 }
 
-DLLRESULT FilterSheet()
+INT_PTR FilterSheet()
 {
     ListView_DeleteAllItems(ListSheet);
     AllSheet.erase(AllSheet.begin(), AllSheet.end());
@@ -575,7 +575,7 @@ std::map<std::string, std::string> NamePos ={};
 
 
 
-DLLRESULT CommandPassportSheetDialog(HWND hWnd, WPARAM wParam)
+INT_PTR CommandPassportSheetDialog(HWND hWnd, WPARAM wParam)
 {
     if(wParam == IDOK)
     {
@@ -750,7 +750,7 @@ void GetDataTempCassete(TCassette& p, std::string name, int pos)
 }
 
 //BOOL CenterWindow2(HWND hwndChild, HWND hwndParent);
-DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
+INT_PTR InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
 {
     //#define Stat03Flag WS_CHILD | WS_VISIBLE | WS_BORDER | SS_OWNERDRAW | SS_CENTERIMAGE | DT_SINGLELINE
 
@@ -813,7 +813,7 @@ DLLRESULT InitPassportSheetDialog(HWND hDlg, LPARAM lParam)
 }
 
 
-DLLRESULT CALLBACK SheetPasportProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK SheetPasportProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_INITDIALOG) return InitPassportSheetDialog(hDlg, lParam);
     if(message == WM_COMMAND) return CommandPassportSheetDialog(hDlg, wParam);
@@ -1105,7 +1105,7 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-DLLRESULT InitFilterDataSheetDialog(HWND hWnd)
+INT_PTR InitFilterDataSheetDialog(HWND hWnd)
 {
     CenterWindow(hWnd, SheetWindow);
     SetWindowText(GetDlgItem(hWnd, IDC_EDIT1), DataStartSheet.c_str());
@@ -1113,7 +1113,7 @@ DLLRESULT InitFilterDataSheetDialog(HWND hWnd)
     return 0;
 }
 
-DLLRESULT InitFilterIDSheetDialog(HWND hWnd)
+INT_PTR InitFilterIDSheetDialog(HWND hWnd)
 {
     CenterWindow(hWnd, SheetWindow);
     SetWindowText(GetDlgItem(hWnd, IDC_EDIT1), strYear.c_str());
@@ -1123,7 +1123,7 @@ DLLRESULT InitFilterIDSheetDialog(HWND hWnd)
     return 0;
 }
 
-DLLRESULT CommandFilterDataSheetDialog(HWND hWnd, WPARAM wParam)
+INT_PTR CommandFilterDataSheetDialog(HWND hWnd, WPARAM wParam)
 {
     if(wParam == IDC_BUTTON1)
     {
@@ -1159,7 +1159,7 @@ DLLRESULT CommandFilterDataSheetDialog(HWND hWnd, WPARAM wParam)
     return 0;
 }
 
-DLLRESULT CommandFilterIDSheetDialog(HWND hWnd, WPARAM wParam)
+INT_PTR CommandFilterIDSheetDialog(HWND hWnd, WPARAM wParam)
 {
     if(wParam == IDC_BUTTON1)
     {
@@ -1203,7 +1203,7 @@ DLLRESULT CommandFilterIDSheetDialog(HWND hWnd, WPARAM wParam)
 }
 
 
-DLLRESULT UserDataSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR UserDataSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(wParam == 1)
     {
@@ -1230,7 +1230,7 @@ DLLRESULT UserDataSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 
 
-DLLRESULT UserIDSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR UserIDSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(wParam == 1)
     {
@@ -1256,7 +1256,7 @@ DLLRESULT UserIDSheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-DLLRESULT CALLBACK FilterSheetIDProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK FilterSheetIDProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_USER)return UserIDSheet(hWnd, message, wParam, lParam);
     if(message == WM_INITDIALOG)return InitFilterIDSheetDialog(hWnd);
@@ -1264,7 +1264,7 @@ DLLRESULT CALLBACK FilterSheetIDProc(HWND hWnd, UINT message, WPARAM wParam, LPA
     return 0;
 }
 
-DLLRESULT CALLBACK FilterSheetDataProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK FilterSheetDataProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_USER)return UserDataSheet(hWnd, message, wParam, lParam);
     if(message == WM_INITDIALOG)return InitFilterDataSheetDialog(hWnd);

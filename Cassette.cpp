@@ -315,7 +315,7 @@ void FilterCassette()
     //AllCassette.erase(AllCassette.begin(), AllCassette.end());
 }
 
-DLLRESULT UserDataCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR UserDataCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(wParam == 1)
     {
@@ -340,7 +340,7 @@ DLLRESULT UserDataCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam
     return 0;
 }
 
-DLLRESULT InitFilterCassetteDialog(HWND hWnd)
+INT_PTR InitFilterCassetteDialog(HWND hWnd)
 {
     CenterWindow(hWnd, CassetteWindow);
     SetWindowText(GetDlgItem(hWnd, IDC_EDIT1), DataStartCassette.c_str());
@@ -350,7 +350,7 @@ DLLRESULT InitFilterCassetteDialog(HWND hWnd)
 
 //IDD_DIALOG3
 
-DLLRESULT CommandFilterCassetteDialog(HWND hWnd, WPARAM wParam)
+INT_PTR CommandFilterCassetteDialog(HWND hWnd, WPARAM wParam)
 {
     if(wParam == IDC_BUTTON1)
     {
@@ -387,7 +387,7 @@ DLLRESULT CommandFilterCassetteDialog(HWND hWnd, WPARAM wParam)
     return 0;
 }
 
-DLLRESULT CALLBACK FilterCassetteDataProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK FilterCassetteDataProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_USER)return UserDataCassette(hWnd, message, wParam, lParam);
     if(message == WM_INITDIALOG)return InitFilterCassetteDialog(hWnd);
@@ -395,7 +395,7 @@ DLLRESULT CALLBACK FilterCassetteDataProc(HWND hWnd, UINT message, WPARAM wParam
     return 0;
 }
 
-DLLRESULT CALLBACK FilterCassetteIDProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK FilterCassetteIDProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_USER)return UserDataCassette(hWnd, message, wParam, lParam);
     if(message == WM_INITDIALOG)return InitFilterCassetteDialog(hWnd);
@@ -925,7 +925,7 @@ LRESULT SaveCassetteList(HWND hWnd)
 }
 
 HWND OutDialog = NULL;
-DLLRESULT CALLBACK OutInfoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK OutInfoProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_INITDIALOG)
     {
