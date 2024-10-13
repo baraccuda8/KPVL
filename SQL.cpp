@@ -53,7 +53,7 @@ extern std::map<int, std::string> EventCassette;
 extern std::map<std::string, std::string> NamePos;
 
 
-bool PGConnection::connection(){
+bool PGConnection::Ñonnection(){
     try
     {
         m_connection = PQsetdbLogin(m_dbhost.c_str(), m_dbport.c_str(), NULL, NULL, m_dbname.c_str(), m_dbuser.c_str(), m_dbpass.c_str());
@@ -126,7 +126,7 @@ DLLRESULT CommandDialog(HWND hWnd, WPARAM wParam)
         GetWindowText(GetDlgItem(hWnd, IDC_EDIT4), ss, 256);    m_dbuser = ss;
         GetWindowText(GetDlgItem(hWnd, IDC_EDIT5), ss, 256);    m_dbpass = ss;
 
-        if(conn_kpvl.connection())
+        if(conn_kpvl.Ñonnection())
         {
             //SaveConnect();
             EndDialog(hWnd, FALSE);
@@ -521,13 +521,13 @@ bool InitSQL()
         if(!LoadConnect())
         {
             DialogBox(hInstance, MAKEINTRESOURCE(IDD_DIALOG1), NULL, bagSave);
-            if(!conn_kpvl.connection())
+            if(!conn_kpvl.Ñonnection())
                 throw std::exception("Error SQL connection KPVL");
             //Sleep(1000);
-            if(!conn_dops.connection())
+            if(!conn_dops.Ñonnection())
                 throw std::exception("Error SQL connection dops");
             //Sleep(1000);
-            if(!conn_tags.connection())
+            if(!conn_tags.Ñonnection())
                 throw std::exception("Error SQL connection tags");
             //Sleep(1000);
             SaveConnect();
@@ -538,13 +538,13 @@ bool InitSQL()
         }
         else
         {
-            if(!conn_kpvl.connection())
+            if(!conn_kpvl.Ñonnection())
                 throw std::exception("Error SQL connection KPVL");
             //Sleep(1000);
-            if(!conn_dops.connection())
+            if(!conn_dops.Ñonnection())
                 throw std::exception("Error SQL connection dops");
             //Sleep(1000);
-            if(!conn_tags.connection())
+            if(!conn_tags.Ñonnection())
                 throw std::exception("Error SQL connection tags");
             //SETALLOY::Reloc();
             //Sleep(3000);

@@ -976,7 +976,7 @@ LRESULT CommandCassette(HWND hWnd, WPARAM wParam)
             {
                 TCassette& cassette = AllCassette[iItem];
                 PGConnection conn;
-                conn.connection();
+                conn.Ñonnection();
                 std::stringstream sd;
                 //sd << "UPDATE cassette SET delete_at = now(), event = 7 WHERE id = " << cassette.Id << ";";
                 sd << "UPDATE cassette SET delete_at = now() WHERE id = " << cassette.Id << ";";
@@ -994,7 +994,7 @@ LRESULT CommandCassette(HWND hWnd, WPARAM wParam)
             {
                 TCassette& cassette = AllCassette[iItem];
                 PGConnection conn;
-                conn.connection();
+                conn.Ñonnection();
                 std::stringstream sd;
                 sd << "UPDATE cassette SET delete_at = DEFAULT, event = 0 WHERE id = " << cassette.Id << ";";
                 SETUPDATESQL(conn, sd);

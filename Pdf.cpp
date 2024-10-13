@@ -1004,7 +1004,7 @@ PdfClass::PdfClass(TSheet& sheet, bool view)
 #pragma region Готовим графики
 		Sheet = sheet;
 
-		if(!conn.connection())
+		if(!conn.Сonnection())
 			return;// throw std::exception(__FUN(std::string("Error SQL conn connection to GraffKPVL")));
 
 		FurnRef.erase(FurnRef.begin(), FurnRef.end());
@@ -1102,7 +1102,7 @@ PdfClass::PdfClass(TCassette& TC)
 
 		//Sheet = sheet;
 
-		if(!conn.connection())
+		if(!conn.Сonnection())
 			return;// throw std::exception(__FUN(std::string("Error SQL conn connection to GraffKPVL")));
 		GetSheet();
 

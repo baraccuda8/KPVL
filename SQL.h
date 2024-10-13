@@ -166,7 +166,7 @@ public:
     bool connections;
     PGConnection() { connections = false; };
     ~PGConnection(){ PQfinish(m_connection); };
-    bool connection();
+    bool Ñonnection();
 
     PGresult* PGexec(std::string std);
 
