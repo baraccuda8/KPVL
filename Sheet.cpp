@@ -96,16 +96,17 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::DataTime, { "Дата время\nсоздания листа", LL0 }},
     {casSheet::Start_at, { "Дата время\nзагрузки в печь", LL0 }},
     {casSheet::SecondPos_at, { "Дата время\nво второй зоне", LL0 }},
-    //{casSheet::Zone, { "Лист\nнайден в", 100 }},
-    {casSheet::Pos, { "Текущая\nпозиция", 100 }},
 
 #ifdef _DEBUG
+    {casSheet::InCant_at, { "На кантовку", LL0 }},
+    {casSheet::Cant_at, { "Кантовка", LL0 }},
     {casSheet::Delete_at,  { "Удален", LL0 }},
 #endif
 
+    {casSheet::DataTime_End, { "Дата время\nвыгрузки из печи", LL0 }},
+    {casSheet::Pos, { "Текущая\nпозиция", 100 }},
     {casSheet::News, { "Кан\nтовка", L0 }},
 
-    {casSheet::DataTime_End, { "Дата время\nвыгрузки из печи", LL0 }},
     {casSheet::DataTime_All, { "Время закалки\nмин", L1 }},
     {casSheet::TimeForPlateHeat, { "Задание Время\nокончания нагрева", L2 }},
     {casSheet::PresToStartComp, { "Задание\nДавления воды", L2 }},
@@ -258,6 +259,8 @@ int Col_Sheet_correct = 0;
 int Col_Sheet_pdf = 0;
 int Col_Sheet_SecondPos_at = 0;
 int Col_Sheet_hour = 0;
+int Col_Sheet_InCant_at = 0;
+int Col_Sheet_Cant_at = 0;
 int Col_Sheet_Delete_at = 0;
 #pragma endregion
 
@@ -315,9 +318,10 @@ void GetColSheet(PGresult* res)
             else if(l == "bot6") Col_Sheet_bot6 = j;
             else if(l == "bot7") Col_Sheet_bot7 = j;
             else if(l == "bot8") Col_Sheet_bot8 = j;
-            else if(l == "day") Col_Sheet_day = j;
-            else if(l == "month") Col_Sheet_month = j;
             else if(l == "year") Col_Sheet_year = j;
+            else if(l == "month") Col_Sheet_month = j;
+            else if(l == "day") Col_Sheet_day = j;
+            else if(l == "hour") Col_Sheet_hour = j;
             else if(l == "cassetteno") Col_Sheet_cassetteno = j;
             else if(l == "sheetincassette") Col_Sheet_sheetincassette = j;
             else if(l == "timeforplateheat") Col_Sheet_timeforplateheat = j;
@@ -326,7 +330,8 @@ void GetColSheet(PGresult* res)
             else if(l == "correct") Col_Sheet_correct = j;
             else if(l == "pdf") Col_Sheet_pdf = j;
             else if(l == "secondpos_at") Col_Sheet_SecondPos_at = j;
-            else if(l == "hour") Col_Sheet_hour = j;
+            else if(l == "incant_at")Col_Sheet_InCant_at = j;
+            else if(l == "cant_at")Col_Sheet_Cant_at = j;
             else if(l == "delete_at") Col_Sheet_Delete_at = j;
 
         }
@@ -345,10 +350,18 @@ INT_PTR FilterSheet()
         for(int l = 0; l < line; l++)
         {
             TSheet sheet;
-            sheet.DataTime = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_create_at));
-            sheet.Pos = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pos);
             sheet.id = conn_kpvl.PGgetvalue(res, l, Col_Sheet_id);
+
+            sheet.DataTime = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_create_at));
             sheet.DataTime_End = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_datatime_end));
+            sheet.Start_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_start_at));
+            sheet.InCant_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_InCant_at));
+            sheet.Cant_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_Cant_at));
+            sheet.SecondPos_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_SecondPos_at));
+            sheet.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_Delete_at));
+
+            sheet.Pos = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pos);
+
             sheet.DataTime_All = conn_kpvl.PGgetvalue(res, l, Col_Sheet_datatime_all);
             sheet.Alloy = conn_kpvl.PGgetvalue(res, l, Col_Sheet_alloy);
             sheet.Thikness = conn_kpvl.PGgetvalue(res, l, Col_Sheet_thikness);
@@ -395,21 +408,19 @@ INT_PTR FilterSheet()
             sheet.Bot7 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot7);
             sheet.Bot8 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_bot8);
 
-            sheet.Hour = conn_kpvl.PGgetvalue(res, l, Col_Sheet_hour);
-            sheet.Day = conn_kpvl.PGgetvalue(res, l, Col_Sheet_day);
-            sheet.Month = conn_kpvl.PGgetvalue(res, l, Col_Sheet_month);
             sheet.Year = conn_kpvl.PGgetvalue(res, l, Col_Sheet_year);
+            sheet.Month = conn_kpvl.PGgetvalue(res, l, Col_Sheet_month);
+            sheet.Day = conn_kpvl.PGgetvalue(res, l, Col_Sheet_day);
+            sheet.Hour = conn_kpvl.PGgetvalue(res, l, Col_Sheet_hour);
             sheet.CassetteNo = conn_kpvl.PGgetvalue(res, l, Col_Sheet_cassetteno);
             sheet.SheetInCassette = conn_kpvl.PGgetvalue(res, l, Col_Sheet_sheetincassette);
 
-            sheet.Start_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_start_at));
             sheet.TimeForPlateHeat = conn_kpvl.PGgetvalue(res, l, Col_Sheet_timeforplateheat);
             sheet.PresToStartComp = conn_kpvl.PGgetvalue(res, l, Col_Sheet_prestostartcomp);
             sheet.Temperature = conn_kpvl.PGgetvalue(res, l, Col_Sheet_temperature);
-            sheet.Correct = conn_kpvl.PGgetvalue(res, l, Col_Sheet_correct);
+
+            sheet.Correct = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_correct));
             sheet.Pdf = conn_kpvl.PGgetvalue(res, l, Col_Sheet_pdf);
-            sheet.SecondPos_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_SecondPos_at));
-            sheet.Delete_at = GetStringData(conn_kpvl.PGgetvalue(res, l, Col_Sheet_Delete_at));
             
             AllSheet.push_back(sheet);
             AddHistoriSheet(false);
@@ -951,8 +962,9 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::DataTime_End, GetDataTimeStr(p.DataTime_End).c_str());
                 ELSEIF (casSheet::DataTime_All, p.DataTime_All.c_str());
 
-                //ELSEIF (casSheet::Zone,             NameZone[atoi(p.Zone.c_str())]);
 #ifdef _DEBUG
+                ELSEIF (casSheet::InCant_at, GetDataTimeStr(p.InCant_at).c_str());
+                ELSEIF (casSheet::Cant_at, GetDataTimeStr(p.Cant_at).c_str());
                 ELSEIF (casSheet::Delete_at, GetDataTimeStr(p.Delete_at).c_str());
 #endif
                 else if(subItem == casSheet::Pos) lstrcpyA(plvdi->item.pszText, NamePos[p.Pos].c_str());

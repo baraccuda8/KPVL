@@ -124,6 +124,8 @@ typedef struct TSheet{
     std::string Correct = "";           //Время корректировки
     std::string Pdf = "";               //Путь к файлу PDF
     std::string SecondPos_at = "";      //Время прехода во вторую зону
+    std::string InCant_at = "";
+    std::string Cant_at = "";
     std::string Delete_at = "";
     TSheet()
     {
@@ -149,13 +151,15 @@ namespace casSheet{
         DataTime = 2,
         Start_at, 
         SecondPos_at, 
-        //Zone,
-        Pos,
-#ifdef _DEBUG
-        Delete_at, 
-#endif
-        News,
         DataTime_End,
+        //Zone,
+#ifdef _DEBUG
+        InCant_at,
+        Cant_at,
+        Delete_at,
+#endif
+        Pos,
+        News,
         DataTime_All,
 
         TimeForPlateHeat, //Время сигнализации окончания нагрева, мин
