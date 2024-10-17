@@ -20,6 +20,18 @@
 
 #define SAWEDEBUG
 
+#define AllLogger "All Log"
+#define AllLogger_Rem (std::string(AllLogger) + ".log").c_str()
+
+
+//Структура заголовков колонок окон ListBox
+typedef struct {
+    std::string title;
+    ULONG cx;
+}ListTitle;
+
+
+
 extern std::string MyName;
 //Перечисление фонтов от 6 до 16
 enum emFont {
@@ -48,7 +60,6 @@ LRESULT AddItem(HWND hwndSheet, bool begin = TRUE);
 
 void CheckDir(std::string dir);
 
-BOOL DataTimeOfString(std::string str, std::string format, std::tm& TM);
 
 BOOL CenterWindow(HWND hwndChild, HWND hwndParent);
 
@@ -61,6 +72,8 @@ extern HWND MidiClientWindow;
 extern std::string CurrentDirPatch;
 extern std::string strPatchFileName;
 extern std::string FullAllDebugLog;
+
+#pragma region Region HBRUSH
 
 //Черная заливка
 extern HBRUSH TitleBrush0;
@@ -106,11 +119,15 @@ extern HBRUSH TitleBrush13;
 
 //extern COLORREF m_clrText;
 //extern COLORREF m_clrTextBk;
+#pragma endregion
 
 
 #define ELSEIF(_s, _d) else if(subItem == _s) lstrcpy(plvdi->item.pszText, _d)
 
 void DisplayContextMenu(HWND hwnd, int ID);
+LRESULT OnPaintHeadListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+LRESULT OnHeader_Layout(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData);
+
 
 namespace LISTPAINT{
     enum TItemRectType2{
@@ -134,34 +151,40 @@ namespace LISTPAINT{
 extern LRESULT OldSubProc;
 LRESULT APIENTRY SubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-inline int Stoi(std::string input)
-{
-    std::optional<int> out = 0;
-    try
-    {
-        return std::stoi(input);
-    }
-    catch(...)
-    {
-    }
-    return 0;
-}
-
-inline float Stof(std::string input)
-{
-    try
-    {
-        return std::stof(input);
-    }
-    catch(...)
-    {
-    }
-    return 0.0f;
-}
-
-std::string GetDataTimeString();
-std::string GetDataTimeStr(std::string str);
-std::string GetDataTimeStr2(std::string str);
-
-std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime);
+//inline int Stoi(std::string input)
+//{
+//    std::optional<int> out = 0;
+//    try
+//    {
+//        return std::stoi(input);
+//    }
+//    catch(...)
+//    {
+//    }
+//    return 0;
+//}
+//
+//inline float Stof(std::string input)
+//{
+//    try
+//    {
+//        return std::stof(input);
+//    }
+//    catch(...)
+//    {
+//    }
+//    return 0.0f;
+//}
+//
+//std::string GetDataTimeString();
+//std::string GetDataTimeStr(std::string str);
+//std::string GetDataTimeStr2(std::string str);
+//
+//time_t DataTimeOfString(std::string str, std::tm& TM);
+//time_t DataTimeOfString(std::string str);
+//
+//time_t DataTimeDiff(std::string str1, std::string str2);
+//
+//std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime);
+//BOOL DataTimeOfString(std::string str, std::string format, std::tm& TM);
 

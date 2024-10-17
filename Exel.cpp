@@ -1,7 +1,8 @@
 #include "pch.h"
+#include "main.h"
+#include "StringData.h"
 #include "file.h"
 
-#include "main.h"
 #include "Calendar.h"
 #include "file.h"
 #include "Cassette.h"
@@ -21,7 +22,7 @@
 #define FSTART std::string(std::string("-->") + std::string(__FUNCTION__) + " ")
 #define TSTOP (std::string(__FUNCTION__) + " ")
 
-#define CATCH(_s) catch(std::exception& exc){SendDebug(std::string((_s)) + exc.what());}catch(...){SendDebug(std::string((_s)) + "Unknown error");}
+//#define CATCH(_s) catch(std::exception& exc){SendDebug(std::string((_s)) + exc.what());}catch(...){SendDebug(std::string((_s)) + "Unknown error");}
 
 
 const char* NameKey = "ERICK RUBEN GONZALEZ BELTRAN";

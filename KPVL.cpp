@@ -1,13 +1,7 @@
 ﻿#include "pch.h"
-#include <iostream>
-
-#include <strsafe.h>
-
-#include <direct.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "main.h"
+#include "StringData.h"
+
 #include "Calendar.h"
 
 #include "Cassette.h"
@@ -16,7 +10,6 @@
 #include "SQL.h"
 #include "OnLine.h"
 #include "GdiPlusInit.h"
-#include <gdiplusimagecodec.h>
 
 GUID guidBmp ={};
 GUID guidJpeg ={};
@@ -272,6 +265,7 @@ std::map<emFont, HFONT> Font;
 std::map<int, MYHICON>Icon;
 
 
+#pragma region Region HBRUSH
 //темносиняя заливка
 HBRUSH TitleBrush4 = CreateSolidBrush(RGB(0, 99, 177));
 
@@ -319,7 +313,7 @@ HBRUSH TitleBrush11 = CreateSolidBrush(RGB(224, 0, 0));
 
 //COLORREF m_clrText = 0x00FFFFFF; // (COLORREF)GetStockObject(WHITE_BRUSH);
 //COLORREF m_clrTextBk = (COLORREF)GetStockObject(LTGRAY_BRUSH);
-
+#pragma endregion
 
 HRESULT GetGdiplusEncoderClsid(const std::wstring& format, GUID* pGuid)
 {
@@ -409,10 +403,6 @@ void InitFont()
 }
 
 namespace LISTPAINT{
-
-    
-
-
     LPCTSTR MakeShortString(HDC hdc, LPCTSTR lpszLong, int nColumnLen, int nOffset)
     {
         static TCHAR szThreeDots[]="...";
@@ -525,130 +515,213 @@ namespace LISTPAINT{
 
 };
 
-std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime)
+//std::string GetDataTimeStr(std::string str, std::string& outDate, std::string& outTime)
+//{
+//    outDate = "";
+//    outTime = "";
+//    boost::regex xRegEx("^(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}:\\d{2}:\\d{2}).*");
+//    boost::match_results<std::string::const_iterator>what;
+//    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
+//    if(what.size() > 4)
+//    {
+//        std::string year = what[1].str();
+//        std::string month = what[2].str();
+//        std::string day = what[3].str();
+//        if(what[4].length())
+//            outTime = what[4].str();
+//        if(day.length() && month.length() && year.length())
+//            outDate = day + "-" + month + "-" + year;
+//    }
+//    if(outDate.length() && outTime.length())
+//        return outDate + " " + outTime;
+//    else
+//    {
+//        if(outDate.length())
+//        {
+//            return outDate;
+//        }
+//        else
+//        {
+//            if(outTime.length())
+//            {
+//                outTime;
+//            }
+//        }
+//    }
+//    return "";
+//}
+//std::string GetDataTimeString()
+//{
+//    std::time_t st = time(NULL);
+//    tm curr_tm;
+//    localtime_s(&curr_tm, &st);
+//
+//    std::stringstream sdt;
+//    sdt << boost::format("%|04|-") % (curr_tm.tm_year + 1900);
+//    sdt << boost::format("%|02|-") % (curr_tm.tm_mon + 1);
+//    sdt << boost::format("%|02| ") % curr_tm.tm_mday;
+//    sdt << boost::format("%|02|:") % curr_tm.tm_hour;
+//    sdt << boost::format("%|02|:") % curr_tm.tm_min;
+//    sdt << boost::format("%|02|") % curr_tm.tm_sec;
+//    return sdt.str();
+//}
+//time_t DataTimeOfString(std::string str, std::tm& TM)
+//{
+//    try
+//    {
+//        TM.tm_year = 0; TM.tm_mon = 0; TM.tm_mday = 0; TM.tm_hour = 0; TM.tm_min = 0; TM.tm_sec = 0;
+//        std::string::const_iterator start = str.begin();
+//        std::string::const_iterator end = str.end();
+//        boost::match_results<std::string::const_iterator> what;
+//        boost::regex xRegEx;
+//
+//        xRegEx = FORMATTIME1;
+//        if(boost::regex_search(start, end, what, xRegEx, boost::match_default) && what.size() > 6)
+//        {
+//            TM.tm_year = Stoi(what[1]);
+//            TM.tm_mon = Stoi(what[2]);
+//            TM.tm_mday = Stoi(what[3]);
+//            TM.tm_hour = Stoi(what[4]);
+//            TM.tm_min = Stoi(what[5]);
+//            TM.tm_sec = Stoi(what[6]);
+//
+//            std::tm tm = TM;
+//            tm.tm_year -= 1900;
+//            tm.tm_mon -= 1;
+//            return mktime(&tm);
+//        }
+//        else
+//        {
+//            xRegEx = FORMATTIME2;
+//            if(boost::regex_search(start, end, what, xRegEx, boost::match_default))
+//            {
+//                TM.tm_mday = Stoi(what[1]);
+//                TM.tm_mon = Stoi(what[2]);
+//                TM.tm_year = Stoi(what[3]);
+//                TM.tm_hour = Stoi(what[4]);
+//                TM.tm_min = Stoi(what[5]);
+//                TM.tm_sec = Stoi(what[6]);
+//
+//                std::tm tm = TM;
+//                tm.tm_year -= 1900;
+//                tm.tm_mon -= 1;
+//                return mktime(&tm);
+//            }
+//        }
+//    }
+//    catch(...) {}
+//
+//    return 0;
+//}
+//time_t DataTimeOfString(std::string str)
+//{
+//    try
+//    {
+//        std::string::const_iterator start = str.begin();
+//        std::string::const_iterator end = str.end();
+//        boost::match_results<std::string::const_iterator> what;
+//        boost::regex xRegEx;
+//
+//        xRegEx = FORMATTIME1;
+//        if(boost::regex_search(start, end, what, xRegEx, boost::match_default) && what.size() > 6)
+//        {
+//            std::tm TM;
+//            TM.tm_year = Stoi(what[1]) - 1900;
+//            TM.tm_mon = Stoi(what[2]) - 1;
+//            TM.tm_mday = Stoi(what[3]);
+//            TM.tm_hour = Stoi(what[4]);
+//            TM.tm_min = Stoi(what[5]);
+//            TM.tm_sec = Stoi(what[6]);
+//            return mktime(&TM);
+//        }
+//        else
+//        {
+//            xRegEx = FORMATTIME2;
+//            if(boost::regex_search(start, end, what, xRegEx, boost::match_default) && what.size() > 6)
+//            {
+//                std::tm TM;
+//                TM.tm_mday = Stoi(what[1]);
+//                TM.tm_mon = Stoi(what[2]) - 1;
+//                TM.tm_year = Stoi(what[3]) - 1900;
+//                TM.tm_hour = Stoi(what[4]);
+//                TM.tm_min = Stoi(what[5]);
+//                TM.tm_sec = Stoi(what[6]);
+//                return mktime(&TM);
+//            }
+//        }
+//    }
+//    catch(...) {}
+//
+//    return 0;
+//}
+//time_t DataTimeDiff(std::string str1, std::string str2)
+//{
+//    time_t tm1 = DataTimeOfString(str1);
+//    time_t tm2 = DataTimeOfString(str2);
+//    return (time_t)difftime(tm1, tm2);
+//}
+
+
+//Рисуем заголовок ListBox
+LRESULT OnPaintHeadListView(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
-    outDate = "";
-    outTime = "";
-    boost::regex xRegEx("^(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}:\\d{2}:\\d{2}).*");
-    boost::match_results<std::string::const_iterator>what;
-    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
-    if(what.size() > 4)
+    PAINTSTRUCT ps;
+    HDC hDC = BeginPaint(hWnd, &ps);
+    char szBuff[256] = "";
+    int count = (int)SendMessageA(hWnd, HDM_GETITEMCOUNT, 0, 0L);
+    SelectObject(hDC, TitleBrush1);
+    HFONT oldfont = (HFONT)SelectObject(hDC, Font[emFont::Font10]);
+    SetTextColor(hDC, RGB(0, 0, 0));
+    SetBkMode(hDC, TRANSPARENT);
+
+    for(int i= 0; i < count; i++)
     {
-        std::string year = what[1].str();
-        std::string month = what[2].str();
-        std::string day = what[3].str();
-        if(what[4].length())
-            outTime = what[4].str();
-        if(day.length() && month.length() && year.length())
-            outDate = day + "-" + month + "-" + year;
+        SIZE siz;
+        HDITEM hi ={0};
+        RECT rcItem ={0};
+        hi.mask = HDI_TEXT;
+        hi.pszText = szBuff;
+        hi.cchTextMax = 255;
+        Header_GetItem(hWnd, i, &hi);
+        Header_GetItemRect(hWnd, i, &rcItem);
+
+        FillRect(hDC, &rcItem, TitleBrush2);
+        //rcItem.left +=1;
+        rcItem.left+=1;
+        FillRect(hDC, &rcItem, TitleBrush4);
+        FrameRect(hDC, &rcItem, TitleBrush0);
+
+        SetTextColor(hDC, RGB(255, 255, 255));
+        SetBkMode(hDC, TRANSPARENT);
+
+        GetTextExtentPoint32A(hDC, szBuff, (int)strlen(szBuff), &siz);
+        char* s = szBuff;
+        int coco = 1;
+        while(s && *s) { if(*(s++) == '\n')coco++; }
+        coco *= siz.cy / 2;
+        int y = (rcItem.bottom - rcItem.top) / 2;
+        rcItem.top = y - coco;
+        rcItem.bottom = y + coco;
+        DrawTextA(hDC, szBuff, -1, &rcItem, DT_CENTER | DT_WORDBREAK | DT_VCENTER);
     }
-    if(outDate.length() && outTime.length())
-        return outDate + " " + outTime;
-    else
-    {
-        if(outDate.length())
-        {
-            return outDate;
-        }
-        else
-        {
-            if(outTime.length())
-            {
-                outTime;
-            }
-        }
-    }
-    return "";
+    SelectObject(hDC, oldfont);
+    EndPaint(hWnd, &ps);
+    return 1;
 }
 
-std::string GetDataTimeStr(std::string str)
+//Устанавливаем высоту заголовка ListBox
+LRESULT OnHeader_Layout(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR dwRefData)
 {
-    std::string outDate = "";
-    std::string outTime = "";
-    boost::regex xRegEx("^(\\d{4})-(\\d{2})-(\\d{2}) (\\d{2}:\\d{2}:\\d{2}).*");
-    boost::match_results<std::string::const_iterator>what;
-    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
-    if(what.size() > 4)
-    {
-        std::string year = what[1].str();
-        std::string month = what[2].str();
-        std::string day = what[3].str();
-        if(what[4].length())
-            outTime = what[4].str();
-        if(day.length() && month.length() && year.length())
-            outDate = day + "-" + month + "-" + year;
-    }
-    if(outDate.length() && outTime.length())
-        return outDate + " " + outTime;
-    else
-    {
-        if(outDate.length())
-        {
-            return outDate;
-        }
-        else
-        {
-            if(outTime.length())
-            {
-                outTime;
-            }
-        }
-    }
-    return "";
+    HDLAYOUT* hl = (HDLAYOUT*)lParam;
+    LRESULT  ret = DefSubclassProc(hWnd, message, wParam, lParam);
+
+    //hl->pwpos->flags = 0x00000014; //SWP_NOZORDER | SWP_NOACTIVATE
+    hl->pwpos->cy = (int)dwRefData;
+    hl->prc->top = (int)dwRefData;
+
+    return ret;
 }
 
-
-std::string GetDataTimeStr2(std::string str)
-{
-    std::string outDate = "";
-    std::string outTime = "";
-    boost::regex xRegEx("^(\\d{2})-(\\d{2})-(\\d{4}) (\\d{2}:\\d{2}:\\d{2}).*");
-    boost::match_results<std::string::const_iterator>what;
-    boost::regex_search(str, what, xRegEx, boost::match_default) && what.size();
-    if(what.size() > 4)
-    {
-        std::string year = what[3].str();
-        std::string month = what[2].str();
-        std::string day = what[1].str();
-        if(what[4].length())
-            outTime = what[4].str();
-        if(day.length() && month.length() && year.length())
-            outDate = year + "-" + month + "-" + day;
-    }
-    if(outDate.length() && outTime.length())
-        return outDate + " " + outTime;
-    else
-    {
-        if(outDate.length())
-        {
-            return outDate;
-        }
-        else
-        {
-            if(outTime.length())
-            {
-                outTime;
-            }
-        }
-    }
-    return "";
-}
-
-std::string GetDataTimeString()
-{
-    std::time_t st = time(NULL);
-    tm curr_tm;
-    localtime_s(&curr_tm, &st);
-
-    std::stringstream sdt;
-    sdt << boost::format("%|04|-") % (curr_tm.tm_year + 1900);
-    sdt << boost::format("%|02|-") % (curr_tm.tm_mon + 1);
-    sdt << boost::format("%|02| ") % curr_tm.tm_mday;
-    sdt << boost::format("%|02|:") % curr_tm.tm_hour;
-    sdt << boost::format("%|02|:") % curr_tm.tm_min;
-    sdt << boost::format("%|02|") % curr_tm.tm_sec;
-    return sdt.str();
-}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -778,7 +851,7 @@ int WinErrorExit(HWND hWnd, const char* lpszFunction)
     StringCchPrintf((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), TEXT("%s\r\nfailed with error %d:\r\n%s"), lpszFunction, dw, (LPTSTR)lpMsgBuf);
 
     //if(MainLogger) MainLogger->error(std::string((char*)lpDisplayBuf));
-    MessageBox(hWnd, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
+    MessageBox(hWnd, (LPCTSTR)lpDisplayBuf, "Error", MB_OK | MB_SYSTEMMODAL | MB_ICONERROR);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
@@ -962,7 +1035,6 @@ void ClosePid();
 //
 //}
 
-
 void CurrentDir()
 {
     char ss[256] = "";
@@ -1006,6 +1078,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
     {
         SendDebug("wWinMain", "Start KPVL");
         hInstance = hInst; // Сохранить маркер экземпляра в глобальной переменной
+        remove(AllLogger_Rem);
 
         if(!hInstance)
             throw std::runtime_error((FUNCTION_LINE_NAME + std::string("Ошибка запуска программы : hInstance = NULL")).c_str());

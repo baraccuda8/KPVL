@@ -58,6 +58,10 @@
 typedef struct TSheet{
 
     bool Edit = false;
+    time_t diff = 0;
+    std::string Diff = "";
+    std::string Cassette = "";          //ИД связанной касеты
+        
     std::string id = "";                //Уникальный номер
     std::string DataTime = "";          //Дата, время создание листа
     std::string Start_at = "";          //Дата, время загрузки листа в закалочную печь
@@ -147,8 +151,9 @@ typedef struct TSheet{
 namespace casSheet{
     enum cas{
         NN = 0,
-        ID = 1,
-        DataTime = 2,
+        Cassette = 1,
+        ID,
+        DataTime,
         Start_at, 
         SecondPos_at, 
         DataTime_End,
@@ -156,6 +161,9 @@ namespace casSheet{
 #ifdef _DEBUG
         InCant_at,
         Cant_at,
+        Correct,
+        Diff,
+        Pdf,
         Delete_at,
 #endif
         Pos,
@@ -193,7 +201,6 @@ namespace casSheet{
         LamPressBot,
         PosClapanTop,
         PosClapanBot,
-        Mask,
 
         Lam1PosClapanTop,
         Lam1PosClapanBot,
@@ -202,12 +209,8 @@ namespace casSheet{
 
         Lam_TE1,
 
-        //Year,
-        //Month,
-        //Day,
-        //Hour,
-        //CassetteNo,
-        //SheetInCassette,
+#ifndef _DEBUG
+        Mask,
 
         Top1,
         Top2,
@@ -226,8 +229,7 @@ namespace casSheet{
         Bot6,
         Bot7,
         Bot8,
-        Correct,
-        Pdf,
+#endif
     };
 };
 
@@ -303,12 +305,19 @@ namespace cas{
 extern std::deque<TSheet>AllSheet;
 extern HWND SheetWindow;
 
+extern std::string strYear;
+extern std::string strMonth;
+extern std::string strDay;
+extern std::string strHour;
+extern std::string strCassetteNo;
+
+
 void SheetInitApplication();
 void SheetInitInstance();
 
 //void FilterIDCasseteSheet(TCassette& p);
 //void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);
-void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strhour, int strcassetteno);
+void FilterIDCasseteSheet();
 
 //Номер колонки в таблице листов
 #pragma region //Номер колонки в таблице листов

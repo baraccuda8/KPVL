@@ -64,9 +64,6 @@ enum Cassete{
     Id,
     Event,
     Create_at,
-#ifdef _DEBUG
-    //Close_at,
-#endif
     Year,
     Month,
     Day,
@@ -78,13 +75,13 @@ enum Cassete{
 #ifdef _DEBUG
     End_at,
 #endif
+
     Finish_at,
-    //Error_at,
-#ifdef _DEBUG
     Delete_at,
+#ifdef _DEBUG
     Correct,
     Pdf,
-    Return_at,
+    //Return_at,
 #endif
     PointRef_1,     //Уставка температуры
     FactTemper,       //Факт температуры за 5 минут до конца отпуска
@@ -127,6 +124,13 @@ typedef struct TCassette{
     std::string Return_at = "";             //Вернули в список
 }TCassette;
 
+
+
+extern std::deque<TCassette>AllCassette;
+void CassetteInitApplication();
+void CassetteInitInstance();
+
+
 namespace cas4{
     enum {
         DataTime = 0,
@@ -141,7 +145,7 @@ namespace cas4{
         Error,
         End,
         Delete,
-        Return_at,
+        //Return_at,
         Peth,
         //TempRef,      //Заданное значение температуры
         PointTime_1,    //Время разгона
@@ -152,8 +156,3 @@ namespace cas4{
 
     };
 };
-
-
-extern std::deque<TCassette>AllCassette;
-void CassetteInitApplication();
-void CassetteInitInstance();

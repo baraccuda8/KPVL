@@ -210,6 +210,7 @@ time /T &gt;&gt;date.txt
     <ClCompile Include="Pdf.cpp" />
     <ClCompile Include="Sheet.cpp" />
     <ClCompile Include="SQL.cpp" />
+    <ClCompile Include="StringData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Calendar.h" />
@@ -226,6 +227,7 @@ time /T &gt;&gt;date.txt
     <ClInclude Include="Service.h" />
     <ClInclude Include="Sheet.h" />
     <ClInclude Include="SQL.h" />
+    <ClInclude Include="StringData.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KPVL.rc" />

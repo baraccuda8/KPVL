@@ -1,37 +1,31 @@
 #include "pch.h"
-#include <setjmp.h>
 
-//#include "win.h"
+
 #include "main.h"
+#include "StringData.h"
+
+
 #include "file.h"
-//#include "ClCodeSys.h"
 #include "Sheet.h"
 #include "Cassette.h"
 #include "SQL.h"
 #include "Pdf.h"
-//#include "ValueTag.h"
-//#include "term.h"
-//#include "hard.h"
-//#include "KPVL.h"
-//#include "Furn.h"
-//#include "Graff.h"
 
 #include "hpdf.h"
 #include "Pdf.h"
-#define AllLogger "AllLogger"
+//#define AllLogger "AllLogger"
 
-#define LOG_ERROR(_l, _s)\
-{\
-    SendDebug(_l, _s);\
-}
+//#define LOG_ERROR(_l, _s)\
+//{\
+//    SendDebug(_l, _s);\
+//}
 
-#define CATCH(_l, _s) catch(std::runtime_error& exc)LOG_ERROR(_l, _s + exc.what()) catch(...)LOG_ERROR(_l, _s + "Unknown error")
+//#define CATCH(_l, _s) catch(std::runtime_error& exc)LOG_ERROR(_l, _s + exc.what()) catch(...)LOG_ERROR(_l, _s + "Unknown error")
 
 const char* tempImage = "t_kpvl.jpg";
 const char* furnImage = "t_furn.jpg";
 
 std::string lpLogPdf = "Pdf";
-std::string FORMATTIME = "(\\d{1,4}).(\\d{1,2}).(\\d{1,2}) (\\d{1,2}):(\\d{1,2}):(\\d{1,2})";
 
 extern Gdiplus::Font font1;
 extern Gdiplus::Font font2;
@@ -65,7 +59,7 @@ void error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data)
 {
 	//printf ("ERROR: error_no=%04X, detail_no=%u\n", (HPDF_UINT)error_no, (HPDF_UINT)detail_no);
 	std::string ss = "ERROR: " + FUNCTION_LINE_NAME + ", error_no = " + std::to_string(error_no) + ", detail_no = " + std::to_string(detail_no);
-	LOG_ERROR(AllLogger, ss);
+	LOG_ERROR(AllLogger, ss, "");
 	//longjmp(env, 1);
 }
 
@@ -274,7 +268,7 @@ void PdfClass::GetSheet()
 		}
 	}CATCH(AllLogger, FUNCTION_LINE_NAME);
 #ifdef SAWEDEBUG 
-	SendDebug(">>TEST", FUNCTION_LINE_NAME);
+	//SendDebug(">>TEST", FUNCTION_LINE_NAME);
 #endif
 }
 
@@ -322,7 +316,7 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, in
 				int64_t t = 0;
 
 				float f = static_cast<float>(atof(conn.PGgetvalue(res, 0, 1).c_str()));
-				DataTimeOfString(Start, FORMATTIME, TM_Temp);
+				DataTimeOfString(Start, TM_Temp);
 				TM_Temp.tm_year -= 1900;
 				TM_Temp.tm_mon -= 1;
 				tr[Start] = std::pair(mktime(&TM_Temp), f);
@@ -335,7 +329,7 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, in
 					if(Start <= sData)
 					{
 						std::string sTemp = conn.PGgetvalue(res, l, 1);
-						DataTimeOfString(sData, FORMATTIME, TM_Temp);
+						DataTimeOfString(sData, TM_Temp);
 						TM_Temp.tm_year -= 1900;
 						TM_Temp.tm_mon -= 1;
 
@@ -346,7 +340,7 @@ void PdfClass::GetTempRef(std::string Start, std::string Stop, T_SqlTemp& tr, in
 				}
 
 
-				DataTimeOfString(Stop, FORMATTIME, TM_Temp);
+				DataTimeOfString(Stop, TM_Temp);
 				TM_Temp.tm_year -= 1900;
 				TM_Temp.tm_mon -= 1;
 				tr[Stop] = std::pair(mktime(&TM_Temp), f);
@@ -424,7 +418,7 @@ void PdfClass::SqlTempActKPVL(T_SqlTemp& tr)
 								if(SrTemp == 0.0f)SrTemp = f;
 								else SrTemp = (SrTemp + f) / 2.0f;
 
-								DataTimeOfString(sData, FORMATTIME, TM_Temp);
+								DataTimeOfString(sData, TM_Temp);
 								TM_Temp.tm_year -= 1900;
 								TM_Temp.tm_mon -= 1;
 								tr[sData] = std::pair(mktime(&TM_Temp), f);
@@ -441,9 +435,9 @@ void PdfClass::SqlTempActKPVL(T_SqlTemp& tr)
 		std::ostringstream oss;
 		oss << std::setprecision(1) << std::fixed << SrTemp;
 		strSrTemp = oss.str();
-	}CATCH(AllLogger, FUNCTION_LINE_NAME);
+	}CATCH(AllLogger, "");
 #ifdef SAWEDEBUG 
-	SendDebug(">>TEST", FUNCTION_LINE_NAME);
+	//SendDebug(">>TEST", FUNCTION_LINE_NAME);
 #endif
 }
 
@@ -813,7 +807,7 @@ bool PdfClass::NewPdf()
 	//pdf = HPDF_New (NULL, NULL); // error_handler, NULL);
 	if(!pdf)
 	{
-		LOG_ERROR(AllLogger, "Error HPDF_New");
+		LOG_ERROR(AllLogger, "Error HPDF_New", "");
 		return false; //throw std::exception(__FUN(std::string("error: cannot create PdfDoc object")));
 	}
 

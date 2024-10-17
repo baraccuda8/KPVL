@@ -1,6 +1,6 @@
 #pragma once
 
-#define errordata "Не правильно наюрана дата"
+#define errordata "Не правильно набрана дата\n"
 
 bool TestData(std::string sd);
 

@@ -6,10 +6,10 @@
 //#include "resource.h"
 #define SQLLogger "SQLLogger"
 
-#define LOG_ERR_SQL(_l, _r, _c){\
-    SendDebug(_l, _c);\
-    SendDebug(_l, utf8_to_cp1251(PQresultErrorMessage(_r)));\
-}
+//#define LOG_ERR_SQL(_l, _r, _c){\
+//    SendDebug(_l, _c);\
+//    SendDebug(_l, utf8_to_cp1251(PQresultErrorMessage(_r)));\
+//}
 
 #define SETUPDATESQL(_c, _s){\
     std::string _comand = _s.str(); \
