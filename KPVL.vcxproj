@@ -234,7 +234,9 @@ time /T &gt;&gt;date.txt
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
+    <Image Include="icon2.ico" />
     <Image Include="IDI_ICON1.ICO" />
+    <Image Include="IDI_ICON2.ICO" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dat2.bin" />

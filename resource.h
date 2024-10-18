@@ -17,6 +17,7 @@
 #define IDD_ABOUTBOX                    120
 #define IDR_DAT2                        123
 #define IDR_TXT1                        125
+#define IDI_ICON2                       128
 #define IDC_EDIT1                       1001
 #define IDC_EDIT2                       1002
 #define IDC_EDIT3                       1003
@@ -93,7 +94,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        126
+#define _APS_NEXT_RESOURCE_VALUE        129
 #define _APS_NEXT_COMMAND_VALUE         40027
 #define _APS_NEXT_CONTROL_VALUE         1041
 #define _APS_NEXT_SYMED_VALUE           101

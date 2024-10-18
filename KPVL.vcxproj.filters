@@ -114,6 +114,12 @@
     <Image Include="IDI_ICON1.ICO">
       <Filter>Файлы ресурсов</Filter>
     </Image>
+    <Image Include="icon2.ico">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
+    <Image Include="IDI_ICON2.ICO">
+      <Filter>Файлы ресурсов</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="параметры для хранения.xlsx">

@@ -734,8 +734,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 void InitInstance()
 {
     szTitle += " '" + m_dbhost + "'";
-
+#ifdef _DEBUG
+    GlobalWindow = CreateWindowExA(0, szWindowClass0.c_str(), (szTitle + " Debug").c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+#else
     GlobalWindow = CreateWindowExA(0, szWindowClass0.c_str(), szTitle.c_str(), WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_CLIPSIBLINGS, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, NULL, NULL, hInstance, NULL);
+#endif // _DEBUG
 
     if(!GlobalWindow)
         throw std::exception(std::string("Ошибка создания окна : " + szWindowClass0).c_str());
@@ -832,9 +835,13 @@ void MyRegisterClass()
     cex0.hbrBackground  = (HBRUSH)(CTLCOLOR_DLG + 1);
     cex0.lpszMenuName   = MAKEINTRESOURCE(IDR_MENU1);
     cex0.lpszClassName  = szWindowClass0.c_str();
+#ifdef _DEBUG
+    cex0.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
+    cex0.hIconSm        = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
+#else
     cex0.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
     cex0.hIconSm        = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-
+#endif // _DEBUG
     if(cex0.hInstance && !RegisterClassExA(&cex0))
         throw std::exception("Ошибка регистрации класса окна cex0:");
 }
