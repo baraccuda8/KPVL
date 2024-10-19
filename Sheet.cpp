@@ -449,7 +449,7 @@ void GetSheet(PGresult* res, TSheet& sheet, int l)
 std::string Old_Start_at = "";
 void GetDiftDatd(TSheet& sheet)
 {
-    if(Old_Start_at.length())
+    if(!sheet.Diff.length() && Old_Start_at.length())
     {
         if(Old_Start_at > sheet.Start_at)
             sheet.diff = DataTimeDiff(Old_Start_at, sheet.Start_at);
@@ -459,50 +459,53 @@ void GetDiftDatd(TSheet& sheet)
         std::tm TM;
 
         gmtime_s(&TM, &sheet.diff);
-        sheet.Diff = GetDataTimeString(TM);
+        //sheet.Diff = GetDataTimeString(TM);
 
-        //std::stringstream ss;
-        //ss << std::setw(2) << std::setfill('0') << (TM.tm_year - 70) << "-";
-        //ss << std::setw(2) << std::setfill('0') << (TM.tm_mon - 0) << "-";
-        //ss << std::setw(2) << std::setfill('0') << (TM.tm_mday - 1) << " ";
-        //ss << std::setw(2) << std::setfill('0') << TM.tm_hour << ":";
-        //ss << std::setw(2) << std::setfill('0') << TM.tm_min << ":";
-        //ss << std::setw(2) << std::setfill('0') << TM.tm_sec;
-        //std::string sd = ss.str();
-        //sheet.Diff = sd;
+        std::stringstream ss;
+        ss << std::setw(2) << std::setfill('0') << (TM.tm_year - 70) << "-";
+        ss << std::setw(2) << std::setfill('0') << (TM.tm_mon - 0) << "-";
+        ss << std::setw(2) << std::setfill('0') << (TM.tm_mday - 1) << " ";
+        ss << std::setw(2) << std::setfill('0') << TM.tm_hour << ":";
+        ss << std::setw(2) << std::setfill('0') << TM.tm_min << ":";
+        ss << std::setw(2) << std::setfill('0') << TM.tm_sec;
+        std::string sd = ss.str();
+        sheet.Diff = sd;
     }
     Old_Start_at = sheet.Start_at;
 }
 
+void GetCassetteId(TSheet& a)
+{
+    std::stringstream ssd;
+    ssd << "SELECT id FROM cassette WHERE";
+    ssd << " year = " << a.Year << " AND";
+    ssd << " month = " << a.Month << " AND";
+    ssd << " day = " << a.Day << " AND";
+    if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
+        ssd << " hour = " << a.Hour << " AND";
+    ssd << " cassetteno = " << a.CassetteNo;
+    ssd << " ORDER BY run_at DESC LIMIT 1;";
+    std::string comand = ssd.str();
+    PGresult* res = conn_kpvl.PGexec(comand);
+    if(PQresultStatus(res) == PGRES_TUPLES_OK)
+    {
+        if(PQntuples(res))
+            a.Cassette = conn_kpvl.PGgetvalue(res, 0, 0);
+    }
+    else
+        LOG_ERR_SQL(AllLogger, res, "");
+    PQclear(res);
+}
+
 void GetCasseteId()
 {
+    Old_Start_at = "";
     for(auto& a : AllSheet)
     {
-        Old_Start_at = "";
         GetDiftDatd(a);
         if(!Stoi(a.Cassette) && Stoi(a.Pos) > 6)
         {
-            {
-                std::stringstream ssd;
-                ssd << "SELECT id FROM cassette WHERE";
-                ssd << " year = " << a.Year << " AND";
-                ssd << " month = " << a.Month << " AND";
-                ssd << " day = " << a.Day << " AND";
-                if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
-                    ssd << " hour = " << a.Hour << " AND";
-                ssd << " cassetteno = " << a.CassetteNo;
-                ssd << " ORDER BY run_at DESC LIMIT 1;";
-                std::string comand = ssd.str();
-                PGresult* res = conn_kpvl.PGexec(comand);
-                if(PQresultStatus(res) == PGRES_TUPLES_OK)
-                {
-                    if(PQntuples(res))
-                        a.Cassette = conn_kpvl.PGgetvalue(res, 0, 0);
-                }
-                else
-                    LOG_ERR_SQL(AllLogger, res, "");
-                PQclear(res);
-            }
+            GetCassetteId(a);
             if(Stoi(a.Cassette))
             {
                 std::stringstream ssd;
@@ -595,12 +598,13 @@ void FilterIDCasseteSheet()
 #ifdef _DEBUG
     f << "true ";
 #else
-    f << " delete_at IS NULL AND pdf IS NOT NULL AND pdf <> '' ";
+    f << "delete_at IS NULL ";
 #endif
+    f << "ORDER BY start_at DESC;";
     FilterComand = f.str();
 
     std::stringstream d;
-    DataFilterSheet = "";
+
     if(strYear.length())
         d << "Год = " << Stoi(strYear) << " ";
     if(strMonth.length())
@@ -620,8 +624,6 @@ void FilterIDCasseteSheet()
     //FilterComand += "month = '" + strMonth + "' AND ";
     //FilterComand += "day = '" + strDay + "' AND ";
     //FilterComand += "cassetteno = '" + strCassetteNo + "' ";
-    FilterComand += "ORDER BY start_at DESC";
-    FilterComand += ";";
     FilterSheet();
     
     bFilterData = FALSE;

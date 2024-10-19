@@ -835,12 +835,12 @@ void MyRegisterClass()
     cex0.hbrBackground  = (HBRUSH)(CTLCOLOR_DLG + 1);
     cex0.lpszMenuName   = MAKEINTRESOURCE(IDR_MENU1);
     cex0.lpszClassName  = szWindowClass0.c_str();
-#ifdef _DEBUG
-    cex0.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
-    cex0.hIconSm        = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
-#else
+#ifndef _DEBUG
     cex0.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
-    cex0.hIconSm        = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON1));
+    cex0.hIconSm        = cex0.hIcon;
+#else
+    cex0.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_ICON2));
+    cex0.hIconSm        = cex0.hIcon;
 #endif // _DEBUG
     if(cex0.hInstance && !RegisterClassExA(&cex0))
         throw std::exception("Ошибка регистрации класса окна cex0:");
@@ -1154,7 +1154,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInst, _In_opt_ HINSTANCE hPrevInstance, _I
             while(GetMessage(&msg, nullptr, 0, 0) && msg.message != WM_QUIT)
             {
                 {
-                    if(!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+                    //if(!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
                     {
                         TranslateMessage(&msg);
                         DispatchMessage(&msg);
