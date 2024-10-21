@@ -1590,6 +1590,8 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
         {
             FillRect(lpdis->hDC, &rc, TitleBrush4);
             if(p.Edit)
+                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
+            else if(p.Delete_at.length())
                 clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
             else
                 clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
@@ -1597,6 +1599,8 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
         else
         {
             if(p.Edit)
+                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
+            else if(p.Delete_at.length())
                 clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
 #ifdef _DEBUG
             if(p.diff && p.diff < 60)

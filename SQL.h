@@ -173,6 +173,8 @@ extern T_GenSeqFromHmi GenSeqFromHmi;
 
 extern std::deque<Value*> AllTag;
 
+std::string PGgetvalue(PGresult* res, int l, int i);
+
 class PGConnection
 {
 public:

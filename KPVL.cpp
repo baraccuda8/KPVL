@@ -278,14 +278,11 @@ HBRUSH TitleBrush1 = CreateSolidBrush(RGB(255, 255, 255));
 //синяя заливка
 HBRUSH TitleBrush2 = CreateSolidBrush(RGB(177, 99, 177));
 
-
-
 //Розовая заливка
 HBRUSH TitleBrush3 = CreateSolidBrush(RGB(224, 255, 224));
 
 //синяя заливка
 HBRUSH TitleBrush13 = CreateSolidBrush(RGB(0, 177, 177));
-
 
 //Светло серая заливка
 HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));

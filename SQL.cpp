@@ -23,6 +23,13 @@ std::string m_dbpass = "";
 extern std::map<int, std::string> EventCassette;
 extern std::map<std::string, std::string> NamePos;
 
+std::string PGgetvalue(PGresult* res, int l, int i)
+{
+    std::string ss = PQgetvalue(res, l, i);
+    if(!ss.empty())
+        return utf8_to_cp1251(ss);
+    else return "";
+}
 
 bool PGConnection::Ñonnection(){
     try
@@ -347,6 +354,7 @@ void Test()
                 ssd2 << "UPDATE cassette SET sheetincassette = ";
                     ssd2 << "(SELECT COUNT(*) FROM sheet";
                     ssd2 << " WHERE";
+                    ssd2 << " delete_at IS NULL";
                     ssd2 << " year = '" << year << "' AND";
                     ssd2 << " month = '" << month << "' AND";
                     ssd2 << " day = '" << day << "' AND";
