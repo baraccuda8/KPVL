@@ -119,7 +119,6 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
 
     {casSheet::DataTime_All, { "Время закалки\nмин", L1 }},
     {casSheet::TimeForPlateHeat, { "Задание Время\nокончания нагрева", L2 }},
-    {casSheet::PresToStartComp, { "Задание\nДавления воды", L2 }},
 
     {casSheet::Alloy, { "Марка стали", L1 }},
     {casSheet::Thikness, { "Толщина\nлиста\nмм", L2 }},
@@ -129,9 +128,11 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::Pack, { "Пачка", L0 }},
     {casSheet::Sheet, { "Номер\nлиста", L0 }},
     {casSheet::SubSheet, { "Номер\nпод\nлиста", L0 }},
+
     {casSheet::Temper, { "Заданная\nтемп-ра\nС°", LL2 }},
     {casSheet::Temperature, { "Факт\nтемп-ра\nС°", LL2 }},
     {casSheet::Speed, { "Скорость\nвыдачи\nмм/с", 80 }},
+    {casSheet::PresToStartComp, { "Задание\nДавления воды", L2 }},
     {casSheet::Za_PT3, { "Давление\nводы в баке.\nбар", LL2 }},
     {casSheet::Za_TE3, { "Температура\nводы в баке.\nС°", LL1 }},
     {casSheet::LamPressTop, { "Давление\nв верхнем\nколлекторе", LL2 }},
@@ -157,7 +158,7 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::InCant_at, { "На кантовку", LL0 }},
     {casSheet::Cant_at, { "Кантовка", LL0 }},
     {casSheet::Correct,  { "Correct", LL0 }},
-    {casSheet::Diff,  { "Diff", LL0 }},
+    {casSheet::Diff,  { "Diff", L1 }},
     {casSheet::Pdf,  { "Pdf", LL3 }},
     {casSheet::Delete_at,  { "Удален", LL0 }},
 #else
@@ -462,10 +463,11 @@ void GetDiftDatd(TSheet& sheet)
         //sheet.Diff = GetDataTimeString(TM);
 
         std::stringstream ss;
-        ss << std::setw(2) << std::setfill('0') << (TM.tm_year - 70) << "-";
-        ss << std::setw(2) << std::setfill('0') << (TM.tm_mon - 0) << "-";
-        ss << std::setw(2) << std::setfill('0') << (TM.tm_mday - 1) << " ";
-        ss << std::setw(2) << std::setfill('0') << TM.tm_hour << ":";
+        //ss << std::setw(2) << std::setfill('0') << (TM.tm_year - 70) << "-";
+        //ss << std::setw(2) << std::setfill('0') << (TM.tm_mon - 0) << "-";
+        //ss << std::setw(2) << std::setfill('0') << (TM.tm_mday - 1) << " ";
+
+        ss << std::setw(2) << std::setfill('0') << (TM.tm_hour + (TM.tm_mday - 1) * 24) << ":";
         ss << std::setw(2) << std::setfill('0') << TM.tm_min << ":";
         ss << std::setw(2) << std::setfill('0') << TM.tm_sec;
         std::string sd = ss.str();

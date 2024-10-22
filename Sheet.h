@@ -168,10 +168,9 @@ namespace casSheet{
 #endif
         Pos,
         News,
-        DataTime_All,
 
         TimeForPlateHeat, //Время сигнализации окончания нагрева, мин
-        PresToStartComp,  //Уставка давления для запуска комперссора
+        DataTime_All,
 
         Alloy,
         Thikness,
@@ -194,6 +193,7 @@ namespace casSheet{
         Temperature, 
         Speed,
 
+        PresToStartComp,  //Уставка давления для запуска комперссора
         Za_PT3,
         Za_TE3,
 

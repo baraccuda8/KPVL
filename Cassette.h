@@ -57,13 +57,29 @@ namespace casCassette{
 
     };
 };
+#define _CREATE_AT
+#ifdef _DEBUG
 
-#define END_AT
+    //#define _CLOSE_AT
+    #define _END_AT
+    #define _DELETE_AT
+    //#define _ERROR_AT
+    #define _CORRECT
+    #define _PDF
+    #define _RETURN_AT
+
+#endif // _DEBUG
+
 enum Cassete{
     NN,
     Id,
     Event,
+#ifdef _CREATE_AT
     Create_at,
+#endif
+#ifdef _CLOSE_AT
+    Close_at,
+#endif
     Year,
     Month,
     Day,
@@ -72,17 +88,28 @@ enum Cassete{
     SheetInCassette,
     Peth,
     Run_at,
-#ifdef _DEBUG
+#ifdef _END_AT
     End_at,
 #endif
 
     Finish_at,
+#ifdef _DELETE_AT
     Delete_at,
-#ifdef _DEBUG
-    Correct,
-    Pdf,
-    //Return_at,
 #endif
+#ifdef _ERROR_AT
+    Error_at,
+#endif
+
+#ifdef _CORRECT
+    Correct,
+#endif
+#ifdef _PDF
+    Pdf,
+#endif
+#ifdef _RETURN_AT
+    Return_at,
+#endif
+
     PointRef_1,     //Уставка температуры
     FactTemper,       //Факт температуры за 5 минут до конца отпуска
 
