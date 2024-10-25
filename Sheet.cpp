@@ -400,8 +400,8 @@ void GetSheet(PGresult* res, TSheet& sheet, int l)
     sheet.Za_PT3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_za_pt3);
     sheet.Za_TE3 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_za_te3);
 
-    sheet.LaminPressTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampresstop);
-    sheet.LaminPressBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampressbot);
+    sheet.LamPressTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampresstop);
+    sheet.LamPressBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lampressbot);
     sheet.PosClapanTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_posclapantop);
     sheet.PosClapanBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_posclapanbot);
     sheet.Mask = conn_kpvl.PGgetvalue(res, l, Col_Sheet_mask);
@@ -411,7 +411,7 @@ void GetSheet(PGresult* res, TSheet& sheet, int l)
     sheet.Lam2PosClapanTop = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam2posclapantop);
     sheet.Lam2PosClapanBot = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam2posclapanbot);
 
-    sheet.LAM_TE1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam_te1);
+    sheet.Lam_TE1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_lam_te1);
     sheet.News = conn_kpvl.PGgetvalue(res, l, Col_Sheet_news);
     sheet.Top1 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top1);
     sheet.Top2 = conn_kpvl.PGgetvalue(res, l, Col_Sheet_top2);
@@ -1072,15 +1072,15 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Speed, p.Speed.c_str());
                 ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
                 ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
-                ELSEIF (casSheet::LamPressTop, p.LaminPressTop.c_str());
-                ELSEIF (casSheet::LamPressBot, p.LaminPressBot.c_str());
+                ELSEIF (casSheet::LamPressTop, p.LamPressTop.c_str());
+                ELSEIF (casSheet::LamPressBot, p.LamPressBot.c_str());
                 ELSEIF (casSheet::PosClapanTop, p.PosClapanTop.c_str());
                 ELSEIF (casSheet::PosClapanBot, p.PosClapanBot.c_str());
                 ELSEIF (casSheet::Lam1PosClapanTop, p.Lam1PosClapanTop.c_str());
                 ELSEIF (casSheet::Lam1PosClapanBot, p.Lam1PosClapanBot.c_str());
                 ELSEIF (casSheet::Lam2PosClapanTop, p.Lam2PosClapanTop.c_str());
                 ELSEIF (casSheet::Lam2PosClapanBot, p.Lam2PosClapanBot.c_str());
-                ELSEIF (casSheet::Lam_TE1, p.LAM_TE1.c_str());
+                ELSEIF (casSheet::Lam_TE1, p.Lam_TE1.c_str());
                 ELSEIF (casSheet::News, Stoi(p.News) ? "Да" : "Нет");
 
                 ELSEIF (casSheet::Year, p.Year.c_str());
@@ -1400,6 +1400,159 @@ LRESULT CALLBACK WndProcHeadListViewSheet(HWND hWnd, UINT message, WPARAM wParam
 }
 
 LRESULT OldListSheetSubProc = NULL;
+
+
+std::map <int, std::string>MapCollSheet ={
+    {casSheet::Cassette, "cassette"},
+    {casSheet::DataTime, "datatime"},
+    {casSheet::Start_at, "start_at"},
+    {casSheet::SecondPos_at, "secondpos_at"},
+    {casSheet::DataTime_End, "datatime_end"},
+
+    {casSheet::Pos, "pos"},
+    {casSheet::News, "news"},
+
+    {casSheet::TimeForPlateHeat, "timeforplateheat"},
+    {casSheet::DataTime_All, "datatime_all"},
+
+    //{casSheet::Alloy, "alloy"},
+    //{casSheet::Thikness, "thikness"},
+    //{casSheet::Melt, "melt"},
+    //{casSheet::Slab, "slab"},
+    //{casSheet::PartNo, "partno"},
+    //{casSheet::Pack, "pack"},
+    //{casSheet::Sheet, "sheet"},
+    //{casSheet::SubSheet, "subSheet"},
+
+    {casSheet::Year, "year"},
+    {casSheet::Month, "month"},
+    {casSheet::Day, "day"},
+    {casSheet::Hour, "hour"},
+    {casSheet::CassetteNo, "cassetteno"},
+    {casSheet::SheetInCassette, "sheetincassette"},
+
+
+    {casSheet::Temper, "temper"},
+    {casSheet::Temperature, "temperature"},
+    {casSheet::Speed, "speed"},
+
+    {casSheet::PresToStartComp, "prestostartcomp"},
+    {casSheet::Za_PT3, "za_pt3"},
+    {casSheet::Za_TE3, "za_te3"},
+
+    {casSheet::LamPressTop, "lampresstop"},
+    {casSheet::LamPressBot, "lampressbot"},
+    {casSheet::PosClapanTop, "posclapantop"},
+    {casSheet::PosClapanBot, "posclapanbot"},
+
+    {casSheet::Lam1PosClapanTop, "lam1posclapantop"},
+    {casSheet::Lam1PosClapanBot, "lam1posclapanbot"},
+    {casSheet::Lam2PosClapanTop, "lam2posclapantop"},
+    {casSheet::Lam2PosClapanBot, "lam2posclapanbot"},
+
+    {casSheet::Lam_TE1, ""},
+
+#ifdef _DEBUG
+    {casSheet::InCant_at, "incant_at"},
+    {casSheet::Cant_at, "cant_at"},
+    {casSheet::Correct, "correct"},
+    {casSheet::Pdf, "pdf"},
+    {casSheet::Delete_at, "delete_at"},
+#else
+        {casSheet::Mask, "mask"},
+        {casSheet::Top1, "toot1"},
+        {casSheet::Top2, "toot2"},
+        {casSheet::Top3, "toot3"},
+        {casSheet::Top4, "toot4"},
+        {casSheet::Top5, "toot5"},
+        {casSheet::Top6, "toot6"},
+        {casSheet::Top7, "toot7"},
+        {casSheet::Top8, "toot8"},
+
+        {casSheet::Bot1, "boot1"},
+        {casSheet::Bot2, "boot2"},
+        {casSheet::Bot3, "boot3"},
+        {casSheet::Bot4, "boot4"},
+        {casSheet::Bot5, "boot5"},
+        {casSheet::Bot6, "boot6"},
+        {casSheet::Bot7, "boot7"},
+        {casSheet::Bot8, "boot8"},
+#endif
+};
+
+
+void SaveUpdateSheetLog(std::stringstream& ssd, std::string old)
+{
+    std::fstream fC;
+    fC = std::fstream("UpdateSheetLog.txt", std::fstream::binary | std::fstream::out | std::ios::app);
+    fC << GetDataTimeString() << " [" << MyName << "] (Old = " << old << ") " << ssd.str() << ";" << std::endl;
+    fC.close();
+
+}
+
+
+bool UpdateSheet1(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd)
+{
+    std::stringstream ssd;
+
+    if(vv == ss) return true;
+    if(MapCollSheet[upd].length())
+    {
+        std::string old = vv;
+        vv = ss;
+        if(!ss.length()) ss = "DEFAULT";
+        if(MapCollSheet[upd] != "delete_at")
+        {
+            if(MapCollSheet[upd] != "pdf")
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = '" << ss << "' WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = '" << ss << "' WHERE id = " << p.id;
+        }
+        else
+        {
+            ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = " << ss << "  WHERE id = " << p.id;
+        }
+        SaveUpdateSheetLog(ssd, old);
+        SETUPDATESQL(conn_kpvl, ssd);
+    }
+    else
+        MessageBox(hWnd, "Поле нельзя редактировать!", "Внимание!", MB_SYSTEMMODAL | MB_ICONWARNING | MB_OK);
+    return true;
+}
+
+bool UpdateSheet2(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd)
+{
+    std::stringstream ssd;
+
+    if(vv == ss) return true;
+    if(MapCollSheet[upd].length())
+    {
+        std::string old = vv;
+        vv = ss;
+        if(!ss.length()) ss = "DEFAULT";
+
+        if(MapCollSheet[upd] != "delete_at")
+        {
+            if(MapCollSheet[upd] != "pdf")
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = " << ss << " WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = '" << ss << "' WHERE id = " << p.id;
+        }
+        else
+        {
+            ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = " << ss << "  WHERE id = " << p.id;
+        }
+        SaveUpdateSheetLog(ssd, old);
+        SETUPDATESQL(conn_kpvl, ssd);
+    }
+    else
+        MessageBox(hWnd, "Поле нельзя редактировать!", "Внимание!", MB_SYSTEMMODAL | MB_ICONWARNING | MB_OK);
+    return true;
+}
+//#define EES1(_ss, _u) EditSubItem == Cassete::_ss) UpdateSheet(GetDataTimeStr2(ss), _u
+//#define EES2(_ss, _u) CassetteSubItem == Cassete::_ss) UpdateSheet(ss, _u
+
+
 LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     if(message == WM_USER && wParam == USER_COMBO_COMMAND)
@@ -1409,68 +1562,98 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             TSheet& p = AllSheet[EditItem];
             int Pos = (int)lParam + 1;
             if(Pos <= 7)
-            {
-                if(Stoi(p.Pos) != Pos)
-                {
-                    p.Pos = std::to_string(Pos);
-                    p.Edit = true;
-                }
-            }
-            else if(Stoi(p.Pos) <= 7)
-            {
-                p.Pos = "10";
-                p.Edit = true;
-            }
-            //EnableWindow(BaseHwndSheetList, p.Edit);
+                UpdateSheet1(hWnd, p.Pos, std::to_string(Pos), p, casSheet::Pos);
+            else 
+                if(Stoi(p.Pos) <= 7) UpdateSheet1(hWnd, p.Pos, "10", p, casSheet::Pos);
         }
-        //int t = 0;
     }
     if(message == WM_USER && wParam == USER_EDIT_COMMAND && lParam)
     {
         char* buff = (char*)lParam;
+
         if(EditItem >= 0 && EditItem < AllSheet.size())
         {
             TSheet& p = AllSheet[EditItem];
-            //if(EditSubItem == casSheet::Pos)            p.Pos = buff;
-            if(EditSubItem == casSheet::News && p.News != buff)
-            {
-                p.News = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::Year && p.Year != buff)
-            {
-                p.Year = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::Month && p.Month != buff)
-            {
-                p.Month = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::Day && p.Day != buff)
-            {
-                p.Day = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::Hour && p.Hour != buff)
-            {
-                p.Hour = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::CassetteNo && p.CassetteNo != buff)
-            {
-                p.CassetteNo = buff;
-                p.Edit = true;
-            }
-            if(EditSubItem == casSheet::SheetInCassette && p.SheetInCassette != buff)
-            {
-                p.SheetInCassette = buff;
-                p.Edit = true;
-            }
+#define ISEDIT1(_e) EditSubItem == casSheet::_e) UpdateSheet1(hWnd, p._e, buff, p, casSheet::_e
+#define ISEDIT2(_e) EditSubItem == casSheet::_e) UpdateSheet2(hWnd, p._e, buff, p, casSheet::_e
 
-            //if(p.Edit)
-            //EnableWindow(BaseHwndSheetList, p.Edit);
+            if(ISEDIT2(Cassette));
+
+            else if(ISEDIT1(DataTime));
+            else if(ISEDIT1(Start_at));
+            else if(ISEDIT1(SecondPos_at));
+            else if(ISEDIT1(DataTime_End));
+            else if(ISEDIT2(TimeForPlateHeat));
+            else if(ISEDIT2(DataTime_All));
+
+            //else if(ISEDIT(Alloy));
+            //else if(ISEDIT(Thikness));
+            //else if(ISEDIT(Melt));
+            //else if(ISEDIT(Slab));
+            //else if(ISEDIT(PartNo));
+            //else if(ISEDIT(Pack));
+            //else if(ISEDIT(Sheet));
+            //else if(ISEDIT(SubSheet));
+
+            else if(ISEDIT2(News));
+            else if(ISEDIT1(Year));
+            else if(ISEDIT1(Month));
+            else if(ISEDIT1(Day));
+            else if(ISEDIT2(Hour));
+            else if(ISEDIT2(CassetteNo));
+            else if(ISEDIT2(SheetInCassette));
+
+            else if(ISEDIT2(Temper));
+            else if(ISEDIT2(Temperature));
+            else if(ISEDIT2(Speed));
+
+            else if(ISEDIT2(PresToStartComp));
+            else if(ISEDIT2(Za_PT3));
+            else if(ISEDIT2(Za_TE3));
+            else if(ISEDIT2(LamPressTop));
+            else if(ISEDIT2(LamPressBot));
+            else if(ISEDIT2(PosClapanTop));
+            else if(ISEDIT2(PosClapanBot));
+            else if(ISEDIT2(Lam1PosClapanTop));
+            else if(ISEDIT2(Lam1PosClapanBot));
+            else if(ISEDIT2(Lam2PosClapanTop));
+            else if(ISEDIT2(Lam2PosClapanBot));
+
+            else if(ISEDIT2(Lam_TE1));
+
+#ifdef _DEBUG
+            else if(ISEDIT1(Pdf));
+            else if(ISEDIT1(InCant_at));
+            else if(ISEDIT1(Cant_at));
+            else if(ISEDIT1(Correct));
+            else if(ISEDIT1(Pdf));
+            else if(ISEDIT1(Delete_at));
+#else
+            else if(ISEDIT1(Mask));
+            else if(ISEDIT2(Top1));
+            else if(ISEDIT2(Top2));
+            else if(ISEDIT2(Top3));
+            else if(ISEDIT2(Top4));
+            else if(ISEDIT2(Top5));
+            else if(ISEDIT2(Top6));
+            else if(ISEDIT2(Top7));
+            else if(ISEDIT2(Top8));
+
+            else if(ISEDIT2(Bot1));
+            else if(ISEDIT2(Bot2));
+            else if(ISEDIT2(Bot3));
+            else if(ISEDIT2(Bot4));
+            else if(ISEDIT2(Bot5));
+            else if(ISEDIT2(Bot6));
+            else if(ISEDIT2(Bot7));
+            else if(ISEDIT2(Bot8));
+#endif // DEBUG
+
+            else
+                MessageBox(hWnd, "Поле нельзя редактировать!", "Внимание!", MB_SYSTEMMODAL | MB_ICONWARNING | MB_OK);
+#undef ISEDIT
         }
+
         GlobalUnlock((HGLOBAL)lParam);
         GlobalFree((HGLOBAL)lParam);
     }

@@ -878,9 +878,6 @@ bool UpdateCassette(LPARAM sd, std::string& vv)
     return true;
 }
 
-#define EEE1(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(GetDataTimeStr2(ss), CassetteID->_ss
-
-#define EEE2(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(ss, CassetteID->_ss
 
 LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -895,55 +892,62 @@ LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 std::string old = "";
                 bool b = false;
 
+#define EEE1(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(GetDataTimeStr2(ss), CassetteID->_ss
+#define EEE2(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(ss, CassetteID->_ss
+
                 //UpdateCassette(ss, CassetteID->Create_at);
                 if(EEE2(Year));
-                if(EEE2(Month));
-                if(EEE2(Day));
-                if(EEE2(Hour));
-                if(EEE2(CassetteNo));
-                if(EEE2(SheetInCassette));
-                if(EEE2(Peth));
-                if(EEE1(Run_at));
-                if(EEE1(Finish_at));
+                else if(EEE2(Month));
+                else if(EEE2(Day));
+                else if(EEE2(Hour));
+                else if(EEE2(CassetteNo));
+                else if(EEE2(SheetInCassette));
+                else if(EEE2(Peth));
+                else if(EEE1(Run_at));
+                else if(EEE1(Finish_at));
 
-                if(EEE2(PointRef_1));     //Уставка температуры
-                if(EEE2(FactTemper));     //Факт температуры за 5 минут до конца отпуска
+                else if(EEE2(PointRef_1));     //Уставка температуры
+                else if(EEE2(FactTemper));     //Факт температуры за 5 минут до конца отпуска
 
-                if(EEE2(PointTime_1));    //Время нагрева
-                if(EEE2(HeatAcc));        //Факт время нагрева
-                if(EEE2(PointDTime_2));   //Время выдержки
-                if(EEE2(HeatWait));       //Факт время выдержки
-                if(EEE2(TimeProcSet));    //Полное время процесса (уставка), мин
-                if(EEE2(Total));          //Факт общее время
+                else if(EEE2(PointTime_1));    //Время нагрева
+                else if(EEE2(HeatAcc));        //Факт время нагрева
+                else if(EEE2(PointDTime_2));   //Время выдержки
+                else if(EEE2(HeatWait));       //Факт время выдержки
+                else if(EEE2(TimeProcSet));    //Полное время процесса (уставка), мин
+                else if(EEE2(Total));          //Факт общее время
 
 #ifdef _CREATE_AT
-                if(EEE1(Create_at));
+                else if(EEE1(Create_at));
 #endif
 #ifdef _CLOSE_AT
-                if(EEE1(Close_at));
+                else if(EEE1(Close_at));
 #endif
 #ifdef _ERROR_AT
-                if(EEE1(Error_at));
+                else if(EEE1(Error_at));
 #endif
 #ifdef _END_AT
-                if(EEE1(End_at));
+                else if(EEE1(End_at));
 #endif
 #ifdef _DELETE_AT
-                if(EEE1(Delete_at));
+                else if(EEE1(Delete_at));
 #endif
 #ifdef _CORRECT
-                if(EEE1(Correct));
+                else if(EEE1(Correct));
 #endif
 #ifdef _PDF
-                if(EEE1(Pdf));
+                else if(EEE1(Pdf));
 #endif
 #ifdef _ERROR_AT
-                if(EEE1(Close_at));
+                else if(EEE1(Close_at));
 #endif
 #ifdef _RETURN_AT
-                if(EEE1(Return_at));
+                else if(EEE1(Return_at));
 #endif
+                else
+                    MessageBox(hWnd, "Поле нельзя редактировать!", "Внимание!", MB_SYSTEMMODAL | MB_ICONWARNING | MB_OK);
 
+#undef EEE1
+#undef EEE2
             }
             CassetteID = NULL;
             GlobalUnlock((HGLOBAL)lParam);

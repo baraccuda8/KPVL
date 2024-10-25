@@ -221,8 +221,8 @@ void PdfClass::GetSheet()
 				sheet.Za_PT3 = conn.PGgetvalue(res, l, Col_Sheet_za_pt3);
 				sheet.Za_TE3 = conn.PGgetvalue(res, l, Col_Sheet_za_te3);
 
-				sheet.LaminPressTop = conn.PGgetvalue(res, l, Col_Sheet_lampresstop);
-				sheet.LaminPressBot = conn.PGgetvalue(res, l, Col_Sheet_lampressbot);
+				sheet.LamPressTop = conn.PGgetvalue(res, l, Col_Sheet_lampresstop);
+				sheet.LamPressBot = conn.PGgetvalue(res, l, Col_Sheet_lampressbot);
 				sheet.PosClapanTop = conn.PGgetvalue(res, l, Col_Sheet_posclapantop);
 				sheet.PosClapanBot = conn.PGgetvalue(res, l, Col_Sheet_posclapanbot);
 				sheet.Mask = conn.PGgetvalue(res, l, Col_Sheet_mask);
@@ -232,7 +232,7 @@ void PdfClass::GetSheet()
 				sheet.Lam2PosClapanTop = conn.PGgetvalue(res, l, Col_Sheet_lam2posclapantop);
 				sheet.Lam2PosClapanBot = conn.PGgetvalue(res, l, Col_Sheet_lam2posclapanbot);
 
-				sheet.LAM_TE1 = conn.PGgetvalue(res, l, Col_Sheet_lam_te1);
+				sheet.Lam_TE1 = conn.PGgetvalue(res, l, Col_Sheet_lam_te1);
 				sheet.News = conn.PGgetvalue(res, l, Col_Sheet_news);
 				sheet.Top1 = conn.PGgetvalue(res, l, Col_Sheet_top1);
 				sheet.Top2 = conn.PGgetvalue(res, l, Col_Sheet_top2);

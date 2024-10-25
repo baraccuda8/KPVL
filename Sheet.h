@@ -83,8 +83,8 @@ typedef struct TSheet{
     std::string Za_PT3 = "";            //Давление воды в баке
     std::string Za_TE3 = "";            //Температура воды в баке
 
-    std::string LaminPressTop = "";     //Давление в верхнем коллекторе
-    std::string LaminPressBot = "";     //Давление в нижнем коллекторе
+    std::string LamPressTop = "";     //Давление в верхнем коллекторе
+    std::string LamPressBot = "";     //Давление в нижнем коллекторе
     std::string PosClapanTop = "";      //Клапан. Скоростная секция. Верх
     std::string PosClapanBot = "";      //Клапан. Скоростная секция. Низ
     std::string Mask = "";              //Режим работы клапана
@@ -94,7 +94,7 @@ typedef struct TSheet{
     std::string Lam2PosClapanTop = "";  //Клапан. Ламинарная секция 2. Верх
     std::string Lam2PosClapanBot = "";  //Клапан. Ламинарная секция 2. Низ
 
-    std::string LAM_TE1 = "";           //Температура воды в поддоне
+    std::string Lam_TE1 = "";           //Температура воды в поддоне
     std::string News = "";              //Признак кантовки
     std::string Top1 = "";              //Отклонения от плоскостности листа До кантовки 1
     std::string Top2 = "";              //Отклонения от плоскостности листа До кантовки 2
