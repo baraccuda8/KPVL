@@ -148,6 +148,11 @@ typedef struct TSheet{
 
 }TSheet;
 
+#ifdef _DEBUG
+#define NODETAL
+#else
+
+#endif
 namespace casSheet{
     enum cas{
         NN = 0,
@@ -192,7 +197,7 @@ namespace casSheet{
         Temper,
         Temperature, 
         Speed,
-
+#ifndef NODETAL
         PresToStartComp,  //Уставка давления для запуска комперссора
         Za_PT3,
         Za_TE3,
@@ -208,6 +213,7 @@ namespace casSheet{
         Lam2PosClapanBot,
 
         Lam_TE1,
+#endif
 
 #ifndef _DEBUG
         Mask,

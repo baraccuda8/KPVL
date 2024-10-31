@@ -132,6 +132,15 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
     {casSheet::Temper, { "Заданная\nтемп-ра\nС°", LL2 }},
     {casSheet::Temperature, { "Факт\nтемп-ра\nС°", LL2 }},
     {casSheet::Speed, { "Скорость\nвыдачи\nмм/с", 80 }},
+
+    {casSheet::Hour, { "ID листа\nЧас", L1 }},
+    {casSheet::Day, { "ID листа\nДень", L1 }},
+    {casSheet::Month, { "ID листа\nМесяц", L1 }},
+    {casSheet::Year, { "ID листа\nГод", L1 }},
+    {casSheet::CassetteNo, { "ID листа\nКасета", L1 }},
+    {casSheet::SheetInCassette, { "Id листа\nНомер", L1 }},
+
+#ifndef NODETAL
     {casSheet::PresToStartComp, { "Задание\nДавления воды", L2 }},
     {casSheet::Za_PT3, { "Давление\nводы в баке.\nбар", LL2 }},
     {casSheet::Za_TE3, { "Температура\nводы в баке.\nС°", LL1 }},
@@ -142,17 +151,11 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
 
     {casSheet::Lam_TE1, { "Температура\nводы\nв поддоне. С°", LL1 }},
 
-    {casSheet::Hour, { "ID листа\nЧас", L1 }},
-    {casSheet::Day, { "ID листа\nДень", L1 }},
-    {casSheet::Month, { "ID листа\nМесяц", L1 }},
-    {casSheet::Year, { "ID листа\nГод", L1 }},
-    {casSheet::CassetteNo, { "ID листа\nКасета", L1 }},
-    {casSheet::SheetInCassette, { "Id листа\nНомер", L1 }},
-
     {casSheet::Lam1PosClapanTop, { "Ламинарная 1\nКлапан верх", LL1 }},
     {casSheet::Lam1PosClapanBot, { "Ламинарная 1\nКлапан низ", LL1 }},
     {casSheet::Lam2PosClapanTop, { "Ламинарная 2\nКлапан верх", LL1 }},
     {casSheet::Lam2PosClapanBot, { "Ламинарная 2\nКлапан низ", LL1 }},
+#endif
 
 #ifdef _DEBUG
     {casSheet::InCant_at, { "На кантовку", LL0 }},
@@ -1070,6 +1073,7 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Temper, p.Temper.c_str());
                 ELSEIF (casSheet::Temperature, p.Temperature.c_str());
                 ELSEIF (casSheet::Speed, p.Speed.c_str());
+#ifndef NODETAL
                 ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
                 ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
                 ELSEIF (casSheet::LamPressTop, p.LamPressTop.c_str());
@@ -1082,7 +1086,8 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Lam2PosClapanBot, p.Lam2PosClapanBot.c_str());
                 ELSEIF (casSheet::Lam_TE1, p.Lam_TE1.c_str());
                 ELSEIF (casSheet::News, Stoi(p.News) ? "Да" : "Нет");
-
+                ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
+#endif
                 ELSEIF (casSheet::Year, p.Year.c_str());
                 ELSEIF (casSheet::Month, p.Month.c_str());
                 ELSEIF (casSheet::Day, p.Day.c_str());
@@ -1090,7 +1095,6 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::CassetteNo, p.CassetteNo.c_str());
                 ELSEIF (casSheet::SheetInCassette, p.SheetInCassette.c_str());
                 ELSEIF (casSheet::TimeForPlateHeat, p.TimeForPlateHeat.c_str()); //Время сигнализации окончания нагрева, мин
-                ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
 
 
 #ifdef _DEBUG
@@ -1436,6 +1440,7 @@ std::map <int, std::string>MapCollSheet ={
     {casSheet::Temperature, "temperature"},
     {casSheet::Speed, "speed"},
 
+#ifndef NODETAL
     {casSheet::PresToStartComp, "prestostartcomp"},
     {casSheet::Za_PT3, "za_pt3"},
     {casSheet::Za_TE3, "za_te3"},
@@ -1451,6 +1456,7 @@ std::map <int, std::string>MapCollSheet ={
     {casSheet::Lam2PosClapanBot, "lam2posclapanbot"},
 
     {casSheet::Lam_TE1, ""},
+#endif
 
 #ifdef _DEBUG
     {casSheet::InCant_at, "incant_at"},
@@ -1500,17 +1506,27 @@ bool UpdateSheet1(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd
     {
         std::string old = vv;
         vv = ss;
-        if(!ss.length()) ss = "DEFAULT";
-        if(MapCollSheet[upd] != "delete_at")
+        
+        if(MapCollSheet[upd] == "delete_at")
         {
-            if(MapCollSheet[upd] != "pdf")
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = '" << ss << "' WHERE id = " << p.id;
+            if(vv.length())
+                ssd << "UPDATE sheet SET delete_at = '" << vv << "'  WHERE id = " << p.id;
             else
-                ssd << "UPDATE sheet SET pdf = '" << ss << "' WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET delete_at = DEFAULT WHERE id = " << p.id;
+        }
+        else if(MapCollSheet[upd] == "pdf")
+        {
+            if(vv.length())
+                ssd << "UPDATE sheet SET pdf = '" << vv << "' WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = DEFAULT WHERE id = " << p.id;
         }
         else
         {
-            ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = " << ss << "  WHERE id = " << p.id;
+            if(vv.length())
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = '" << vv << "' WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
         }
         SaveUpdateSheetLog(ssd, old);
         SETUPDATESQL(conn_kpvl, ssd);
@@ -1529,18 +1545,26 @@ bool UpdateSheet2(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd
     {
         std::string old = vv;
         vv = ss;
-        if(!ss.length()) ss = "DEFAULT";
-
-        if(MapCollSheet[upd] != "delete_at")
+        if(MapCollSheet[upd] == "delete_at")
         {
-            if(MapCollSheet[upd] != "pdf")
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = " << ss << " WHERE id = " << p.id;
+            if(vv.length())
+                ssd << "UPDATE sheet SET delete_at = '" << vv << "'  WHERE id = " << p.id;
             else
-                ssd << "UPDATE sheet SET pdf = '" << ss << "' WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET delete_at = DEFAULT WHERE id = " << p.id;
+        }
+        else if(MapCollSheet[upd] == "pdf")
+        {
+            if(vv.length())
+                ssd << "UPDATE sheet SET pdf = '" << vv << "' WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = DEFAULT WHERE id = " << p.id;
         }
         else
         {
-            ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = " << ss << "  WHERE id = " << p.id;
+            if(vv.length())
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = " << vv << " WHERE id = " << p.id;
+            else
+                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
         }
         SaveUpdateSheetLog(ssd, old);
         SETUPDATESQL(conn_kpvl, ssd);
@@ -1574,15 +1598,16 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         if(EditItem >= 0 && EditItem < AllSheet.size())
         {
             TSheet& p = AllSheet[EditItem];
+#define ISEDIT0(_e) EditSubItem == casSheet::_e) UpdateSheet1(hWnd, p._e, GetDataTimeStr2(buff), p, casSheet::_e
 #define ISEDIT1(_e) EditSubItem == casSheet::_e) UpdateSheet1(hWnd, p._e, buff, p, casSheet::_e
 #define ISEDIT2(_e) EditSubItem == casSheet::_e) UpdateSheet2(hWnd, p._e, buff, p, casSheet::_e
 
             if(ISEDIT2(Cassette));
 
-            else if(ISEDIT1(DataTime));
-            else if(ISEDIT1(Start_at));
-            else if(ISEDIT1(SecondPos_at));
-            else if(ISEDIT1(DataTime_End));
+            else if(ISEDIT0(DataTime));
+            else if(ISEDIT0(Start_at));
+            else if(ISEDIT0(SecondPos_at));
+            else if(ISEDIT0(DataTime_End));
             else if(ISEDIT2(TimeForPlateHeat));
             else if(ISEDIT2(DataTime_All));
 
@@ -1607,6 +1632,7 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else if(ISEDIT2(Temperature));
             else if(ISEDIT2(Speed));
 
+#ifndef NODETAL
             else if(ISEDIT2(PresToStartComp));
             else if(ISEDIT2(Za_PT3));
             else if(ISEDIT2(Za_TE3));
@@ -1620,16 +1646,17 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else if(ISEDIT2(Lam2PosClapanBot));
 
             else if(ISEDIT2(Lam_TE1));
+#endif
 
 #ifdef _DEBUG
+            else if(ISEDIT0(InCant_at));
+            else if(ISEDIT0(Cant_at));
+            else if(ISEDIT0(Correct));
             else if(ISEDIT1(Pdf));
-            else if(ISEDIT1(InCant_at));
-            else if(ISEDIT1(Cant_at));
-            else if(ISEDIT1(Correct));
-            else if(ISEDIT1(Pdf));
-            else if(ISEDIT1(Delete_at));
+            else if(ISEDIT0(Delete_at));
 #else
             else if(ISEDIT1(Mask));
+
             else if(ISEDIT2(Top1));
             else if(ISEDIT2(Top2));
             else if(ISEDIT2(Top3));
@@ -1783,32 +1810,69 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
         }
         else
         {
-            if(p.Edit)
-                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
-            else if(p.Delete_at.length())
+            if(p.Delete_at.length())
+            {
                 clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
-#ifdef _DEBUG
-            if(p.diff && p.diff < 60)
-            {
-                FillRect(lpdis->hDC, &rc, TitleBrush11);
-            }
-            else 
-#endif // DEBUG
-            if(pos < 7)
-            {
-                FillRect(lpdis->hDC, &rc, TitleBrush13);
             }
             else
-            if(pos == 7)
             {
-                if(p.Pdf.length())
+                if(p.Edit)
                 {
+                    clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
+                }
+                else if(p.Delete_at.length())
+                {
+                    clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
+                }
 #ifdef _DEBUG
-                    if(!p.Correct.length())
-                        FillRect(lpdis->hDC, &rc, TitleBrush6); //Светло зеленая заливка
+                if(p.diff && p.diff < 60)
+                {
+                    FillRect(lpdis->hDC, &rc, TitleBrush11);
+                }
+                else
+#endif // DEBUG
+                    if(pos < 7)
+                    {
+                        FillRect(lpdis->hDC, &rc, TitleBrush13);
+                    }
                     else
+                        if(pos == 7)
+                        {
+                            if(p.Pdf.length())
+                            {
+#ifdef _DEBUG
+                                if(!p.Correct.length())
+                                    FillRect(lpdis->hDC, &rc, TitleBrush6); //Светло зеленая заливка
+                                else
 #endif // _DEBUG
-                        if(lvi.iItem % 2)
+                                    if(lvi.iItem % 2)
+                                    {
+                                        FillRect(lpdis->hDC, &rc, TitleBrush5);
+                                    }
+                                    else
+                                    {
+                                        FillRect(lpdis->hDC, &rc, TitleBrush1);
+                                    }
+
+                                    //{
+                                    //    FillRect(lpdis->hDC, &rc, TitleBrush9); //темно зеленая заливка
+                                    //}
+
+                            }
+                            else if(p.Correct.length())
+                            {
+                                FillRect(lpdis->hDC, &rc, TitleBrush3); //светлосиняя заливка
+                            }
+                            else
+                            {
+                                FillRect(lpdis->hDC, &rc, TitleBrush7); //Светло желтая заливка
+                            }
+                        }
+                        else if(pos >= 10)
+                        {
+                            FillRect(lpdis->hDC, &rc, TitleBrush8);
+                        }
+                        else if(lvi.iItem % 2)
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush5);
                         }
@@ -1816,32 +1880,6 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush1);
                         }
-
-                        //{
-                        //    FillRect(lpdis->hDC, &rc, TitleBrush9); //темно зеленая заливка
-                        //}
-
-                }
-                else if(p.Correct.length())
-                {
-                    FillRect(lpdis->hDC, &rc, TitleBrush3); //светлосиняя заливка
-                }
-                else
-                {
-                    FillRect(lpdis->hDC, &rc, TitleBrush7); //Светло желтая заливка
-                }
-            }
-            else if(pos >= 10)
-            {
-                FillRect(lpdis->hDC, &rc, TitleBrush8);
-            }
-            else if(lvi.iItem % 2)
-            {
-                FillRect(lpdis->hDC, &rc, TitleBrush5);
-            }
-            else
-            {
-                FillRect(lpdis->hDC, &rc, TitleBrush1);
             }
         }
 
@@ -1867,6 +1905,23 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
             //nJustify = DT_LEFT;
 
             ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
+
+            
+            if(nColumn >= casSheet::Melt && nColumn <= casSheet::SubSheet)
+            {
+                RECT rcLabel2;
+                ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, casSheet::SubSheet, LVIR_LABEL, &rcLabel2);
+                rcLabel2.left  = rcLabel.left +1;
+                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+            }
+            else if(nColumn >= casSheet::Year && nColumn <= casSheet::SheetInCassette)
+            {
+                RECT rcLabel2;
+                ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, casSheet::SheetInCassette, LVIR_LABEL, &rcLabel2);
+                rcLabel2.left  = rcLabel.left + 1;
+                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+            }
+
 
 #ifndef _DEBUG
             if(nColumn >= casSheet::Top1 && nColumn <= casSheet::Bot8)

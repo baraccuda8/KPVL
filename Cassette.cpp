@@ -761,7 +761,7 @@ LRESULT CALLBACK WndProcHeadListViewCassette(HWND hWnd, UINT message, WPARAM wPa
 LRESULT OldListCassetteSubProc = NULL;
 
 
-std::map <int, std::string>MapColl ={
+std::map <int, std::string>MapCollCassette ={
     { Cassete::Event, "event"},
     { Cassete::Year, "year"},
     { Cassete::Month, "month"},
@@ -823,17 +823,18 @@ bool UpdateCassette(std::string ss, std::string& vv)
     std::stringstream ssd;
     std::string old = vv;
     vv = ss;
+
     if(vv.length())
     {
-        if(MapColl[CassetteSubItem] != "pdf")
-            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
+        if(MapCollCassette[CassetteSubItem] != "pdf")
+            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapCollCassette[CassetteSubItem] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
         else
             ssd << "UPDATE cassette SET pdf = '" << vv << "' WHERE id = " << CassetteID->Id;
     }
     else
     {
-        if(MapColl[CassetteSubItem] != "pdf")
-            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
+        if(MapCollCassette[CassetteSubItem] != "pdf")
+            ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapCollCassette[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
         else
             ssd << "UPDATE cassette SET pdf = DEFAULT WHERE id = " << CassetteID->Id;
     }
@@ -850,11 +851,11 @@ bool UpdateCassette2(std::string ss, std::string& vv, int id)
     vv = ss;
     if(vv.length())
     {
-        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[id] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
+        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapCollCassette[id] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
     }
     else
     {
-        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[id] << " = DEFAULT WHERE id = " << CassetteID->Id;
+        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapCollCassette[id] << " = DEFAULT WHERE id = " << CassetteID->Id;
     }
 
     SaveUpdateLog(ssd, old);
@@ -867,10 +868,10 @@ bool UpdateCassette(LPARAM sd, std::string& vv)
     std::stringstream ssd;
     std::string old = vv;
     vv = std::to_string(sd + 1);
-    if(MapColl[CassetteSubItem] != "pdf")
-        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapColl[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
+    if(MapCollCassette[CassetteSubItem] == "pdf")
+        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
     else
-        ssd << "UPDATE cassette SET " << MapColl[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
+        ssd << "UPDATE cassette SET pdf = DEFAULT, " << MapCollCassette[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
     CassetteID->Pdf = "";
 
     SaveUpdateLog(ssd, old);
