@@ -453,6 +453,7 @@ void GetSheet(PGresult* res, TSheet& sheet, int l)
 std::string Old_Start_at = "";
 void GetDiftDatd(TSheet& sheet)
 {
+    if(sheet.Delete_at.length()) return;
     if(!sheet.Diff.length() && Old_Start_at.length())
     {
         if(Old_Start_at > sheet.Start_at)
@@ -477,6 +478,7 @@ void GetDiftDatd(TSheet& sheet)
         sheet.Diff = sd;
     }
     Old_Start_at = sheet.Start_at;
+
 }
 
 void GetCassetteId(TSheet& a)
@@ -1073,6 +1075,7 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Temper, p.Temper.c_str());
                 ELSEIF (casSheet::Temperature, p.Temperature.c_str());
                 ELSEIF (casSheet::Speed, p.Speed.c_str());
+                ELSEIF (casSheet::News, Stoi(p.News) ? "Да" : "Нет");
 #ifndef NODETAL
                 ELSEIF (casSheet::Za_PT3, p.Za_PT3.c_str());
                 ELSEIF (casSheet::Za_TE3, p.Za_TE3.c_str());
@@ -1085,7 +1088,6 @@ LRESULT DispInfoSheet(LPARAM lParam)
                 ELSEIF (casSheet::Lam2PosClapanTop, p.Lam2PosClapanTop.c_str());
                 ELSEIF (casSheet::Lam2PosClapanBot, p.Lam2PosClapanBot.c_str());
                 ELSEIF (casSheet::Lam_TE1, p.Lam_TE1.c_str());
-                ELSEIF (casSheet::News, Stoi(p.News) ? "Да" : "Нет");
                 ELSEIF (casSheet::PresToStartComp, p.PresToStartComp.c_str());  //Уставка давления для запуска комперссора
 #endif
                 ELSEIF (casSheet::Year, p.Year.c_str());
@@ -1824,13 +1826,6 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                 {
                     clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
                 }
-#ifdef _DEBUG
-                if(p.diff && p.diff < 60)
-                {
-                    FillRect(lpdis->hDC, &rc, TitleBrush11);
-                }
-                else
-#endif // DEBUG
                     if(pos < 7)
                     {
                         FillRect(lpdis->hDC, &rc, TitleBrush13);
@@ -1936,6 +1931,12 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                     clrTextSave = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
                     FillRect(lpdis->hDC, &rcLabel, TitleBrush7);
                 }
+            }
+#else
+            
+            if(nColumn == casSheet::Diff && p.diff && p.diff < 60)
+            {
+                FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
             }
 #endif // DEBUG
             //rcLabel.left += 1;
