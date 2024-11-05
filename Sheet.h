@@ -149,7 +149,7 @@ typedef struct TSheet{
 }TSheet;
 
 #ifdef _DEBUG
-#define NODETAL
+//#define NODETAL
 #else
 
 #endif

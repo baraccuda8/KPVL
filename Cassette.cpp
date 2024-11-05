@@ -457,8 +457,9 @@ int CassetteSubItem = 0;
 
 
 //Клик правой кнопкой мыши
-LRESULT RightClickCassette(LPNM_LISTVIEW pnm)
+LRESULT RightDbClickCassette(LPARAM lParam)
 {
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
     if(pnm->iSubItem == Cassete::Event)
     {
         char szBuff[1024];
@@ -627,8 +628,11 @@ LRESULT ListCassetteSubCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 //Двойной клик мыши
-LRESULT DoubleClickCassette(LPNM_LISTVIEW pnm)
+LRESULT DoubleClickCassette(LPARAM lParam)
 {
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
+    if(pnm->uKeyFlags == 4)return RightDbClickCassette(lParam);
+
     if(pnm->iItem >= 0 && pnm->iItem < (int)AllCassette.size())
     {
         TCassette& p = AllCassette[pnm->iItem];
@@ -719,9 +723,18 @@ LRESULT DispInfoCassette(LPARAM lParam)
 
 
 
-
-LRESULT LeftClickCassette(LPNM_LISTVIEW pnm)
+LRESULT RightClickCassette(LPARAM lParam)
 {
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
+    //MessageBox(pnm->hdr.hwndFrom, "", "", 0);
+    //if(pnm->uKeyFlags == 4)return 0;
+    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
+    return 0;
+}
+
+LRESULT LeftClickCassette(LPARAM lParam)
+{
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
     return 0;
 }
 
@@ -729,10 +742,11 @@ LRESULT OnNotifyCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
 #ifdef _DEBUG
-    if(pnm->hdr.code == NM_RCLICK)return RightClickCassette(pnm); else 
-    if(pnm->hdr.code == NM_CLICK)return LeftClickCassette(pnm); else 
+    //if(pnm->hdr.code == NM_RDBLCLK)return RightDbClickCassette(lParam); else
+    if(pnm->hdr.code == NM_RCLICK)return RightClickCassette(lParam); else
+    //if(pnm->hdr.code == NM_CLICK)return LeftClickCassette(lParam); else
 #endif
-    if(pnm->hdr.code == NM_DBLCLK) return DoubleClickCassette(pnm); else 
+    if(pnm->hdr.code == NM_DBLCLK) return DoubleClickCassette(lParam); else
     if(pnm->hdr.code == LVN_GETDISPINFO)return DispInfoCassette(lParam);
 
     return 0;
@@ -982,7 +996,7 @@ LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
 
 void InitListCassette()
 {
-    #define Flag WS_CHILD | WS_VISIBLE | WS_BORDER /*| WS_CLIPSIBLINGS | WS_CLIPCHILDREN*/ | LVS_REPORT | LVS_NOSORTHEADER | LVS_OWNERDRAWFIXED/* | LVS_SINGLESEL*/
+    #define Flag WS_CHILD | WS_VISIBLE | WS_BORDER /*| WS_CLIPSIBLINGS | WS_CLIPCHILDREN*/ | LVS_REPORT | LVS_NOSORTHEADER | LVS_OWNERDRAWFIXED | LVS_SINGLESEL
 
     RECT rc;
     GetClientRect(CassetteWindow, &rc);
