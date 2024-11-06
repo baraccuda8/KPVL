@@ -1450,7 +1450,7 @@ std::map <int, std::string>MapCollSheet ={
     {casSheet::Lam2PosClapanTop, "lam2posclapantop"},
     {casSheet::Lam2PosClapanBot, "lam2posclapanbot"},
 
-    {casSheet::Lam_TE1, ""},
+    {casSheet::Lam_TE1, "lam_te1"},
 #endif
 
 #ifdef _DEBUG
@@ -1638,9 +1638,13 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else if(ISEDIT2(Lam1PosClapanTop));
             else if(ISEDIT2(Lam1PosClapanBot));
             else if(ISEDIT2(Lam2PosClapanTop));
-            else if(ISEDIT2(Lam2PosClapanBot));
+            else
+                if(EditSubItem == casSheet::Lam_TE1) 
+                    UpdateSheet2(hWnd, p.Lam_TE1, buff, p, casSheet::Lam_TE1);
+            else 
+                    if(ISEDIT2(Lam2PosClapanBot));
 
-            else if(ISEDIT2(Lam_TE1));
+            
 #endif
 
 #ifdef _DEBUG
