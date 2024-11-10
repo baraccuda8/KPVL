@@ -757,6 +757,10 @@ void InitInstance()
     //MdiChildInitInstance();
     SheetInitInstance();
     CassetteInitInstance();
+
+    InitListCassette();
+    InitListSheet();
+
     SendMessage(MidiClientWindow, WM_MDITILE, MDITILE_HORIZONTAL, 0);
 }
 

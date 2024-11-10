@@ -26,11 +26,13 @@ typedef struct qwe
     float f;
 }qwe;
 
+
 std::map<std::string, std::deque<qwe>>DataTempSheet;
 std::map<std::string, std::deque<qwe>>DataTempCassette;
 
 std::string command = "SELECT create_at, content, FROM todos WHERTE id = 13 ORDER BY create_at;";
 
+extern std::deque<TCassette>AllCassette;
 std::deque<TSheet>AllSheet;
 
 #define hEdit_Sheet 1001
@@ -483,42 +485,85 @@ void GetDiftDatd(TSheet& sheet)
 
 void GetCassetteId(TSheet& a)
 {
-    std::stringstream ssd;
-    ssd << "SELECT id FROM cassette WHERE";
-    ssd << " year = " << a.Year << " AND";
-    ssd << " month = " << a.Month << " AND";
-    ssd << " day = " << a.Day << " AND";
-    if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
-        ssd << " hour = " << a.Hour << " AND";
-    ssd << " cassetteno = " << a.CassetteNo;
-    ssd << " ORDER BY run_at DESC LIMIT 1;";
-    std::string comand = ssd.str();
-    PGresult* res = conn_kpvl.PGexec(comand);
-    if(PQresultStatus(res) == PGRES_TUPLES_OK)
-    {
-        if(PQntuples(res))
-            a.Cassette = conn_kpvl.PGgetvalue(res, 0, 0);
-    }
-    else
-        LOG_ERR_SQL(AllLogger, res, "");
-    PQclear(res);
+        std::stringstream ssd;
+        ssd << "SELECT id, event FROM cassette WHERE";
+        ssd << " year = " << a.Year << " AND";
+        ssd << " month = " << a.Month << " AND";
+        ssd << " day = " << a.Day << " AND";
+        if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
+            ssd << " hour = " << a.Hour << " AND";
+        ssd << " cassetteno = " << a.CassetteNo;
+        ssd << " ORDER BY run_at DESC LIMIT 1;";
+        std::string comand = ssd.str();
+        PGresult* res = conn_kpvl.PGexec(comand);
+        if(PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+            if(PQntuples(res))
+            {
+                a.Cassette = conn_kpvl.PGgetvalue(res, 0, 0);
+                a.Event = conn_kpvl.PGgetvalue(res, 0, 1);
+            }
+        }
+        else
+            LOG_ERR_SQL(AllLogger, res, "");
+        PQclear(res);
 }
 
+void GetCassetteEvent(TSheet& a)
+{
+    for(auto& c : AllCassette)
+    {
+        if(a.Cassette == c.Id)
+            a.Event = c.Event;
+    }
+
+    if(!Stoi(a.Event))
+    {
+        std::stringstream ssd;
+        ssd << "SELECT id, event FROM cassette WHERE id = " << a.Cassette;
+        //ssd << " year = " << a.Year << " AND";
+        //ssd << " month = " << a.Month << " AND";
+        //ssd << " day = " << a.Day << " AND";
+        //if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
+        //    ssd << " hour = " << a.Hour << " AND";
+        //ssd << " cassetteno = " << a.CassetteNo;
+        ssd << " ORDER BY run_at DESC LIMIT 1;";
+        std::string comand = ssd.str();
+        PGresult* res = conn_kpvl.PGexec(comand);
+        if(PQresultStatus(res) == PGRES_TUPLES_OK)
+        {
+            if(PQntuples(res))
+            {
+                a.Cassette = conn_kpvl.PGgetvalue(res, 0, 0);
+                a.Event = conn_kpvl.PGgetvalue(res, 0, 1);
+            }
+        }
+        else
+            LOG_ERR_SQL(AllLogger, res, "");
+        PQclear(res);
+    }
+}
 void GetCasseteId()
 {
     Old_Start_at = "";
     for(auto& a : AllSheet)
     {
         GetDiftDatd(a);
-        if(!Stoi(a.Cassette) && Stoi(a.Pos) > 6)
+        if(Stoi(a.Pos) > 6)
         {
-            GetCassetteId(a);
-            if(Stoi(a.Cassette))
+            if(!Stoi(a.Cassette))
             {
-                std::stringstream ssd;
-                ssd << "UPDATE sheet SET cassette = " << Stoi(a.Cassette) << " WHERE id = " << a.id;
-                SETUPDATESQL(conn_kpvl, ssd);
+                GetCassetteId(a);
+                if(Stoi(a.Cassette))
+                {
+                    std::stringstream ssd;
+                    ssd << "UPDATE sheet SET cassette = " << Stoi(a.Cassette) << " WHERE id = " << a.id;
+                    SETUPDATESQL(conn_kpvl, ssd);
+                }
             }
+
+            if(Stoi(a.Cassette) && !Stoi(a.Event))
+                GetCassetteEvent(a);
         }
     }
     int t = 0;
@@ -913,21 +958,12 @@ INT_PTR CALLBACK SheetPasportProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM
 }
 
 //Клик правой кнопкой мыши
-LRESULT RightClickSheet(LPARAM lParam)
+LRESULT RightDoubleClickSheet(LPARAM lParam)
 {
     LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
-
-    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
-    return 0;
-}
-
-void FilterUpdate();
-//Двойной клик мыши
-LRESULT DoubleClickSheet(LPARAM lParam)
-{
-    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
-
-    if(pnm->uKeyFlags == 4)
+    //if(pnm->uKeyFlags == 4)
+    //    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
+    //else
     {
 
         if(pnm->iSubItem > 0)
@@ -995,6 +1031,14 @@ LRESULT DoubleClickSheet(LPARAM lParam)
         }
         return 0;
     }
+    return 0;
+}
+
+void FilterUpdate();
+//Двойной клик мыши
+LRESULT DoubleClickSheet(LPARAM lParam)
+{
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
     {
         HWND hwndLV = pnm->hdr.hwndFrom;
         int item = pnm->iItem;
@@ -1202,7 +1246,7 @@ LRESULT OnNotifySheet(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 #ifdef _DEBUG
     //if(pnm->hdr.code == NM_CLICK)return LeftClickSheet(pnm); else 
-    if(pnm->hdr.code == NM_RDBLCLK)return RightClickSheet(lParam); else
+    if(pnm->hdr.code == NM_RDBLCLK)return RightDoubleClickSheet(lParam); else
 #endif
     if(pnm->hdr.code == NM_DBLCLK) return DoubleClickSheet(lParam); else
     if(pnm->hdr.code == LVN_GETDISPINFO)DispInfoSheet(lParam);
@@ -1394,6 +1438,12 @@ LRESULT CALLBACK WndProcHeadListViewSheet(HWND hWnd, UINT message, WPARAM wParam
     if(message == WM_ERASEBKGND)    return 0;
     if(message == WM_PAINT)         return OnPaintHeadListView(hWnd, message, wParam, lParam, uIdSubclass, dwRefData);
     if(message == HDM_LAYOUT)       return OnHeader_Layout(hWnd, message, wParam, lParam, uIdSubclass, dwRefData);
+    if(message == WM_LBUTTONDOWN)
+    {
+        //int tt = 0;
+        //MessageBox(hWnd, "", "", 0);
+        //return 0;
+    }
 
     return DefSubclassProc(hWnd, message, wParam, lParam);
 }
@@ -1414,14 +1464,14 @@ std::map <int, std::string>MapCollSheet ={
     {casSheet::TimeForPlateHeat, "timeforplateheat"},
     {casSheet::DataTime_All, "datatime_all"},
 
-    //{casSheet::Alloy, "alloy"},
-    //{casSheet::Thikness, "thikness"},
-    //{casSheet::Melt, "melt"},
-    //{casSheet::Slab, "slab"},
-    //{casSheet::PartNo, "partno"},
-    //{casSheet::Pack, "pack"},
-    //{casSheet::Sheet, "sheet"},
-    //{casSheet::SubSheet, "subSheet"},
+    {casSheet::Alloy, "alloy"},
+    {casSheet::Thikness, "thikness"},
+    {casSheet::Melt, "melt"},
+    {casSheet::Slab, "slab"},
+    {casSheet::PartNo, "partno"},
+    {casSheet::Pack, "pack"},
+    {casSheet::Sheet, "sheet"},
+    {casSheet::SubSheet, "subSheet"},
 
     {casSheet::Year, "year"},
     {casSheet::Month, "month"},
@@ -1606,14 +1656,14 @@ LRESULT ListSheetSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             else if(ISEDIT2(TimeForPlateHeat));
             else if(ISEDIT2(DataTime_All));
 
-            //else if(ISEDIT(Alloy));
-            //else if(ISEDIT(Thikness));
-            //else if(ISEDIT(Melt));
-            //else if(ISEDIT(Slab));
-            //else if(ISEDIT(PartNo));
-            //else if(ISEDIT(Pack));
-            //else if(ISEDIT(Sheet));
-            //else if(ISEDIT(SubSheet));
+            else if(ISEDIT1(Alloy));
+            else if(ISEDIT1(Thikness));
+            else if(ISEDIT2(Melt));
+            else if(ISEDIT2(Slab));
+            else if(ISEDIT2(PartNo));
+            else if(ISEDIT2(Pack));
+            else if(ISEDIT2(Sheet));
+            else if(ISEDIT2(SubSheet));
 
             else if(ISEDIT2(News));
             else if(ISEDIT1(Year));
@@ -1809,20 +1859,26 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
         }
         else
         {
-            if(p.Delete_at.length())
+            if(Stoi(p.Event) == 3)
             {
-                clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
+                FillRect(lpdis->hDC, &rc, TitleBrush6);
             }
             else
             {
-                if(p.Edit)
-                {
-                    clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
-                }
-                else if(p.Delete_at.length())
+                if(p.Delete_at.length())
                 {
                     clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
                 }
+                else
+                {
+                    if(p.Edit)
+                    {
+                        clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 255, 0));
+                    }
+                    else if(p.Delete_at.length())
+                    {
+                        clrTextSave = SetTextColor(lpdis->hDC, RGB(255, 0, 0));
+                    }
                     if(pos < 7)
                     {
                         FillRect(lpdis->hDC, &rc, TitleBrush13);
@@ -1872,6 +1928,7 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush1);
                         }
+                }
             }
         }
 
@@ -2079,7 +2136,6 @@ void SheetInitInstance()
         if(!SheetWindow)
             throw std::exception(std::string("Ошибка создания окна : SheetWindow").c_str());
 
-        InitListSheet();
 
         RECT rc;
         GetClientRect(SheetWindow, &rc);

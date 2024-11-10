@@ -61,6 +61,7 @@ typedef struct TSheet{
     time_t diff = 0;
     std::string Diff = "";
     std::string Cassette = "";          //ИД связанной касеты
+    std::string Event = "";          //ИД связанной касеты
         
     std::string id = "";                //Уникальный номер
     std::string DataTime = "";          //Дата, время создание листа
@@ -320,6 +321,7 @@ extern std::string strCassetteNo;
 
 void SheetInitApplication();
 void SheetInitInstance();
+void InitListSheet();
 
 //void FilterIDCasseteSheet(TCassette& p);
 //void FilterIDCasseteSheet(int stryear, int strmonth, int strday, int strcassetteno);

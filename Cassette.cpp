@@ -455,143 +455,6 @@ INT_PTR CALLBACK FilterCassetteIDProc(HWND hWnd, UINT message, WPARAM wParam, LP
 TCassette* CassetteID = NULL;
 int CassetteSubItem = 0;
 
-
-//Клик правой кнопкой мыши
-LRESULT RightDbClickCassette(LPARAM lParam)
-{
-    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
-    if(pnm->iSubItem == Cassete::Event)
-    {
-        char szBuff[1024];
-        HWND hwndLV = pnm->hdr.hwndFrom;
-        LV_ITEM lvi;
-        lvi.iItem = pnm->iItem; // ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
-        if(lvi.iItem == -1) return FALSE;
-        lvi.iSubItem = pnm->iSubItem;
-        lvi.pszText = szBuff;
-        lvi.cchTextMax = 255;
-        lvi.mask = LVIF_TEXT;
-        ListView_GetItem(hwndLV, &lvi);
-
-        CassetteID = NULL;
-        //CassetteEditItem = pnm->iItem;
-        
-        CassetteSubItem = pnm->iSubItem;
-        CassetteID = &(AllCassette[pnm->iItem]);
-
-        RECT r1;
-        ListView_GetSubItemRect(hwndLV, pnm->iItem, pnm->iSubItem, LVIR_LABEL, &r1);
-
-        HWND hcombo = CreateWindowEx(0, "COMBOBOX", "", CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
-        int i=0;
-
-        for(auto a : EventCassette)
-            if(a.first)
-                SendMessage(hcombo, CB_INSERTSTRING, -1, (LPARAM)a.second.c_str());
-
-        int Event = Stoi(CassetteID->Event);
-        SendMessage(hcombo, CB_SETCURSEL, Event - 1, 0);
-
-        SetWindowPos(hcombo, HWND_TOP, 0, 0, r1.right - r1.left, (r1.bottom - r1.top) * (i + 1) + 5, SWP_NOMOVE | SWP_NOZORDER);
-        SendMessage(hcombo, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
-        //OldSubProcCombo = SetWindowLongPtr(hcombo, GWLP_WNDPROC, (LONG_PTR)SubProcCombo);
-        SendMessage(hcombo, CB_SHOWDROPDOWN, TRUE, 0);
-        SetFocus(hcombo);
-
-    }
-    else
-    {
-        if(
-            pnm->iSubItem == Cassete::Id ||
-            pnm->iSubItem == Cassete::Year ||
-            pnm->iSubItem == Cassete::Month ||
-            pnm->iSubItem == Cassete::Day ||
-            pnm->iSubItem == Cassete::Hour ||
-            pnm->iSubItem == Cassete::CassetteNo ||
-            pnm->iSubItem == Cassete::SheetInCassette ||
-            pnm->iSubItem == Cassete::Peth ||
-
-            pnm->iSubItem == Cassete::Run_at ||
-
-            pnm->iSubItem == Cassete::Finish_at ||
-
-            pnm->iSubItem == Cassete::PointRef_1 ||     //Уставка температуры
-            pnm->iSubItem == Cassete::FactTemper ||     //Факт температуры за 5 минут до конца отпуска
-
-            pnm->iSubItem == Cassete::PointTime_1 ||    //Время нагрева
-            pnm->iSubItem == Cassete::HeatAcc ||        //Факт время нагрева
-            pnm->iSubItem == Cassete::PointDTime_2 ||   //Время выдержки
-            pnm->iSubItem == Cassete::HeatWait ||       //Факт время выдержки
-            pnm->iSubItem == Cassete::TimeProcSet ||    //Полное время процесса (уставка), мин
-            pnm->iSubItem == Cassete::Total             //Факт общее время
-
-#ifdef _CREATE_AT
-            || pnm->iSubItem == Cassete::Create_at
-#endif
-#ifdef _ERROR_AT
-            || pnm->iSubItem == Cassete::Error_at
-#endif
-
-#ifdef _CLOSE_AT
-            || pnm->iSubItem == Cassete::Close_at
-#endif
-#ifdef _DELETE_AT
-             || pnm->iSubItem == Cassete::Delete_at
-#endif
-#ifdef _END_AT
-            || pnm->iSubItem == Cassete::End_at
-#endif
-#ifdef _CORRECT
-            || pnm->iSubItem == Cassete::Correct
-#endif
-#ifdef _PDF
-            || pnm->iSubItem == Cassete::Pdf
-#endif
-#ifdef _RETURN_AT
-            || pnm->iSubItem == Cassete::Return_at
-#endif
-            )
-        {
-            char szBuff[1024];
-            HWND hwndLV = pnm->hdr.hwndFrom;
-            LV_ITEM lvi;
-            lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
-            if(lvi.iItem == -1) return FALSE;
-            lvi.iSubItem = pnm->iSubItem;
-            lvi.pszText = szBuff;
-            lvi.cchTextMax = 255;
-            lvi.mask = LVIF_TEXT;
-            ListView_GetItem(hwndLV, &lvi);
-
-            //int ListSubItem = ((NMLISTVIEW*)pnm)->iSubItem;
-            //int ListItem = lvi.iItem;
-
-
-            CassetteID = NULL;
-            CassetteSubItem = 0;
-
-            if(lvi.iItem >= 0 && lvi.iItem < (int)AllCassette.size())
-            {
-                RECT r1;
-                ListView_GetSubItemRect(hwndLV, lvi.iItem, lvi.iSubItem, LVIR_LABEL, &r1);
-
-                {
-                    CassetteSubItem = pnm->iSubItem;
-                    CassetteID = &(AllCassette[pnm->iItem]);
-                }
-
-                HWND hwEdit = CreateWindowEx(0, "EDIT", szBuff, WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
-                //SetWindowLong(hwEdit, GWLP_USERDATA, (ULONG)this);
-                SendMessage(hwEdit, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
-
-                OldSubProc = SetWindowLongPtr(hwEdit, GWLP_WNDPROC, (LONG_PTR)SubProc);
-                SetFocus(hwEdit);
-            }
-        }
-    }
-    return 0;
-}
-
 LRESULT ListCassetteSubCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
 {
     HWND hwndComboBox = (HWND)lParam;
@@ -627,11 +490,153 @@ LRESULT ListCassetteSubCommand(HWND hWnd, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
+
+//Клик правой кнопкой мыши
+LRESULT RightDbClickCassette(LPARAM lParam)
+{
+    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
+    //if(pnm->uKeyFlags == 4)
+    //    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
+    //else
+    {
+        if(pnm->iSubItem == Cassete::Event)
+        {
+            char szBuff[1024];
+            HWND hwndLV = pnm->hdr.hwndFrom;
+            LV_ITEM lvi;
+            lvi.iItem = pnm->iItem; // ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+            if(lvi.iItem == -1) return FALSE;
+            lvi.iSubItem = pnm->iSubItem;
+            lvi.pszText = szBuff;
+            lvi.cchTextMax = 255;
+            lvi.mask = LVIF_TEXT;
+            ListView_GetItem(hwndLV, &lvi);
+
+            CassetteID = NULL;
+            //CassetteEditItem = pnm->iItem;
+
+            CassetteSubItem = pnm->iSubItem;
+            CassetteID = &(AllCassette[pnm->iItem]);
+
+            RECT r1;
+            ListView_GetSubItemRect(hwndLV, pnm->iItem, pnm->iSubItem, LVIR_LABEL, &r1);
+
+            HWND hcombo = CreateWindowEx(0, "COMBOBOX", "", CBS_DROPDOWNLIST | WS_CHILD | WS_VISIBLE | CBS_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
+            int i=0;
+
+            for(auto a : EventCassette)
+                if(a.first)
+                    SendMessage(hcombo, CB_INSERTSTRING, -1, (LPARAM)a.second.c_str());
+
+            int Event = Stoi(CassetteID->Event);
+            SendMessage(hcombo, CB_SETCURSEL, Event - 1, 0);
+
+            SetWindowPos(hcombo, HWND_TOP, 0, 0, r1.right - r1.left, (r1.bottom - r1.top) * (i + 1) + 5, SWP_NOMOVE | SWP_NOZORDER);
+            SendMessage(hcombo, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
+            //OldSubProcCombo = SetWindowLongPtr(hcombo, GWLP_WNDPROC, (LONG_PTR)SubProcCombo);
+            SendMessage(hcombo, CB_SHOWDROPDOWN, TRUE, 0);
+            SetFocus(hcombo);
+
+        }
+        else
+        {
+            if(
+                pnm->iSubItem == Cassete::Id ||
+                pnm->iSubItem == Cassete::Year ||
+                pnm->iSubItem == Cassete::Month ||
+                pnm->iSubItem == Cassete::Day ||
+                pnm->iSubItem == Cassete::Hour ||
+                pnm->iSubItem == Cassete::CassetteNo ||
+                pnm->iSubItem == Cassete::SheetInCassette ||
+                pnm->iSubItem == Cassete::Peth ||
+
+                pnm->iSubItem == Cassete::Run_at ||
+
+                pnm->iSubItem == Cassete::Finish_at ||
+
+                pnm->iSubItem == Cassete::PointRef_1 ||     //Уставка температуры
+                pnm->iSubItem == Cassete::FactTemper ||     //Факт температуры за 5 минут до конца отпуска
+
+                pnm->iSubItem == Cassete::PointTime_1 ||    //Время нагрева
+                pnm->iSubItem == Cassete::HeatAcc ||        //Факт время нагрева
+                pnm->iSubItem == Cassete::PointDTime_2 ||   //Время выдержки
+                pnm->iSubItem == Cassete::HeatWait ||       //Факт время выдержки
+                pnm->iSubItem == Cassete::TimeProcSet ||    //Полное время процесса (уставка), мин
+                pnm->iSubItem == Cassete::Total             //Факт общее время
+
+#ifdef _CREATE_AT
+                || pnm->iSubItem == Cassete::Create_at
+#endif
+#ifdef _ERROR_AT
+                || pnm->iSubItem == Cassete::Error_at
+#endif
+
+#ifdef _CLOSE_AT
+                || pnm->iSubItem == Cassete::Close_at
+#endif
+#ifdef _DELETE_AT
+                || pnm->iSubItem == Cassete::Delete_at
+#endif
+#ifdef _END_AT
+                || pnm->iSubItem == Cassete::End_at
+#endif
+#ifdef _CORRECT
+                || pnm->iSubItem == Cassete::Correct
+#endif
+#ifdef _PDF
+                || pnm->iSubItem == Cassete::Pdf
+#endif
+#ifdef _RETURN_AT
+                || pnm->iSubItem == Cassete::Return_at
+#endif
+                )
+            {
+                char szBuff[1024];
+                HWND hwndLV = pnm->hdr.hwndFrom;
+                LV_ITEM lvi;
+                lvi.iItem = ListView_GetNextItem(hwndLV, -1, LVNI_ALL | LVNI_FOCUSED);
+                if(lvi.iItem == -1) return FALSE;
+                lvi.iSubItem = pnm->iSubItem;
+                lvi.pszText = szBuff;
+                lvi.cchTextMax = 255;
+                lvi.mask = LVIF_TEXT;
+                ListView_GetItem(hwndLV, &lvi);
+
+                //int ListSubItem = ((NMLISTVIEW*)pnm)->iSubItem;
+                //int ListItem = lvi.iItem;
+
+
+                CassetteID = NULL;
+                CassetteSubItem = 0;
+
+                if(lvi.iItem >= 0 && lvi.iItem < (int)AllCassette.size())
+                {
+                    RECT r1;
+                    ListView_GetSubItemRect(hwndLV, lvi.iItem, lvi.iSubItem, LVIR_LABEL, &r1);
+
+                    {
+                        CassetteSubItem = pnm->iSubItem;
+                        CassetteID = &(AllCassette[pnm->iItem]);
+                    }
+
+                    HWND hwEdit = CreateWindowEx(0, "EDIT", szBuff, WS_BORDER | WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL, r1.left, r1.top, r1.right - r1.left, r1.bottom - r1.top, hwndLV, (HMENU)100, hInstance, 0);
+                    //SetWindowLong(hwEdit, GWLP_USERDATA, (ULONG)this);
+                    SendMessage(hwEdit, WM_SETFONT, (WPARAM)Font[emFont::Font09], 0L);
+
+                    OldSubProc = SetWindowLongPtr(hwEdit, GWLP_WNDPROC, (LONG_PTR)SubProc);
+                    SetFocus(hwEdit);
+                }
+            }
+        }
+    }
+    return 0;
+}
+
 //Двойной клик мыши
 LRESULT DoubleClickCassette(LPARAM lParam)
 {
     LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
-    if(pnm->uKeyFlags == 4)return RightDbClickCassette(lParam);
+    //if(pnm->uKeyFlags == 4)return RightDbClickCassette(lParam);
 
     if(pnm->iItem >= 0 && pnm->iItem < (int)AllCassette.size())
     {
@@ -722,15 +727,14 @@ LRESULT DispInfoCassette(LPARAM lParam)
 
 
 
-
-LRESULT RightClickCassette(LPARAM lParam)
-{
-    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
-    //MessageBox(pnm->hdr.hwndFrom, "", "", 0);
-    //if(pnm->uKeyFlags == 4)return 0;
-    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
-    return 0;
-}
+//LRESULT RighDoubletClickCassette(LPARAM lParam)
+//{
+//    LPNMITEMACTIVATE pnm = (LPNMITEMACTIVATE)lParam;
+//    //MessageBox(pnm->hdr.hwndFrom, "", "", 0);
+//    //if(pnm->uKeyFlags == 4)return 0;
+//    DisplayContextMenu(pnm->hdr.hwndFrom, IDR_MENU2);
+//    return 0;
+//}
 
 LRESULT LeftClickCassette(LPARAM lParam)
 {
@@ -743,7 +747,7 @@ LRESULT OnNotifyCassette(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     LPNM_LISTVIEW  pnm = (LPNM_LISTVIEW)lParam;
 #ifdef _DEBUG
     //if(pnm->hdr.code == NM_RDBLCLK)return RightDbClickCassette(lParam); else
-    if(pnm->hdr.code == NM_RCLICK)return RightClickCassette(lParam); else
+    if(pnm->hdr.code == NM_RDBLCLK)return RightDbClickCassette(lParam); else
     //if(pnm->hdr.code == NM_CLICK)return LeftClickCassette(lParam); else
 #endif
     if(pnm->hdr.code == NM_DBLCLK) return DoubleClickCassette(lParam); else
@@ -1384,9 +1388,7 @@ void CassetteInitInstance()
         CassetteWindow = (HWND)SendMessage(MidiClientWindow, WM_MDICREATE, 0, (LPARAM)&mcs);
         if(!CassetteWindow)
             throw std::exception(std::string("Ошибка создания окна : CassetteWindow").c_str());
-
-        InitListCassette();
-
+        
         FilterHwndCassetteData = CreateWindowEx(0, "BUTTON", "Фильтр по дате", WS_CHILD | WS_VISIBLE | WS_BORDER/* | BS_FLAT*/, 0, 0, 150, 20, CassetteWindow, (HMENU)110, hInstance, NULL);
         if(!CassetteWindow)
             throw std::exception(std::string("Ошибка создания окна : Фильтр").c_str());

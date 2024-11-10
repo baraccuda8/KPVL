@@ -155,6 +155,7 @@ typedef struct TCassette{
 
 extern std::deque<TCassette>AllCassette;
 void CassetteInitApplication();
+void InitListCassette();
 void CassetteInitInstance();
 
 
