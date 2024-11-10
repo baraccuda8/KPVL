@@ -195,6 +195,8 @@ std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
 //}
 
 
+extern std::map <std::string, std::string> CasseteEvent;
+
 void SizeListSheet(HWND List, LPARAM lParam)
 {
     int cx = LOWORD(lParam);
@@ -511,10 +513,10 @@ void GetCassetteId(TSheet& a)
 
 void GetCassetteEvent(TSheet& a)
 {
-    for(auto& c : AllCassette)
+    for(auto& c : CasseteEvent)
     {
-        if(a.Cassette == c.Id)
-            a.Event = c.Event;
+        if(a.Cassette == c.first)
+            a.Event = c.second;
     }
 
     if(!Stoi(a.Event))

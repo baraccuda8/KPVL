@@ -161,6 +161,7 @@ namespace Coll{
     int Return_at = 0;
 };
 
+std::map <std::string, std::string> CasseteEvent;
 
 //Получение номера колонки
 void GetCollCassette(PGresult* res)
@@ -237,6 +238,7 @@ void GetCassette(PGresult* res, TCassette& cassette, int line)
     cassette.Correct = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Correct));
     cassette.Pdf = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Pdf));
     cassette.Return_at = GetStringData(conn_kpvl.PGgetvalue(res, line, Coll::Return_at));
+    CasseteEvent[cassette.Id] = cassette.Event;
 }
 
 void FilterUpdate()
