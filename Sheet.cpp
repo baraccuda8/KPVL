@@ -1861,7 +1861,7 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
         }
         else
         {
-            if(Stoi(p.Event) == 3)
+            if(Stoi(p.Event) == 3 && p.Correct.length() && !p.Pdf.length())
             {
                 FillRect(lpdis->hDC, &rc, TitleBrush6);
             }
