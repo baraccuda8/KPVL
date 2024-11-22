@@ -58,7 +58,9 @@
 typedef struct TSheet{
 
     bool Edit = false;
+    bool OnSheetInCassette = false;
     time_t diff = 0;
+
     std::string Diff = "";
     std::string Cassette = "";          //ИД связанной касеты
     std::string Event = "";          //ИД связанной касеты
@@ -121,7 +123,7 @@ typedef struct TSheet{
     std::string Year = "";              //ID Листа Год
     std::string CassetteNo = "";        //ID Листа Касета
     std::string SheetInCassette = "";   //ID Листа Лист
-
+    
     std::string TimeForPlateHeat = ""; //Время сигнализации окончания нагрева, мин (Задание Время кончания нагрева)
     std::string PresToStartComp = "";  //Уставка давления для запуска комперссора (Задание давления воды)
     //std::string TempWatTankCool = "";   //Температура закалочной воды для вкл.охлаждения

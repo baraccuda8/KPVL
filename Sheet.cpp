@@ -454,16 +454,49 @@ void GetSheet(PGresult* res, TSheet& sheet, int l)
     sheet.Cassette = conn_kpvl.PGgetvalue(res, l, Col_Sheet_Cassette);
 }
 
-std::string Old_Start_at = "";
+//std::string Old_Start_at = "";
+//std::string Old_Hour = "";
+//std::string Old_Day = "";               //ID Листа День
+//std::string Old_Month = "";             //ID Листа Месяц
+//std::string Old_Year = "";              //ID Листа Год
+//std::string Old_CassetteNo = "";        //ID Листа Касета
+//std::string Old_SheetInCassette = "";   //ID Листа Лист
+
+TSheet* Old_sheet = NULL;
+
 void GetDiftDatd(TSheet& sheet)
 {
     if(sheet.Delete_at.length()) return;
-    if(!sheet.Diff.length() && Old_Start_at.length())
+    if(!sheet.Diff.length() && Old_sheet)
     {
-        if(Old_Start_at > sheet.Start_at)
-            sheet.diff = DataTimeDiff(Old_Start_at, sheet.Start_at);
+        if(Old_sheet->Start_at > sheet.Start_at)
+        {
+            sheet.diff = DataTimeDiff(Old_sheet->Start_at, sheet.Start_at);
+
+            if(Old_sheet->Year == sheet.Year &&
+               Old_sheet->Month == sheet.Month &&
+               Old_sheet->Day == sheet.Day &&
+               Old_sheet->Hour == sheet.Hour &&
+               Old_sheet->CassetteNo == sheet.CassetteNo &&
+               Stoi(sheet.Cassette)
+               )
+
+                if(Stoi(Old_sheet->SheetInCassette) - Stoi(sheet.SheetInCassette) != 1)
+                    Old_sheet->OnSheetInCassette = true;
+
+            //Old_sheet = &sheet;
+            //Old_Year = sheet.Year;
+            //Old_Month = sheet.Month;
+            //Old_Day = sheet.Day;
+            //Old_Hour = sheet.Hour;
+            //Old_CassetteNo = sheet.CassetteNo;
+            //Old_SheetInCassette = sheet.SheetInCassette;
+
+        }
         else
-            sheet.diff = DataTimeDiff(sheet.Start_at, Old_Start_at);
+        {
+            sheet.diff = DataTimeDiff(sheet.Start_at, Old_sheet->Start_at);
+        }
 
         std::tm TM;
 
@@ -480,8 +513,10 @@ void GetDiftDatd(TSheet& sheet)
         ss << std::setw(2) << std::setfill('0') << TM.tm_sec;
         std::string sd = ss.str();
         sheet.Diff = sd;
+
+
     }
-    Old_Start_at = sheet.Start_at;
+    Old_sheet = &sheet;
 
 }
 
@@ -547,10 +582,10 @@ void GetCassetteEvent(TSheet& a)
 }
 void GetCasseteId()
 {
-    Old_Start_at = "";
+    //Old_Start_at = "";
+    Old_sheet = NULL;
     for(auto& a : AllSheet)
     {
-        GetDiftDatd(a);
         if(Stoi(a.Pos) > 6)
         {
             if(!Stoi(a.Cassette))
@@ -567,6 +602,7 @@ void GetCasseteId()
             if(Stoi(a.Cassette) && !Stoi(a.Event))
                 GetCassetteEvent(a);
         }
+        GetDiftDatd(a);
     }
     int t = 0;
 }
@@ -1561,19 +1597,12 @@ bool UpdateSheet1(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd
             else
                 ssd << "UPDATE sheet SET delete_at = DEFAULT WHERE id = " << p.id;
         }
-        else if(MapCollSheet[upd] == "pdf")
-        {
-            if(vv.length())
-                ssd << "UPDATE sheet SET pdf = '" << vv << "' WHERE id = " << p.id;
-            else
-                ssd << "UPDATE sheet SET pdf = DEFAULT WHERE id = " << p.id;
-        }
         else
         {
             if(vv.length())
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = '" << vv << "' WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = '" << vv << "' WHERE id = " << p.id;
             else
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
         }
         SaveUpdateSheetLog(ssd, old);
         SETUPDATESQL(conn_kpvl, ssd);
@@ -1599,19 +1628,12 @@ bool UpdateSheet2(HWND hWnd, std::string& vv, std::string ss, TSheet& p, int upd
             else
                 ssd << "UPDATE sheet SET delete_at = DEFAULT WHERE id = " << p.id;
         }
-        else if(MapCollSheet[upd] == "pdf")
-        {
-            if(vv.length())
-                ssd << "UPDATE sheet SET pdf = '" << vv << "' WHERE id = " << p.id;
-            else
-                ssd << "UPDATE sheet SET pdf = DEFAULT WHERE id = " << p.id;
-        }
         else
         {
             if(vv.length())
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = " << vv << " WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = " << vv << " WHERE id = " << p.id;
             else
-                ssd << "UPDATE sheet SET pdf = DEFAULT, " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
+                ssd << "UPDATE sheet SET " << MapCollSheet[upd] << " = DEFAULT WHERE id = " << p.id;
         }
         SaveUpdateSheetLog(ssd, old);
         SETUPDATESQL(conn_kpvl, ssd);
@@ -1817,6 +1839,8 @@ LRESULT CommandSheet(HWND hWnd, WPARAM wParam, LPARAM lParam)
 }
 
 
+HPEN RedPen = CreatePen(PS_SOLID, 1, RGB(0, 0, 0));
+
 LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
 {
     LPDRAWITEMSTRUCT lpdis = (LPDRAWITEMSTRUCT)lParam;
@@ -1886,20 +1910,20 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                         FillRect(lpdis->hDC, &rc, TitleBrush13);
                     }
                     else
+                    {
                         if(pos == 7)
                         {
                             if(p.Pdf.length())
                             {
-#ifdef _DEBUG
+                                #ifdef _DEBUG
                                 if(!p.Correct.length())
                                     FillRect(lpdis->hDC, &rc, TitleBrush6); //Светло зеленая заливка
                                 else
-#endif // _DEBUG
+                                    #endif // _DEBUG
                                     if(lvi.iItem % 2)
                                     {
                                         FillRect(lpdis->hDC, &rc, TitleBrush5);
-                                    }
-                                    else
+                                    } else
                                     {
                                         FillRect(lpdis->hDC, &rc, TitleBrush1);
                                     }
@@ -1908,28 +1932,24 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                                     //    FillRect(lpdis->hDC, &rc, TitleBrush9); //темно зеленая заливка
                                     //}
 
-                            }
-                            else if(p.Correct.length())
+                            } else if(p.Correct.length())
                             {
                                 FillRect(lpdis->hDC, &rc, TitleBrush3); //светлосиняя заливка
-                            }
-                            else
+                            } else
                             {
                                 FillRect(lpdis->hDC, &rc, TitleBrush7); //Светло желтая заливка
                             }
-                        }
-                        else if(pos >= 10)
+                        } else if(pos >= 10)
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush8);
-                        }
-                        else if(lvi.iItem % 2)
+                        } else if(lvi.iItem % 2)
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush5);
-                        }
-                        else
+                        } else
                         {
                             FillRect(lpdis->hDC, &rc, TitleBrush1);
                         }
+                    }
                 }
             }
         }
@@ -1989,23 +2009,38 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
                 }
             }
 #else
-            
-            if(nColumn == casSheet::Diff && p.diff && p.diff < 60)
+            bool setTextSave = false;
+            COLORREF clrTextSave2 = 0;
+            if(
+                (nColumn == casSheet::News && !Stoi(p.News) && Stoi(p.Pos) > 6) ||
+                (nColumn == casSheet::Diff && p.diff && p.diff < 60) || 
+                (nColumn == casSheet::SheetInCassette && p.OnSheetInCassette))
             {
+
+                setTextSave = true;
+                clrTextSave2 = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
                 FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
             }
+
+
 #endif // DEBUG
             //rcLabel.left += 1;
             //rcLabel.right -= 1;
 
 
+            rcLabel.top += 2;
             rcLabel.left += 2;
             rcLabel.right -= 2;
+            rcLabel.bottom -= 2;
 
 
             pszText=LISTPAINT::MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
 
+
             DrawText(lpdis->hDC, pszText, -1, &rcLabel, DT_CENTER | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER);
+
+            if(setTextSave)
+                SetTextColor(lpdis->hDC, clrTextSave2);
         }
 
         if(bSelected)
@@ -2014,7 +2049,7 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
             rc.right -= 1;
             //DrawFrameControl(lpdis->hDC, &rc, DFC_BUTTON, DFCS_BUTTONPUSH);
             DrawFocusRect(lpdis->hDC, &rc);
-            //FrameRect(lpdis->hDC, &rc, TitleBrush0);
+            
         }
         
         //if(bSelected)SetBkColor(lpdis->hDC, (ULONG)clrBkSave);
