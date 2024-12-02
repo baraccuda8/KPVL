@@ -32,6 +32,8 @@
 *.out
 *.app
 *.aps
+*.pdb
+*.idb
 /lib
 /bin
 /old

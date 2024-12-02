@@ -838,27 +838,27 @@ void SaveUpdateLog(std::stringstream& ssd, std::string old)
     
 }
 
-bool UpdateCassette(std::string ss, std::string& vv)
-{
-    std::stringstream ssd;
-    std::string old = vv;
-    vv = ss;
+//bool UpdateCassette(std::string ss, std::string& vv)
+//{
+//    std::stringstream ssd;
+//    std::string old = vv;
+//    vv = ss;
+//
+//    if(vv.length())
+//    {
+//        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = '" << vv << "' WHERE id = " << CassetteID->Id;
+//    }
+//    else
+//    {
+//        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
+//    }
+//
+//    SaveUpdateLog(ssd, old);
+//    SETUPDATESQL(conn_kpvl, ssd);
+//    return true;
+//}
 
-    if(vv.length())
-    {
-        ssd << "UPDATE cassette SET pdf = '" << vv << "' WHERE id = " << CassetteID->Id;
-    }
-    else
-    {
-        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
-    }
-
-    SaveUpdateLog(ssd, old);
-    SETUPDATESQL(conn_kpvl, ssd);
-    return true;
-}
-
-bool UpdateCassette2(std::string ss, std::string& vv, int id)
+bool UpdateCassette(std::string ss, std::string& vv, int id)
 {
     std::stringstream ssd;
     std::string old = vv;
@@ -877,25 +877,25 @@ bool UpdateCassette2(std::string ss, std::string& vv, int id)
     return true;
 }
 
-bool UpdateCassette(LPARAM sd, std::string& vv)
-{
-    std::stringstream ssd;
-    std::string old = vv;
-    vv = std::to_string(sd + 1);
-    if(vv.length())
-    {
-        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
-    }
-    else
-    {
-        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
-    }
-
-
-    SaveUpdateLog(ssd, old);
-    SETUPDATESQL(conn_kpvl, ssd);
-    return true;
-}
+//bool UpdateCassette(LPARAM sd, std::string& vv, int id)
+//{
+//    std::stringstream ssd;
+//    std::string old = vv;
+//    vv = std::to_string(sd + 1);
+//    if(vv.length())
+//    {
+//        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = " << vv << " WHERE id = " << CassetteID->Id;
+//    }
+//    else
+//    {
+//        ssd << "UPDATE cassette SET " << MapCollCassette[CassetteSubItem] << " = DEFAULT WHERE id = " << CassetteID->Id;
+//    }
+//
+//
+//    SaveUpdateLog(ssd, old);
+//    SETUPDATESQL(conn_kpvl, ssd);
+//    return true;
+//}
 
 
 LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -911,11 +911,10 @@ LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 std::string old = "";
                 bool b = false;
 
-#define EEE1(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(GetDataTimeStr2(ss), CassetteID->_ss
-#define EEE2(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(ss, CassetteID->_ss
+                #define EEE1(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(GetDataTimeStr2(ss), CassetteID->_ss, Cassete::_ss
+                #define EEE2(_ss) CassetteSubItem == Cassete::_ss) UpdateCassette(ss, CassetteID->_ss, Cassete::_ss
 
-                //UpdateCassette(ss, CassetteID->Create_at);
-                if(EEE2(Year));
+                if(CassetteSubItem == Cassete::Year) UpdateCassette(ss, CassetteID->Year, Cassete::Year);
                 else if(EEE2(Month));
                 else if(EEE2(Day));
                 else if(EEE2(Hour));
@@ -923,6 +922,7 @@ LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 else if(EEE2(SheetInCassette));
                 else if(EEE2(Peth));
                 else if(EEE1(Run_at));
+                    //if(CassetteSubItem == Cassete::Run_at)UpdateCassette(GetDataTimeStr2(ss), CassetteID->Run_at);
                 else if(EEE1(Finish_at));
 
                 else if(EEE2(PointRef_1));     //Уставка температуры
@@ -981,13 +981,13 @@ LRESULT ListCassetteSubProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPara
                 if(event != Event)
                 {
                     if(CassetteSubItem == Cassete::Event)
-                        UpdateCassette(lParam, CassetteID->Event);
+                        UpdateCassette(std::to_string(Event), CassetteID->Event, Cassete::Event);
 
 #ifdef _DELETE_AT
                     if(Event == evCassete::Delete)
-                        UpdateCassette2(GetDataTimeString(), CassetteID->Delete_at, Cassete::Delete_at);
+                        UpdateCassette(GetDataTimeString(), CassetteID->Delete_at, Cassete::Delete_at);
                     else if(event == evCassete::Delete)
-                        UpdateCassette2("", CassetteID->Delete_at, Cassete::Delete_at);
+                        UpdateCassette("", CassetteID->Delete_at, Cassete::Delete_at);
 #endif
                 }
             }
