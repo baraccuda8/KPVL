@@ -241,6 +241,24 @@ void GetCassette(PGresult* res, TCassette& cassette, int line)
     CasseteEvent[cassette.Id] = cassette.Event;
 }
 
+void GetIsRutPref()
+{
+	//TCassette* old = AllCassette.begin();
+	auto old = AllCassette.begin();
+	for(auto a = AllCassette.begin() + 1; a != AllCassette.end(); a++ )
+	{
+		if(a->Run_at.length() &&
+		   old->Run_at.length() &&
+		   a->Peth == old->Peth &&
+		   a->Run_at == old->Run_at)
+		{ 
+			a->isRinAtPref = true;
+			old->isRinAtPref = true;
+		}
+		old = a;
+	}
+}
+
 void FilterUpdate()
 {
     //std::stringstream com;
@@ -272,6 +290,7 @@ void FilterUpdate()
         SendDebug("conn_kpvl", errc);
     }
     PQclear(res);
+	GetIsRutPref();
 
     if(cursel >= 0)
     {
@@ -1277,6 +1296,9 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
 
         SelectObject(lpdis->hDC, Font[emFont::Font10]);
 
+		bool setTextSave = false;
+        COLORREF clrTextSave2 = 0;
+
         for(int nColumn=0; LISTPAINT::GetColumn(lpdis->hwndItem, nColumn, &lvc); nColumn++)
         {
             ListView_GetItemText(lpdis->hwndItem, lpdis->itemID, nColumn, szBuff, sizeof(szBuff));
@@ -1285,10 +1307,22 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
             ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
             rcLabel.left += 2;
             rcLabel.right -= 2;
+			if(
+				(nColumn == Cassete::SheetInCassette && Stoi(p.SheetInCassette) <= 0) ||
+				(nColumn == Cassete::Run_at && p.isRinAtPref)
+				)
+			{ 
+				setTextSave = true;
+                clrTextSave2 = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+                FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
+			}
 
             pszText=LISTPAINT::MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
 
             DrawText(lpdis->hDC, pszText, -1, &rcLabel, DT_CENTER | DT_SINGLELINE | DT_NOPREFIX | DT_NOCLIP | DT_VCENTER);
+
+			if(setTextSave)
+                SetTextColor(lpdis->hDC, clrTextSave2);
         }
         if(bSelected)
         {

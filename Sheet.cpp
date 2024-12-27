@@ -107,18 +107,17 @@ std::map <int, ListTitle> SheetTemp_Collumn ={
 };
 
 //Заголовки колонок окна листов
-std::map <casSheet::cas, ListTitle> Sheet_Collumn ={
-    {casSheet::NN, { "№", 60 }},
-    {casSheet::Cassette, { "№", 60 }},
-    {casSheet::ID, { "ID", 50 }},
-    {casSheet::DataTime, { "Дата время\nсоздания листа", LL0 }},
-    {casSheet::Start_at, { "Дата время\nзагрузки в печь", LL0 }},
-    {casSheet::SecondPos_at, { "Дата время\nво второй зоне", LL0 }},
+std::map <casSheet::cas, ListTitle> Sheet_Collumn = {
+	{casSheet::NN, { "№", 60 }},
+	{casSheet::Cassette, { "№", 60 }},
+	{casSheet::ID, { "ID", 50 }},
+	{casSheet::DataTime, { "Дата время\nсоздания листа", LL0 }},
+	{casSheet::Start_at, { "Дата время\nзагрузки в печь", LL0 }},
+	{casSheet::SecondPos_at, { "Дата время\nво второй зоне", LL0 }},
 
-    {casSheet::DataTime_End, { "Дата время\nвыгрузки из печи", LL0 }},
-    {casSheet::Pos, { "Текущая\nпозиция", 100 }},
-    {casSheet::News, { "Кан\nтовка", L0 }},
-
+	{casSheet::DataTime_End, { "Дата время\nвыгрузки из печи", LL0 }},
+	{casSheet::Pos, { "Текущая\nпозиция", 100 }},
+	{casSheet::News, { "Кан\nтовка", L0 }},
     {casSheet::DataTime_All, { "Время закалки\nмин", L1 }},
     {casSheet::TimeForPlateHeat, { "Задание Время\nокончания нагрева", L2 }},
 
@@ -1995,7 +1994,12 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
 #else
             bool setTextSave = false;
             COLORREF clrTextSave2 = 0;
+			if(nColumn == casSheet::TimeForPlateHeat && Stoi(p.id) == 23854)
+			{ 
+				int tt = 0;
+			}
             if(
+				(nColumn == casSheet::TimeForPlateHeat && Stoi(p.Pos) > 3 && (std::abs(Stof(p.TimeForPlateHeat) -  Stof(p.DataTime_All)) >= 2.0f )) || 
                 (nColumn == casSheet::News && !Stoi(p.News) && Stoi(p.Pos) > 6) ||
                 (nColumn == casSheet::Diff && p.diff && p.diff < 60) || 
                 (nColumn == casSheet::SheetInCassette && p.OnSheetInCassette))
