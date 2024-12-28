@@ -247,13 +247,23 @@ void GetIsRutPref()
 	auto old = AllCassette.begin();
 	for(auto a = AllCassette.begin() + 1; a != AllCassette.end(); a++ )
 	{
-		if(a->Run_at.length() &&
-		   old->Run_at.length() &&
-		   a->Peth == old->Peth &&
-		   a->Run_at == old->Run_at)
-		{ 
-			a->isRinAtPref = true;
-			old->isRinAtPref = true;
+		if(a->Peth == old->Peth)
+		{
+			if(a->Run_at.length() && old->Run_at.length() && a->Run_at == old->Run_at)
+			{
+				a->isRunAtPref = true;
+				old->isRunAtPref = true;
+			}
+			if(a->End_at.length() && old->End_at.length() && a->End_at == old->End_at)
+			{
+				a->isEndAtPref = true;
+				old->isEndAtPref = true;
+			}
+			if(a->Finish_at.length() && old->Finish_at.length() && a->Finish_at == old->Finish_at)
+			{
+				a->isFinishAtPref = true;
+				old->isFinishAtPref = true;
+			}
 		}
 		old = a;
 	}
@@ -1305,17 +1315,37 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
             //nJustify = DT_LEFT;
 
             ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
-            rcLabel.left += 2;
-            rcLabel.right -= 2;
+
+			if(
+				nColumn == Cassete::Year || 
+				nColumn == Cassete::Month ||
+				nColumn == Cassete::Day ||
+				nColumn == Cassete::Hour ||
+				nColumn == Cassete::CassetteNo ||
+				nColumn >= Cassete::PointRef_1
+				)
+            {
+                RECT rcLabel2 = rcLabel;
+                //ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel2);
+                rcLabel2.left  = rcLabel.left + 1;
+                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+            }
+
+            rcLabel.left ++;
+            rcLabel.right --;
 			if(
 				(nColumn == Cassete::SheetInCassette && Stoi(p.SheetInCassette) <= 0) ||
-				(nColumn == Cassete::Run_at && p.isRinAtPref)
+				(nColumn == Cassete::Run_at && p.isRunAtPref) ||
+				(nColumn == Cassete::End_at && p.isEndAtPref) ||
+				(nColumn == Cassete::Finish_at && p.isFinishAtPref)
 				)
 			{ 
 				setTextSave = true;
                 clrTextSave2 = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
                 FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
 			}
+            rcLabel.left ++;
+            rcLabel.right --;
 
             pszText=LISTPAINT::MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
 

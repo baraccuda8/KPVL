@@ -1963,15 +1963,15 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
             
             if(nColumn >= casSheet::Melt && nColumn <= casSheet::SubSheet)
             {
-                RECT rcLabel2;
-                ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, casSheet::SubSheet, LVIR_LABEL, &rcLabel2);
+                RECT rcLabel2 = rcLabel;
+                //ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel2);
                 rcLabel2.left  = rcLabel.left +1;
                 FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
             }
             else if(nColumn >= casSheet::Year && nColumn <= casSheet::SheetInCassette)
             {
-                RECT rcLabel2;
-                ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, casSheet::SheetInCassette, LVIR_LABEL, &rcLabel2);
+                RECT rcLabel2 = rcLabel;
+                //ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel2);
                 rcLabel2.left  = rcLabel.left + 1;
                 FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
             }

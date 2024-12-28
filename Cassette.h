@@ -149,7 +149,9 @@ typedef struct TCassette{
     std::string Correct = "";          //Факт время выдержки
     std::string Pdf = "";             //Факт общее время
     std::string Return_at = "";       //Вернули в список
-	bool isRinAtPref = false;
+	bool isRunAtPref = false;
+	bool isEndAtPref = false;
+	bool isFinishAtPref = false;
 }TCassette;
 
 
