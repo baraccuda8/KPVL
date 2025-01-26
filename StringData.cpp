@@ -141,8 +141,27 @@ std::wstring GetData(std::wstring str)
 }
 
 
+BOOL DataTimeOfString(std::string str, std::string format, std::tm& TM)
+{
+    TM.tm_year = 0; TM.tm_mon = 0; TM.tm_mday = 0; TM.tm_hour = 0; TM.tm_min = 0; TM.tm_sec = 0;
+    std::string::const_iterator start = str.begin();
+    std::string::const_iterator end = str.end();
+    boost::regex xRegEx(format);
+    boost::match_results<std::string::const_iterator> what;
 
-
+    if(boost::regex_search(start, end, what, xRegEx, boost::match_default))
+    {
+        size_t size = what.size();
+        if(size >= 1)TM.tm_year = atoi(what[1].str().c_str());
+        if(size >= 2)TM.tm_mon = atoi(what[2].str().c_str());
+        if(size >= 3)TM.tm_mday = atoi(what[3].str().c_str());
+        if(size >= 4)TM.tm_hour = atoi(what[4].str().c_str());
+        if(size >= 5)TM.tm_min = atoi(what[5].str().c_str());
+        if(size >= 6)TM.tm_sec = atoi(what[6].str().c_str());
+        return TRUE;
+    }
+    return FALSE;
+}
 time_t DataTimeOfString(std::string str, int& d1, int& d2, int& d3, int& d4, int& d5, int& d6)
 {
     try
@@ -248,7 +267,7 @@ time_t DataTimeOfString(std::string str)
 
         if(boost::regex_search(start, end, what, boost::regex(FORMATTIME1), boost::match_default) && what.size() > 6)
         {
-            std::tm TM;
+			std::tm TM = {0};
             TM.tm_year = Stoi(what[1]) - 1900;
             TM.tm_mon = Stoi(what[2]) - 1;
             TM.tm_mday = Stoi(what[3]);
@@ -259,7 +278,7 @@ time_t DataTimeOfString(std::string str)
         }
         else if(boost::regex_search(start, end, what, boost::regex(FORMATTIME2), boost::match_default) && what.size() > 6)
         {
-            std::tm TM;
+            std::tm TM = {0};
             TM.tm_mday = Stoi(what[1]);
             TM.tm_mon = Stoi(what[2]) - 1;
             TM.tm_year = Stoi(what[3]) - 1900;
@@ -277,8 +296,8 @@ time_t DataTimeOfString(std::string str)
 time_t DataTimeDiff(std::string str1, std::string str2)
 {
     std::tm TM;
-    time_t tm1 = DataTimeOfString(str1, TM);
-    time_t tm2 = DataTimeOfString(str2, TM);
+    time_t tm1 = DataTimeOfString(str1);
+    time_t tm2 = DataTimeOfString(str2);
     return (time_t)difftime(tm1, tm2);
 }
 

@@ -187,28 +187,6 @@ char* CmdFileSaveXlsx(HWND hWnd, char* SaveFilename)
 	return NULL;
 }
 
-BOOL DataTimeOfString(std::string str, std::string format, std::tm& TM)
-{
-    TM.tm_year = 0; TM.tm_mon = 0; TM.tm_mday = 0; TM.tm_hour = 0; TM.tm_min = 0; TM.tm_sec = 0;
-    std::string::const_iterator start = str.begin();
-    std::string::const_iterator end = str.end();
-    boost::regex xRegEx(format);
-    boost::match_results<std::string::const_iterator> what;
-
-    if(boost::regex_search(start, end, what, xRegEx, boost::match_default))
-    {
-        size_t size = what.size();
-        if(size >= 1)TM.tm_year = atoi(what[1].str().c_str());
-        if(size >= 2)TM.tm_mon = atoi(what[2].str().c_str());
-        if(size >= 3)TM.tm_mday = atoi(what[3].str().c_str());
-        if(size >= 4)TM.tm_hour = atoi(what[4].str().c_str());
-        if(size >= 5)TM.tm_min = atoi(what[5].str().c_str());
-        if(size >= 6)TM.tm_sec = atoi(what[6].str().c_str());
-        return TRUE;
-    }
-    return FALSE;
-}
-
 void DebugInfo(LOGLEVEL l, std::string f, std::string s1, std::string s2)
 {
     time_t st = time(0);

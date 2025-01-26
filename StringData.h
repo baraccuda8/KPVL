@@ -48,7 +48,7 @@ inline std::string string_time(struct tm const* TM)
     return str;
 }
 
-
+BOOL DataTimeOfString(std::string str, std::string format, std::tm& TM);
 std::string GetDataTimeString(FormatDT DT = FormatDT::DMG);
 
 std::string GetDataTimeString(std::time_t& st, FormatDT DT = FormatDT::DMG);

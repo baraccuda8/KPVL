@@ -152,6 +152,7 @@ typedef struct TCassette{
 	bool isRunAtPref = false;
 	bool isEndAtPref = false;
 	bool isFinishAtPref = false;
+	bool isFinishAtErr = false;
 }TCassette;
 
 

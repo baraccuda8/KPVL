@@ -291,7 +291,7 @@ HBRUSH TitleBrush5 = CreateSolidBrush(RGB(245, 245, 245));
 HBRUSH TitleBrush6 = CreateSolidBrush(RGB(99, 177, 99));
 
 //Светло желтая заливка
-HBRUSH TitleBrush7 = CreateSolidBrush(RGB(255, 255, 192));
+HBRUSH TitleBrush7 = CreateSolidBrush(RGB(245, 245, 192));
 
 //Темно желтая заливка
 HBRUSH TitleBrush12 = CreateSolidBrush(RGB(177, 177, 99));

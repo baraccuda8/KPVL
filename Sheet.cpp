@@ -505,12 +505,18 @@ void GetDiftDatd(TSheet& sheet)
 
 void GetCassetteId(TSheet& a)
 {
+		float t = float(Stoi(a.Year)) + float(Stoi(a.Month)) / 100.f;
+
         std::stringstream ssd;
         ssd << "SELECT id, event FROM cassette WHERE";
         ssd << " year = " << a.Year << " AND";
         ssd << " month = " << a.Month << " AND";
         ssd << " day = " << a.Day << " AND";
-        if(Stoi(a.Year) >= 2024 && Stoi(a.Month) >= 8)
+        if( 
+			t > 2024.08f
+			//Stoi(a.Year) < 2024 &&
+			//Stoi(a.Month) < 8
+		   )
             ssd << " hour = " << a.Hour << " AND";
         ssd << " cassetteno = " << a.CassetteNo;
         ssd << " ORDER BY run_at DESC LIMIT 1;";
@@ -663,7 +669,9 @@ void FilterIDCasseteSheet()
         f << "month = '" << Stoi(strMonth) << "' AND ";
     if(strDay.length())
         f << "day = '" << Stoi(strDay) << "' AND ";
-    if(strHour.length() && Stoi(strYear) >= 2024 && Stoi(strMonth) >= 8)
+	//float t = float(Stoi(strYear)) + float(Stoi(strMonth)) / 100.0;
+
+    if(strHour.length())
         f << "hour = " << Stoi(strHour) << " AND ";
     if(strCassetteNo.length())
         f << "cassetteno = " << Stoi(strCassetteNo) << " AND ";
@@ -1994,12 +2002,8 @@ LRESULT DrawItemSheet(HWND, UINT, WPARAM, LPARAM lParam)
 #else
             bool setTextSave = false;
             COLORREF clrTextSave2 = 0;
-			if(nColumn == casSheet::TimeForPlateHeat && Stoi(p.id) == 23854)
-			{ 
-				int tt = 0;
-			}
             if(
-				(nColumn == casSheet::TimeForPlateHeat && Stoi(p.Pos) > 3 && (std::abs(Stof(p.TimeForPlateHeat) -  Stof(p.DataTime_All)) >= 2.0f )) || 
+				(nColumn == casSheet::DataTime_All && Stoi(p.Pos) > 3 && (std::abs(Stof(p.TimeForPlateHeat) -  Stof(p.DataTime_All)) >= 2.0f )) || 
                 (nColumn == casSheet::News && !Stoi(p.News) && Stoi(p.Pos) > 6) ||
                 (nColumn == casSheet::Diff && p.diff && p.diff < 60) || 
                 (nColumn == casSheet::SheetInCassette && p.OnSheetInCassette))

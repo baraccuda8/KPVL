@@ -1315,6 +1315,29 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
             //nJustify = DT_LEFT;
 
             ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel);
+			RECT rcLabel2 = rcLabel;
+            rcLabel2.left++;
+			rcLabel2.bottom--;
+			#define TRT(_T) nColumn >= Cassete::_T && !Stof(p._T)
+
+			if(Stoi(p.Event) >= 5 &&
+				(TRT(FactTemper) ||
+				TRT(PointTime_1) ||
+				TRT(HeatAcc) ||        //Факт время нагрева
+				TRT(PointDTime_2) ||   //Время выдержки
+				TRT(HeatWait) ||       //Факт время выдержки
+				TRT(TimeProcSet) ||    //Полное время процесса (уставка), мин
+				TRT(Total) ||          //Факт общее время
+				TRT(PointRef_1)
+				)
+			  )
+			{ 
+				setTextSave = true;
+	            clrTextSave2 = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+		        FillRect(lpdis->hDC, &rcLabel, TitleBrush7);
+                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+			}
+			#undef TRT
 
 			if(
 				nColumn == Cassete::Year || 
@@ -1322,17 +1345,53 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
 				nColumn == Cassete::Day ||
 				nColumn == Cassete::Hour ||
 				nColumn == Cassete::CassetteNo ||
-				nColumn >= Cassete::PointRef_1
+				(nColumn >= Cassete::PointRef_1 && nColumn <= Cassete::Total)
 				)
             {
-                RECT rcLabel2 = rcLabel;
-                //ListView_GetSubItemRect(lpdis->hwndItem, lpdis->itemID, nColumn, LVIR_LABEL, &rcLabel2);
-                rcLabel2.left  = rcLabel.left + 1;
                 FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
             }
 
-            rcLabel.left ++;
-            rcLabel.right --;
+
+			if(nColumn == Cassete::End_at && p.End_at.length() && !p.Delete_at.length())
+			{
+				time_t t = DataTimeDiff(p.End_at, p.Run_at);
+				if(abs(t / 60.f - Stof(p.Total)) >= 2 )
+				{ 
+					//sprintf(szBuff, "%0.5f", t / 60.f - Stof(p.Total));
+					setTextSave = true;
+		            clrTextSave2 = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+			        FillRect(lpdis->hDC, &rcLabel, TitleBrush7);
+	                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+				}
+			}
+
+			if(
+				(nColumn == Cassete::Run_at || nColumn == Cassete::End_at) && 
+				p.Run_at.length() && p.End_at.length() && !p.Delete_at.length())
+				
+			{
+				time_t t = DataTimeDiff(p.Finish_at, p.Run_at);
+				if(t / 60.f < 180.f)
+				{
+					setTextSave = true;
+					clrTextSave2 = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
+					FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
+					FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+				}
+			}
+
+			if(nColumn == Cassete::Finish_at && p.Finish_at.length() && !p.Delete_at.length())
+			{
+				time_t t = DataTimeDiff(p.Finish_at, p.End_at);
+				if(t != 15 * 60)
+				{ 
+					setTextSave = true;
+		            clrTextSave2 = SetTextColor(lpdis->hDC, RGB(0, 0, 0));
+			        FillRect(lpdis->hDC, &rcLabel, TitleBrush7);
+	                FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
+				}
+			}
+
 			if(
 				(nColumn == Cassete::SheetInCassette && Stoi(p.SheetInCassette) <= 0) ||
 				(nColumn == Cassete::Run_at && p.isRunAtPref) ||
@@ -1343,9 +1402,20 @@ LRESULT DrawItemCassette(HWND, UINT, WPARAM, LPARAM lParam)
 				setTextSave = true;
                 clrTextSave2 = SetTextColor(lpdis->hDC, RGB(255, 255, 255));
                 FillRect(lpdis->hDC, &rcLabel, TitleBrush11);
+				FrameRect(lpdis->hDC, &rcLabel2, TitleBrush0);
 			}
-            rcLabel.left ++;
-            rcLabel.right --;
+
+			if(nColumn == Cassete::End_at || nColumn == Cassete::Run_at)
+			{
+				if(p.Run_at.length() && p.End_at.length())
+				{ 
+					
+				}
+			}
+
+
+            //rcLabel.left ++;
+            //rcLabel.right --;
 
             pszText=LISTPAINT::MakeShortString(lpdis->hDC, szBuff, rcLabel.right - rcLabel.left, 0);
 
